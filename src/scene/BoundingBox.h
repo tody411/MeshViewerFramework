@@ -9,10 +9,13 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 
+#include <QString>
+
 #include <Eigen/Dense>
+
 #include "MeshData.h"
 
-#include <QString>
+
 
 //! BoundingBox implementation.
 class BoundingBox

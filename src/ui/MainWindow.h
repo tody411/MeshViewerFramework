@@ -12,7 +12,9 @@
 
 #include <QMainWindow>
 
-class GLView;
+#include "MenuGroup.h"
+
+class ModelView;
 class Scene;
 
 //! MainWindow implementation.
@@ -43,8 +45,9 @@ private:
 
 private:
     Scene* _scene;
-    GLView*   _view;
+    ModelView*   _view;
 
+    MenuGroup* _fileMenus;
 };
 
 #endif

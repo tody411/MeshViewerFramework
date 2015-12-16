@@ -1,44 +1,49 @@
 
 /*!
-  \file     GLView.cpp
+  \file     ModelView.cpp
   \author       Tody
-  GLView definition.
+  ModelView definition.
   date      2014/11/17
 */
 
-#include "GLView.h"
+#include "ModelView.h"
 #include <QtWidgets>
 #include <QtOpenGL>
 #include <GL/GLU.h>
 
 #include "Scene.h"
+#include "SceneInfoOverlay.h"
 #include "CameraTool.h"
 #include "Logger.h"
 
 #include <iostream>
 
-GLView::GLView ( QWidget* parent )
+ModelView::ModelView ( QWidget* parent )
     : QGLWidget ( QGLFormat ( QGL::SampleBuffers | QGL::AlphaChannel ), parent ), _scene ( nullptr )
 {
     setMouseTracking ( true );
     setFocusPolicy ( Qt::StrongFocus );
+    setAutoFillBackground ( false );
 
     _cameraTool = new CameraTool ( this );
 }
 
-void GLView::setScene ( Scene* scene )
+void ModelView::setScene ( Scene* scene )
 {
     _scene = scene;
-    connect ( _scene, &Scene::updated, this, &GLView::render );
+    connect ( _scene, &Scene::updated, this, &ModelView::render );
+
+
+    _overlays.append ( new SceneInfoOverlay ( scene ) );
 }
 
-void GLView::render()
+void ModelView::render()
 {
-    Logger::getLogger ( "GLView" )->info ( "render", "render" );
+    Logger::getLogger ( "ModelView" )->info ( "render", "render" );
     updateGL();
 }
 
-void GLView::initializeGL()
+void ModelView::initializeGL()
 {
     qglClearColor ( QColor ( 0.1, 0.1, 0.1 ) );
     glClearDepth ( 1.0 );
@@ -53,14 +58,26 @@ void GLView::initializeGL()
     glEnable ( GL_MULTISAMPLE );
 }
 
-void GLView::paintGL()
+void ModelView::paintEvent ( QPaintEvent* event )
+{
+    makeCurrent();
+
+    glPushAttrib ( GL_ALL_ATTRIB_BITS );
+    renderGL();
+    glPopAttrib();
+
+    renderOverlay();
+}
+
+void ModelView::renderGL()
 {
     glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    if ( _scene == nullptr ) return;
-
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
+    renderBackGround();
+
+    if ( _scene == nullptr ) return;
 
     _cameraTool->gl();
 
@@ -79,7 +96,18 @@ void GLView::paintGL()
 
 }
 
-void GLView::resizeGL ( int width, int height )
+void ModelView::renderOverlay()
+{
+    QPainter painter ( this );
+
+    foreach ( BaseOverlay* overlay, _overlays )
+    {
+        overlay->renderPainter ( &painter );
+    }
+    painter.end();
+}
+
+void ModelView::resizeGL ( int width, int height )
 {
     glViewport ( 0, 0, width, height );
     glMatrixMode ( GL_PROJECTION );
@@ -95,7 +123,7 @@ void GLView::resizeGL ( int width, int height )
 }
 
 
-void GLView::mousePressEvent ( QMouseEvent* event )
+void ModelView::mousePressEvent ( QMouseEvent* event )
 {
     _cameraTool->mousePressEvent ( event );
 
@@ -105,38 +133,38 @@ void GLView::mousePressEvent ( QMouseEvent* event )
     std::cout << "pNear" << pNear << std::endl;
     std::cout << "ray" << ray << std::endl;
 }
-void GLView::mouseMoveEvent ( QMouseEvent* event )
+void ModelView::mouseMoveEvent ( QMouseEvent* event )
 {
     _cameraTool->mouseMoveEvent ( event );
-    updateGL();
+    update();
 }
-void GLView::mouseReleaseEvent ( QMouseEvent* event )
+void ModelView::mouseReleaseEvent ( QMouseEvent* event )
 {
     _cameraTool->mouseReleaseEvent ( event );
 }
-void GLView::wheelEvent ( QWheelEvent* event )
+void ModelView::wheelEvent ( QWheelEvent* event )
 {
     _cameraTool->wheelEvent ( event );
-    updateGL();
+    update();
 }
 
-void GLView::keyPressEvent ( QKeyEvent* event )
+void ModelView::keyPressEvent ( QKeyEvent* event )
 {
     _cameraTool->keyPressEvent ( event );
-    updateGL();
+    update();
 }
-void GLView::keyReleaseEvent ( QKeyEvent* event )
+void ModelView::keyReleaseEvent ( QKeyEvent* event )
 {
     _cameraTool->keyReleaseEvent ( event );
 }
 
-const Eigen::Vector2d GLView::mousePosition ( QMouseEvent* event )
+const Eigen::Vector2d ModelView::mousePosition ( QMouseEvent* event )
 {
     QPoint p = event->pos();
     return Eigen::Vector2d ( p.x(), p.y() );
 }
 
-void GLView::unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  Eigen::Vector3d& ray )
+void ModelView::unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  Eigen::Vector3d& ray )
 {
     GLdouble projectionMat[16];
     GLdouble modelviewMat[16];
@@ -162,4 +190,30 @@ void GLView::unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  Eige
 
     pNear =  Eigen::Vector3d ( pNearX, pNearY, pNearZ );
     ray =  Eigen::Vector3d ( pFarX, pFarY, pFarZ ) - pNear;
+}
+
+void ModelView::renderBackGround()
+{
+    glDisable ( GL_DEPTH_TEST );
+    glDisable ( GL_LIGHTING );
+
+    glBegin ( GL_QUADS );
+    glColor3f ( 0.1f, 0.1f, 0.1f );
+    glVertex2f ( -1.0f, -1.0f );
+
+    glColor3f ( 0.1f, 0.1f, 0.1f );
+    glVertex2f ( 1.0f, -1.0f );
+
+    glColor3f ( 0.5f, 0.6f, 0.7f );
+    glVertex2f ( 1.0f, 1.0f );
+
+    glColor3f ( 0.5f, 0.6f, 0.7f );
+    glVertex2f ( -1.0f, 1.0f );
+    glEnd();
+}
+
+
+void ModelView::renderColorBuffer()
+{
+
 }

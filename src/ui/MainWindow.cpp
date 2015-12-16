@@ -11,7 +11,7 @@
 #include <QtWidgets>
 
 #include "Scene.h"
-#include "GLView.h"
+#include "ModelView.h"
 
 
 MainWindow::MainWindow ()
@@ -31,6 +31,9 @@ void MainWindow::release()
 
 void MainWindow::createMenue()
 {
+    _fileMenus = new MenuGroup ( tr ( "&File" ), this );
+
+    menuBar()->addMenu ( _fileMenus );
     //QMenu* fileMenu = new QMenu ( tr ( "&File" ), this );
     //fileMenu->addAction ( new LoadAction ( _scene ) );
     //fileMenu->addAction ( new SaveAction ( _scene ) );
@@ -67,7 +70,7 @@ void MainWindow::createMenue()
 
 void MainWindow::createUI()
 {
-    _view = new GLView ( this );
+    _view = new ModelView ( this );
     _view->setScene ( _scene );
 
     QDockWidget* leftDock = new QDockWidget ( "MainView", this );
@@ -78,6 +81,8 @@ void MainWindow::createUI()
 
     addDockWidget ( Qt::LeftDockWidgetArea, leftDock );
     //addDockWidget ( Qt::RightDockWidgetArea, rightDock );
+
+    statusBar()->showMessage ( "Create UI" );
 
     this->setWindowTitle ( "Simple Mesh Viewer" );
 }

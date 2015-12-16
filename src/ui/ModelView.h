@@ -1,8 +1,9 @@
-
 /*!
-\file     GLView.h
+\file     ModelView.h
 \author   Tody
-GLView definition.
+
+3D Model View implementation.
+
 \date     2014/11/17
 */
 
@@ -13,19 +14,21 @@ GLView definition.
 
 #include <Eigen/Dense>
 
+#include "BaseOverlay.h"
+
 class Scene;
 class CameraTool;
 
-//! GLView implementation.
-class GLView :  public QGLWidget
+//! 3D Model View implementation.
+class ModelView :  public QGLWidget
 {
     Q_OBJECT
 public :
     //! Constructor.
-    GLView ( QWidget* parent = 0 );
+    ModelView ( QWidget* parent = 0 );
 
     //! Destructor.
-    virtual ~GLView() {}
+    virtual ~ModelView() {}
 
     void setScene ( Scene* scene );
 
@@ -34,7 +37,13 @@ public slots:
 
 private:
     virtual void initializeGL();
-    virtual void paintGL();
+
+    virtual void paintEvent ( QPaintEvent* event );
+
+    virtual void renderGL();
+
+    virtual void renderOverlay();
+
     virtual void resizeGL ( int width, int height );
 
     void mousePressEvent ( QMouseEvent* event );
@@ -49,9 +58,17 @@ private:
 
     void unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  Eigen::Vector3d& ray );
 
+    void renderColorBuffer();
+
+private:
+    void renderBackGround();
+
 private:
     CameraTool* _cameraTool;
     Scene* _scene;
+
+    QVector<BaseOverlay*> _overlays;
+
 };
 
 #endif

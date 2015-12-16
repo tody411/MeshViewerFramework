@@ -11,6 +11,9 @@
 
 #include <QString>
 
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
+
 #include "MeshData.h"
 
 //! Mesh implementation.
@@ -43,6 +46,21 @@ public :
     {
         return _mesh.n_faces();
     }
+
+    //! Return the point matrix.
+    void points ( Eigen::MatrixXd& V );
+
+    //! Set the point matrix to the vertices of this mesh.
+    void setPoints ( const Eigen::MatrixXd& V );
+
+    //! Return the normal matrix.
+    void vertexNormals ( Eigen::MatrixXd& N );
+
+    //! Set the normal matrix to the vertices of this mesh.
+    void setVertexNormals ( const Eigen::MatrixXd& N );
+
+    //! Return the face normal matrix.
+    void faceNormals ( Eigen::MatrixXd& N );
 
     //! OpenGL calls for rendering.
     void gl();

@@ -16,8 +16,8 @@ class SceneInfoOverlay : public BaseOverlay
 {
 public :
     //! Constructor.
-    SceneInfoOverlay()
-        : BaseOverlay ( "Scene Information" )
+    SceneInfoOverlay ( Scene* scene )
+        : BaseOverlay ( "Scene Information", scene )
     {}
 
     //! Destructor.

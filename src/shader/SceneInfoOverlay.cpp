@@ -21,7 +21,7 @@ void SceneInfoOverlay::renderPainterImp ( QPainter* painter )
     int text_width = 200;
     int text_height = 100;
 
-    painter->setPen ( QColor ( 20, 15, 100 ) );
+    painter->setPen ( QColor ( 200, 200, 200 ) );
 
     Mesh* mesh = _scene->mesh();
 

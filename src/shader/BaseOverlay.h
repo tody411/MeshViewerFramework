@@ -19,8 +19,8 @@ class BaseOverlay
 {
 public :
     //! Constructor.
-    BaseOverlay ( const QString& name )
-        : _name ( name ), _scene ( nullptr )
+    BaseOverlay ( const QString& name, Scene* scene )
+        : _name ( name ), _scene ( scene )
     {}
 
     //! Destructor.

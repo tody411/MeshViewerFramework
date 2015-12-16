@@ -41,6 +41,7 @@ bool Scene::loadMesh ( const QString& filePath )
 
 void Scene::render()
 {
+    glEnable ( GL_LIGHTING );
     _light.gl();
 
     _mesh.gl();
