@@ -69,7 +69,7 @@ void GLView::paintGL()
     glEnable ( GL_BLEND );
     glEnable ( GL_DEPTH_TEST );
     glDisable ( GL_CULL_FACE );
-    //glColor3d ( 0.2, 0.8, 0.8 );
+
     _scene->render();
 
     glDisable ( GL_DEPTH_TEST );

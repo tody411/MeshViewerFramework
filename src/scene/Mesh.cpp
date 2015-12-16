@@ -36,6 +36,8 @@ bool Mesh::loadMesh ( const QString& filePath )
 
 void Mesh::gl()
 {
+    if ( _mesh.vertices_empty() ) return;
+
     glEnableClientState ( GL_VERTEX_ARRAY );
     glVertexPointer ( 3, GL_FLOAT, 0, _mesh.points() );
 

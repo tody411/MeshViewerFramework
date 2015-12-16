@@ -23,20 +23,12 @@ void SceneInfoOverlay::renderPainterImp ( QPainter* painter )
 
     painter->setPen ( QColor ( 20, 15, 100 ) );
 
-    if ( _modelData == NULL ) return;
-    if ( _modelData->model() == NULL ) return;
+    Mesh* mesh = _scene->mesh();
 
-
-    text += QString ( "  Num Textures  : %1\n" ).arg ( _modelData->getNumTextures() );
-    text += QString ( "  Num Parts     : %1\n" ).arg ( _modelData->getPartsDataCount() );
-    text += QString ( "  Num Draw Data : %1\n" ).arg ( _modelData->getDrawDataCount() );
+    text += QString ( "  Num Vertices  : %1\n" ).arg ( mesh->numVertices() );
+    text += QString ( "  Num Edges     : %1\n" ).arg ( mesh->numEdges() );
+    text += QString ( "  Num Faces     : %1\n" ).arg ( mesh->numFaces() );
 
     painter->drawText ( QRectF ( x, y, text_width, text_height ), text );
 
-    text = QString ( "%1" ).arg ( _renderer->name() );
-
-    painter->drawText ( QRectF ( painter->window().width() - 200, y, text_width - 10, text_height ), Qt::AlignRight, text );
-
-    text = QString ( "%1 fps" ).arg ( _renderer->fps() );
-    painter->drawText ( QRectF ( painter->window().width() - 200,  painter->window().height() - 30, text_width - 10, text_height ), Qt::AlignRight, text );
 }

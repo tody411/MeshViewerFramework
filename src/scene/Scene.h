@@ -35,6 +35,11 @@ public :
 
     void focusGL();
 
+    Mesh* mesh()
+    {
+        return &_mesh;
+    }
+
 signals:
     void updated();
 
@@ -42,7 +47,6 @@ signals:
 private:
     Light       _light;
     Mesh    _mesh;
-
     BoundingBox _bb;
 
 
