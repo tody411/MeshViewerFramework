@@ -45,3 +45,16 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# CMake files
+build
+
+cmake_build.bat
+cmake_clean.bat
+cmake_generate.bat
+
+# Binaries
+
+bin/*.dll
+bin/*.exe
+bin/*.pdb
