@@ -10,10 +10,12 @@
 #define BASECOMMAND_H
 
 #include <QString>
+#include <QElapsedTimer>
 
 #include "Scene.h"
 
 #include "CommandParameters.h"
+#include "CommandParameterUI.h"
 
 //! BaseCommand implementation.
 class BaseCommand : public QObject
@@ -35,7 +37,21 @@ public :
     }
 
 public slots:
-    void doSlot() {}
+    void actionSlot()
+    {
+        if ( _params.empty() )
+        {
+            doSlot();
+        }
+
+        else
+        {
+            CommandParameterUI* paramUI = new CommandParameterUI ( _name, _params );
+            paramUI->show();
+
+            connect ( paramUI, &CommandParameterUI::edited, this, &BaseCommand::doSlot );
+        }
+    }
 
     //! Return the command information.
     const QString str() const
@@ -60,8 +76,21 @@ public slots:
         return info;
     }
 
+private slots:
+    void doSlot()
+    {
+        _inputInfo = _params.str();
+
+        QElapsedTimer timer;
+        timer.start();
+
+        doImp();
+
+        _performanceInfo = QString ( "%1 sec" ).arg ( timer.elapsed() / 1000.0f );
+    }
+
 protected:
-    void doIt ( const CommandParameters& parameters );
+    virtual void doImp () {}
 
 protected:
     //! Command name.
@@ -78,6 +107,9 @@ protected:
 
     //! Perfomance info.
     QString _performanceInfo;
+
+    //! Command parameters.
+    CommandParameters _params;
 };
 
 #endif

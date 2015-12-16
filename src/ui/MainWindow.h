@@ -48,6 +48,8 @@ private:
     ModelView*   _view;
 
     MenuGroup* _fileMenus;
+    MenuGroup* _operationMenus;
+    MenuGroup* _renderMenus;
 };
 
 #endif

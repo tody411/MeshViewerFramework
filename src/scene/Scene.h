@@ -22,14 +22,15 @@ class Scene : public QObject
     Q_OBJECT
 public :
     //! Constructor.
-    Scene ( QObject* parent = nullptr )
-        : QObject ( parent )
-    {}
+    Scene ( QObject* parent = nullptr );
+
 
     //! Destructor.
     virtual ~Scene() {}
 
     bool loadMesh ( const QString& filePath );
+
+    bool saveMesh ( const QString& filePath );
 
     void render();
 
@@ -37,7 +38,7 @@ public :
 
     Mesh* mesh()
     {
-        return &_mesh;
+        return _mesh;
     }
 
 signals:
@@ -46,7 +47,7 @@ signals:
 
 private:
     Light       _light;
-    Mesh    _mesh;
+    Mesh*    _mesh;
     BoundingBox _bb;
 
 

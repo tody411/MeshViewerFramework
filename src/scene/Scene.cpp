@@ -19,9 +19,15 @@
 
 #include "Logger.h"
 
+Scene::Scene ( QObject* parent )
+    : QObject ( parent )
+{
+    _mesh = new Mesh ( this );
+}
+
 bool Scene::loadMesh ( const QString& filePath )
 {
-    if ( !_mesh.loadMesh ( filePath ) )
+    if ( !_mesh->loadMesh ( filePath ) )
     {
         return false;
     }
@@ -29,7 +35,7 @@ bool Scene::loadMesh ( const QString& filePath )
     Logger::getLogger ( "Scene" )->info ( "Load Mesh", filePath );
 
     _bb.clear();
-    _bb.expand ( * ( _mesh.openMeshData() ) );
+    _bb.expand ( * ( _mesh->openMeshData() ) );
 
     Logger::getLogger ( "Scene" )->info ( "Bounding Box", _bb.dump() );
 
@@ -38,13 +44,18 @@ bool Scene::loadMesh ( const QString& filePath )
     return true;
 }
 
+bool Scene::saveMesh ( const QString& filePath )
+{
+    return _mesh->saveMesh ( filePath );
+}
+
 
 void Scene::render()
 {
     glEnable ( GL_LIGHTING );
     _light.gl();
 
-    _mesh.gl();
+    _mesh->gl();
 
     glFlush();
 }

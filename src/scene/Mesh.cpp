@@ -35,6 +35,17 @@ bool Mesh::loadMesh ( const QString& filePath )
     return true;
 }
 
+bool Mesh::saveMesh ( const QString& filePath )
+{
+    std::string file = filePath.toStdString();
+    if ( !OpenMesh::IO::write_mesh ( _mesh, file ) )
+    {
+        std::cerr << "write error" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 
 void Mesh::points ( Eigen::MatrixXd& V )
 {

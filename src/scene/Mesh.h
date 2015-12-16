@@ -16,18 +16,26 @@
 
 #include "MeshData.h"
 
+#include "SceneObject.h"
+
 //! Mesh implementation.
-class Mesh
+class Mesh : public SceneObject
 {
+    Q_OBJECT
 public :
     //! Constructor.
-    Mesh() {}
+    Mesh ( Scene* scene )
+        : SceneObject ( scene )
+    {}
 
     //! Destructor.
     virtual ~Mesh() {}
 
     //! Load mesh data from the file path.
     bool loadMesh ( const QString& filePath );
+
+    //! Save mesh data to the given file path.
+    bool saveMesh ( const QString& filePath );
 
     //! Return the number of vertices.
     unsigned int numVertices() const

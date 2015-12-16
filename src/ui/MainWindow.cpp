@@ -11,6 +11,7 @@
 #include <QtWidgets>
 
 #include "Scene.h"
+#include "Commands.h"
 #include "ModelView.h"
 
 
@@ -32,39 +33,18 @@ void MainWindow::release()
 void MainWindow::createMenue()
 {
     _fileMenus = new MenuGroup ( tr ( "&File" ), this );
+    _fileMenus->addCommand ( new LoadCommand ( _scene ) );
+    _fileMenus->addCommand ( new SaveCommand ( _scene ) );
 
     menuBar()->addMenu ( _fileMenus );
-    //QMenu* fileMenu = new QMenu ( tr ( "&File" ), this );
-    //fileMenu->addAction ( new LoadAction ( _scene ) );
-    //fileMenu->addAction ( new SaveAction ( _scene ) );
-    //fileMenu->addAction ( new MarchingCubesAction ( _scene ) );
-    //menuBar()->addMenu ( fileMenu );
 
-    //QMenu* commandMenu = new QMenu ( tr ( "&Volume Operations" ), this );
-    //commandMenu->addAction ( new DownScaleAction ( _scene ) );
-    //commandMenu->addAction ( new UpScaleAction ( _scene ) );
-    //commandMenu->addAction ( new BoxFilterAction ( _scene ) );
-    //commandMenu->addAction ( new GaussianFilterAction ( _scene )  );
-    //commandMenu->addAction ( new GuidedFilterAction ( _scene )  );
-    //commandMenu->addAction ( new DensityEstimationAction ( _scene ) );
+    _operationMenus = new MenuGroup ( tr ( "&Opearations" ), this );
 
-    //menuBar()->addMenu ( commandMenu );
+    menuBar()->addMenu ( _operationMenus );
 
-    ///* ShaderMenu* shaderMenu = new ShaderMenu();
-    // menuBar()->addMenu ( shaderMenu->createMenue ( _scene, _imageView, this ) );
-    //*/
-    //QMenu* uiMenu = new QMenu ( tr ( "&UI" ), this );
-    //uiMenu->addAction ( ( new FloatingWindow ( new MemoryMonitor(), this ) )->showAction() );
+    _renderMenus = new MenuGroup ( tr ( "&Render" ), this );
 
-    //OperationView* operationView = new OperationView();
-    //operationView->undoGroup()->setActiveStack ( _scene->operations() );
-    //uiMenu->addAction ( ( new FloatingWindow ( operationView, this ) )->showAction() );
-    //menuBar()->addMenu ( uiMenu );
-
-
-
-    //HelpMenu* helpMenue = new HelpMenu ( this );
-    //menuBar()->addMenu ( helpMenue->createMenue ( this ) );
+    menuBar()->addMenu ( _renderMenus );
 
 }
 

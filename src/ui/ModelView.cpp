@@ -33,7 +33,6 @@ void ModelView::setScene ( Scene* scene )
     _scene = scene;
     connect ( _scene, &Scene::updated, this, &ModelView::render );
 
-
     _overlays.append ( new SceneInfoOverlay ( scene ) );
 }
 
