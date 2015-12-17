@@ -25,7 +25,7 @@ public :
     //! Constructor.
     BaseCommand ( const QString& name, Scene* scene )
         :
-        _scene ( scene ), _name ( name )
+        _scene ( scene ), _name ( name ), _isInteractive ( false )
     {}
 
     //! Destructor.
@@ -39,6 +39,8 @@ public :
 public slots:
     void actionSlot()
     {
+        if ( _scene->empty() ) return;
+
         if ( _params.empty() )
         {
             doSlot();
@@ -46,10 +48,16 @@ public slots:
 
         else
         {
+            setupImp() ;
             CommandParameterUI* paramUI = new CommandParameterUI ( _name, _params );
             paramUI->show();
 
-            connect ( paramUI, &CommandParameterUI::edited, this, &BaseCommand::doSlot );
+            connect ( paramUI, &CommandParameterUI::editFinished, this, &BaseCommand::doSlot );
+
+            if ( _isInteractive )
+            {
+                connect ( paramUI, &CommandParameterUI::paramUpdated, this, &BaseCommand::doSlot );
+            }
         }
     }
 
@@ -87,10 +95,20 @@ private slots:
         doImp();
 
         _performanceInfo = QString ( "%1 sec" ).arg ( timer.elapsed() / 1000.0f );
+
+        _scene->showMessage ( str() );
     }
 
 protected:
+    virtual void setupImp() {}
+
     virtual void doImp () {}
+
+    //! Set interactive mode.
+    void setInteractive ( bool isInteractive )
+    {
+        _isInteractive = isInteractive;
+    }
 
 protected:
     //! Command name.
@@ -110,6 +128,9 @@ protected:
 
     //! Command parameters.
     CommandParameters _params;
+
+    //! Interactive mode.
+    bool _isInteractive;
 };
 
 #endif

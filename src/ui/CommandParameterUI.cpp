@@ -180,27 +180,35 @@ void CommandParameterUI::createUI()
     {
         if ( intParameters.contains ( paramName ) )
         {
-            layout->addWidget ( new IntParameterUI ( intParameters[paramName] ) );
+            IntParameterUI* paramUI = new IntParameterUI ( intParameters[paramName] );
+            layout->addWidget ( paramUI );
+            connect ( paramUI, &IntParameterUI::valueChanged, this, &CommandParameterUI::paramUpdated );
         }
 
         if ( doubleParameters.contains ( paramName ) )
         {
-            layout->addWidget ( new DoubleParameterUI ( doubleParameters[paramName] ) );
+            DoubleParameterUI* paramUI = new DoubleParameterUI ( doubleParameters[paramName] ) ;
+            layout->addWidget ( paramUI );
+            connect ( paramUI, &DoubleParameterUI::valueChanged, this, &CommandParameterUI::paramUpdated );
         }
 
         if ( boolParameters.contains ( paramName ) )
         {
-            layout->addWidget ( new BoolParameterUI ( boolParameters[paramName] ) );
+            BoolParameterUI* paramUI = new BoolParameterUI ( boolParameters[paramName] );
+            layout->addWidget ( paramUI );
+            connect ( paramUI, &BoolParameterUI::valueChanged, this, &CommandParameterUI::paramUpdated );
         }
 
         if ( enumParameters.contains ( paramName ) )
         {
-            layout->addWidget ( new EnumParameterUI ( enumParameters[paramName] ) );
+            EnumParameterUI* paramUI = new EnumParameterUI ( enumParameters[paramName] ) ;
+            layout->addWidget ( paramUI );
+            connect ( paramUI, &EnumParameterUI::valueChanged, this, &CommandParameterUI::paramUpdated );
         }
     }
 
     QPushButton* applyButton = new QPushButton ( "Apply" );
-    connect ( applyButton, &QPushButton::clicked, this, &CommandParameterUI::edited );
+    connect ( applyButton, &QPushButton::clicked, this, &CommandParameterUI::editFinished );
     connect ( applyButton, &QPushButton::clicked, this,  &CommandParameterUI::close );
 
     layout->addWidget ( applyButton );

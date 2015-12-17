@@ -22,4 +22,6 @@ void SaveCommand::doImp ()
     if ( _outputFile == "" ) return;
 
     _scene->saveMesh ( _outputFile );
+
+    _outputFile = "";
 }

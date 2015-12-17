@@ -23,6 +23,8 @@ Scene::Scene ( QObject* parent )
     : QObject ( parent )
 {
     _mesh = new Mesh ( this );
+    _light = new Light ( this );
+    _material = new Material ( this );
 }
 
 bool Scene::loadMesh ( const QString& filePath )
@@ -53,9 +55,8 @@ bool Scene::saveMesh ( const QString& filePath )
 void Scene::render()
 {
     glEnable ( GL_LIGHTING );
-    _light.gl();
 
-    _mesh->gl();
+    _mesh->gl ( Mesh::DisplayMode::WIREFRAME );
 
     glFlush();
 }
@@ -64,4 +65,9 @@ void Scene::render()
 void Scene::focusGL()
 {
     _bb.focusGL();
+}
+
+void  Scene::showMessage ( const QString& message, int timeout )
+{
+    emit messageUpdated ( message, timeout );
 }

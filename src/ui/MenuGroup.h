@@ -28,10 +28,11 @@ public :
     //! Destructor.
     virtual ~MenuGroup() {}
 
-
+    //! Add command to the menu group.
     void addCommand ( BaseCommand* command );
 
 private:
+    //! Menu group name.
     QString _name;
 
 };

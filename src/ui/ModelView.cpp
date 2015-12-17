@@ -12,7 +12,7 @@
 #include <GL/GLU.h>
 
 #include "Scene.h"
-#include "SceneInfoOverlay.h"
+#include "Overlays.h"
 #include "CameraTool.h"
 #include "Logger.h"
 
@@ -34,12 +34,20 @@ void ModelView::setScene ( Scene* scene )
     connect ( _scene, &Scene::updated, this, &ModelView::render );
 
     _overlays.append ( new SceneInfoOverlay ( scene ) );
+    _overlays.append ( new CoordinateSystemOverlay ( scene, _cameraTool ) );
 }
 
 void ModelView::render()
 {
     Logger::getLogger ( "ModelView" )->info ( "render", "render" );
-    updateGL();
+    update();
+}
+
+void ModelView::renderScreenShot ( const QString& filePath )
+{
+    QImage image = grabFrameBuffer ( true );
+    image = image.convertToFormat ( QImage::Format_ARGB32 );
+    image.save ( filePath );
 }
 
 void ModelView::initializeGL()
@@ -52,6 +60,7 @@ void ModelView::initializeGL()
 
     glShadeModel ( GL_SMOOTH );
     glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
+
     glEnable ( GL_LIGHTING );
     glEnable ( GL_LIGHT0 );
     glEnable ( GL_MULTISAMPLE );
@@ -62,6 +71,7 @@ void ModelView::paintEvent ( QPaintEvent* event )
     makeCurrent();
 
     glPushAttrib ( GL_ALL_ATTRIB_BITS );
+    renderBackGround();
     renderGL();
     glPopAttrib();
 
@@ -70,16 +80,12 @@ void ModelView::paintEvent ( QPaintEvent* event )
 
 void ModelView::renderGL()
 {
-    glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    glMatrixMode ( GL_MODELVIEW );
-    glLoadIdentity();
-    renderBackGround();
-
     if ( _scene == nullptr ) return;
 
-    _cameraTool->gl();
+    _scene->light()->gl();
+    _scene->material()->gl();
 
+    _cameraTool->gl();
     _scene->focusGL();
 
     glEnable ( GL_BLEND );
@@ -97,6 +103,15 @@ void ModelView::renderGL()
 
 void ModelView::renderOverlay()
 {
+    glPushAttrib ( GL_ALL_ATTRIB_BITS );
+    glMatrixMode ( GL_MODELVIEW );
+    glLoadIdentity();
+    foreach ( BaseOverlay* overlay, _overlays )
+    {
+        overlay->renderViewOverlay();
+    }
+    glPopAttrib();
+
     QPainter painter ( this );
 
     foreach ( BaseOverlay* overlay, _overlays )
@@ -114,28 +129,30 @@ void ModelView::resizeGL ( int width, int height )
 
     float aspect = width / ( float )  height;
 
-    glOrtho ( -1 , 1 , -1 , 1 , -4.0 , 4.0 );
+    glOrtho ( -aspect , aspect , -1 , 1 , -4.0 , 4.0 );
 
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
 
+    _cameraTool->setAspect ( aspect );
 }
 
 
 void ModelView::mousePressEvent ( QMouseEvent* event )
 {
     _cameraTool->mousePressEvent ( event );
-
-    Eigen::Vector3d pNear, ray;
-    unproject ( mousePosition ( event ), pNear, ray );
-
-    std::cout << "pNear" << pNear << std::endl;
-    std::cout << "ray" << ray << std::endl;
 }
 void ModelView::mouseMoveEvent ( QMouseEvent* event )
 {
     _cameraTool->mouseMoveEvent ( event );
     update();
+
+    Eigen::Vector3d pNear, ray;
+    unproject ( mousePosition ( event ), pNear, ray );
+
+    QString message = "Pos: ";
+    message += QString ( "(%1, %2, %3)" ).arg ( pNear[0] ).arg ( pNear[1] ).arg ( pNear[2] );
+    _scene->showMessage ( message );
 }
 void ModelView::mouseReleaseEvent ( QMouseEvent* event )
 {
@@ -165,6 +182,11 @@ const Eigen::Vector2d ModelView::mousePosition ( QMouseEvent* event )
 
 void ModelView::unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  Eigen::Vector3d& ray )
 {
+    glMatrixMode ( GL_MODELVIEW );
+    glLoadIdentity();
+    _cameraTool->gl();
+    _scene->focusGL();
+
     GLdouble projectionMat[16];
     GLdouble modelviewMat[16];
     glGetDoublev ( GL_PROJECTION_MATRIX, projectionMat );
@@ -193,26 +215,28 @@ void ModelView::unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  E
 
 void ModelView::renderBackGround()
 {
+    float aspect = width() / ( float )  height();
+
+    glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glMatrixMode ( GL_MODELVIEW );
+    glLoadIdentity();
+
     glDisable ( GL_DEPTH_TEST );
     glDisable ( GL_LIGHTING );
 
     glBegin ( GL_QUADS );
     glColor3f ( 0.1f, 0.1f, 0.1f );
-    glVertex2f ( -1.0f, -1.0f );
+    glVertex2f ( -aspect, -1.0f );
 
     glColor3f ( 0.1f, 0.1f, 0.1f );
-    glVertex2f ( 1.0f, -1.0f );
+    glVertex2f ( aspect, -1.0f );
 
     glColor3f ( 0.5f, 0.6f, 0.7f );
-    glVertex2f ( 1.0f, 1.0f );
+    glVertex2f ( aspect, 1.0f );
 
     glColor3f ( 0.5f, 0.6f, 0.7f );
-    glVertex2f ( -1.0f, 1.0f );
+    glVertex2f ( -aspect, 1.0f );
     glEnd();
 }
 
 
-void ModelView::renderColorBuffer()
-{
-
-}

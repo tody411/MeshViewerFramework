@@ -21,6 +21,7 @@ MainWindow::MainWindow ()
 
     setAcceptDrops ( true );
     createUI();
+
     createMenue();
 
     this->showMaximized();
@@ -39,10 +40,12 @@ void MainWindow::createMenue()
     menuBar()->addMenu ( _fileMenus );
 
     _operationMenus = new MenuGroup ( tr ( "&Opearations" ), this );
+    _operationMenus->addCommand ( new LaplacianSmoothingCommand ( _scene ) );
 
     menuBar()->addMenu ( _operationMenus );
 
     _renderMenus = new MenuGroup ( tr ( "&Render" ), this );
+    _renderMenus->addCommand ( new RenderCommand ( _scene, _view ) );
 
     menuBar()->addMenu ( _renderMenus );
 
@@ -53,16 +56,13 @@ void MainWindow::createUI()
     _view = new ModelView ( this );
     _view->setScene ( _scene );
 
-    QDockWidget* leftDock = new QDockWidget ( "MainView", this );
+    //setCentralWidget ( _view );
+    QDockWidget* leftDock = new QDockWidget ( "3D Model View", this );
     leftDock->setWidget ( _view );
-
-    /* QDockWidget* rightDock = new QDockWidget ( "LSMPlotter", this );
-     rightDock->setWidget ( _plotter );*/
-
     addDockWidget ( Qt::LeftDockWidgetArea, leftDock );
-    //addDockWidget ( Qt::RightDockWidgetArea, rightDock );
 
-    statusBar()->showMessage ( "Create UI" );
+    //addDockWidget ( Qt::RightDockWidgetArea, rightDock );
+    connect ( _scene, &Scene::messageUpdated, statusBar(), &QStatusBar::showMessage );
 
     this->setWindowTitle ( "Simple Mesh Viewer" );
 }

@@ -158,7 +158,9 @@ public :
     virtual ~CommandParameterUI() {}
 
 signals:
-    void edited();
+    void paramUpdated();
+
+    void editFinished();
 
 private:
     void createUI();

@@ -30,25 +30,32 @@ public :
 
     void release();
 
-
-signals:
-    void fileDropped ( QString filePath );
-
 private:
 
     void createMenue();
 
     void createUI();
 
+    //! Support drag & drop for the mesh file.
     void dragEnterEvent ( QDragEnterEvent* event );
+
+    //! Support drag & drop for the mesh file.
     void dropEvent ( QDropEvent* event );
 
 private:
+    //! Scene data.
     Scene* _scene;
+
+    //! 3D model view.
     ModelView*   _view;
 
+    //! File menus.
     MenuGroup* _fileMenus;
+
+    //! Opeartion menus.
     MenuGroup* _operationMenus;
+
+    //! Render menus.
     MenuGroup* _renderMenus;
 };
 

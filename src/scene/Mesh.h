@@ -23,6 +23,14 @@ class Mesh : public SceneObject
 {
     Q_OBJECT
 public :
+    //! Display mode for the mesh.
+    enum DisplayMode
+    {
+        SHADING,
+        COLOR,
+        WIREFRAME
+    };
+
     //! Constructor.
     Mesh ( Scene* scene )
         : SceneObject ( scene )
@@ -30,6 +38,11 @@ public :
 
     //! Destructor.
     virtual ~Mesh() {}
+
+    bool empty() const
+    {
+        return _mesh.vertices_empty();
+    }
 
     //! Load mesh data from the file path.
     bool loadMesh ( const QString& filePath );
@@ -70,8 +83,22 @@ public :
     //! Return the face normal matrix.
     void faceNormals ( Eigen::MatrixXd& N );
 
+    //! Return the vertex Laplacian matrix.
+    void vertexLaplacian ( Eigen::SparseMatrix<double>& L );
+
     //! OpenGL calls for rendering.
-    void gl();
+    void gl ( DisplayMode displayMode = SHADING );
+
+    //! OpenGL calls for shading.
+    void glShadingMode ( );
+
+    //! OpenGL calls for coloring.
+    void glColorMode ( );
+
+    //! OpenGL calls for wireframe.
+    void glWireframeMode ( );
+
+    //! OpenGL calls for
 
     //! Return open mesh data.
     MeshData* openMeshData()

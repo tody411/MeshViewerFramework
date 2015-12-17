@@ -27,9 +27,17 @@ bool Mesh::loadMesh ( const QString& filePath )
         return false;
     }
 
-    _mesh.triangulate();
-
     _mesh.update_normals();
+
+    if ( !_mesh.is_triangles() )
+    {
+        _mesh.triangulate();
+    }
+
+    if ( !_mesh.has_vertex_normals() )
+    {
+        std::cout << "No vertex normals" << std::endl;
+    }
 
     computeIndices();
     return true;
@@ -79,6 +87,8 @@ void Mesh::setPoints ( const Eigen::MatrixXd& V )
 
         _mesh.point ( *v_it ) = p;
     }
+
+    emit updated();
 }
 
 void Mesh::vertexNormals ( Eigen::MatrixXd& N )
@@ -113,6 +123,8 @@ void Mesh::setVertexNormals ( const Eigen::MatrixXd& N )
 
         _mesh.point ( *v_it ) = n;
     }
+
+    emit updated();
 }
 
 void Mesh::faceNormals ( Eigen::MatrixXd& N )
@@ -133,10 +145,92 @@ void Mesh::faceNormals ( Eigen::MatrixXd& N )
     }
 }
 
-void Mesh::gl()
+void Mesh::vertexLaplacian ( Eigen::SparseMatrix<double>& L )
+{
+    int numRows = numVertices();
+    int numCols = numRows;
+
+    L.resize ( numRows, numCols );
+
+    L.reserve ( Eigen::VectorXi::Constant ( numCols, 8 ) );
+
+    MeshData::VertexIter v_it, v_end ( _mesh.vertices_end() );
+    MeshData::VertexVertexIter vv_it;
+
+    for ( v_it = _mesh.vertices_begin(); v_it != v_end; ++v_it )
+    {
+        double w_sum = 0.0;
+        for ( vv_it = _mesh.vv_begin ( v_it ); vv_it.is_valid(); ++vv_it )
+        {
+            double w = 1.0;
+            L.insert ( v_it->idx(), vv_it->idx() ) = -w;
+            w_sum += w;
+        }
+
+        L.insert ( v_it->idx(), v_it->idx() ) = w_sum;
+    }
+
+    L.makeCompressed();
+}
+
+void Mesh::gl ( DisplayMode displayMode )
 {
     if ( _mesh.vertices_empty() ) return;
 
+    switch ( displayMode )
+    {
+    case Mesh::SHADING:
+        glShadingMode ();
+        break;
+    case Mesh::COLOR:
+        glColorMode();
+        break;
+    case Mesh::WIREFRAME:
+        glWireframeMode ( );
+        break;
+    default:
+        break;
+    }
+}
+
+void Mesh::glShadingMode ()
+{
+    glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
+    glEnableClientState ( GL_VERTEX_ARRAY );
+    glVertexPointer ( 3, GL_FLOAT, 0, _mesh.points() );
+
+    glEnableClientState ( GL_NORMAL_ARRAY );
+    glNormalPointer ( GL_FLOAT, 0, _mesh.vertex_normals() );
+
+    glDrawElements ( GL_TRIANGLES,
+                     _indices.size(),
+                     GL_UNSIGNED_INT,
+                     &_indices [0] );
+
+    glDisableClientState ( GL_VERTEX_ARRAY );
+    glDisableClientState ( GL_NORMAL_ARRAY );
+}
+
+void Mesh::glColorMode ( )
+{
+    glEnableClientState ( GL_VERTEX_ARRAY );
+    glVertexPointer ( 3, GL_FLOAT, 0, _mesh.points() );
+
+    glEnableClientState ( GL_COLOR_ARRAY );
+    glColorPointer ( 3, GL_FLOAT, 0, _mesh.vertex_colors() );
+
+    glDrawElements ( GL_TRIANGLES,
+                     _indices.size(),
+                     GL_UNSIGNED_INT,
+                     &_indices [0] );
+
+    glDisableClientState ( GL_VERTEX_ARRAY );
+    glDisableClientState ( GL_COLOR_ARRAY );
+}
+
+void Mesh::glWireframeMode ( )
+{
+    glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE );
     glEnableClientState ( GL_VERTEX_ARRAY );
     glVertexPointer ( 3, GL_FLOAT, 0, _mesh.points() );
 
@@ -165,6 +259,7 @@ void Mesh::computeIndices()
 
     for ( ; fIt != fEnd; ++fIt )
     {
+        //fvIt = _mesh.cfv_iter ( *fIt );
         fvIt = _mesh.cfv_iter ( *fIt );
         _indices[triID] = fvIt->idx();
         ++triID;

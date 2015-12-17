@@ -34,14 +34,14 @@ public :
         _scene = scene;
     }
 
-    void renderGL()
+    void renderViewOverlay()
     {
         if ( _scene == nullptr )
         {
             return;
         }
 
-        renderGLImp();
+        renderViewOverlayImp();
     }
 
     void renderPainter ( QPainter* painter )
@@ -55,7 +55,7 @@ public :
     }
 
 protected:
-    virtual void renderGLImp() {}
+    virtual void renderViewOverlayImp() {}
 
     virtual void renderPainterImp ( QPainter* painter ) {}
 

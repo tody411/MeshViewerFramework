@@ -15,6 +15,7 @@
 #include "Light.h"
 #include "BoundingBox.h"
 #include "Mesh.h"
+#include "Material.h"
 
 //! Scene implementation.
 class Scene : public QObject
@@ -28,9 +29,16 @@ public :
     //! Destructor.
     virtual ~Scene() {}
 
+    bool empty() const
+    {
+        return _mesh->empty();
+    }
+
     bool loadMesh ( const QString& filePath );
 
     bool saveMesh ( const QString& filePath );
+
+    void glLight();
 
     void render();
 
@@ -41,15 +49,33 @@ public :
         return _mesh;
     }
 
+    Light* light()
+    {
+        return _light;
+    }
+
+    Material* material()
+    {
+        return _material;
+    }
+
+    const BoundingBox boundingBox() const
+    {
+        return _bb;
+    }
+
+    void  showMessage ( const QString& message, int timeout = 0 );
+
 signals:
     void updated();
 
+    void messageUpdated ( const QString& message, int timeout );
 
 private:
-    Light       _light;
+    Light*   _light;
     Mesh*    _mesh;
     BoundingBox _bb;
-
+    Material* _material;
 
 
 };

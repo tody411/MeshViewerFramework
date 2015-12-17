@@ -12,5 +12,9 @@
 #include "LoadCommand.h"
 #include "SaveCommand.h"
 
+#include "LaplacianSmoothingCommand.h"
+
+#include "RenderCommand.h"
+
 #endif
 

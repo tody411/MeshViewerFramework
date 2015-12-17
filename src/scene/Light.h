@@ -11,21 +11,22 @@
 
 #include <Eigen/Dense>
 
+#include "SceneObject.h"
+
 //! Light implementation.
-class Light
+class Light : public SceneObject
 {
 public :
     //! Constructor.
-    Light()
+    Light ( Scene* scene )
+        : SceneObject ( scene )
     {
         lightNo = 0;
-        lightPosition = Eigen::Vector4f ( 0.2, 0.3, 1.0, 0.0 ).normalized();
+        lightPosition = Eigen::Vector4f ( 0.2, 0.3, 0.6, 0.0 );
 
-        ambient  = Eigen::Vector4f ( 0.2, 0.2, 0.2, 1.0 ).normalized();
-
-        diffuse  = Eigen::Vector4f ( 0.8, 0.8, 0.8, 1.0 ).normalized();
-
-        specular  = Eigen::Vector4f ( 0.8, 0.8, 0.8, 1.0 ).normalized();
+        ambient  = Eigen::Vector4f ( 1.0, 1.0, 1.0, 1.0 );
+        diffuse  = Eigen::Vector4f (  1.0, 1.0, 1.0, 1.0 );
+        specular  = Eigen::Vector4f (  1.0, 1.0, 1.0, 1.0 );
     }
 
     //! Destructor.
