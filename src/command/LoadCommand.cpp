@@ -21,4 +21,6 @@ void LoadCommand::doImp ()
     if ( _inputFile == "" ) return;
 
     _scene->loadMesh ( _inputFile );
+
+    _inputFile = "";
 }

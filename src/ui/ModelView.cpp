@@ -39,7 +39,6 @@ void ModelView::setScene ( Scene* scene )
 
 void ModelView::render()
 {
-    Logger::getLogger ( "ModelView" )->info ( "render", "render" );
     update();
 }
 
