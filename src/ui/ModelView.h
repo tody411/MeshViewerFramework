@@ -41,6 +41,12 @@ public:
     //! Render screen shot of the current view.
     void renderScreenShot ( const QString& filePath );
 
+    //! Return the overlays.
+    QVector<BaseOverlay*> overlays() const
+    {
+        return _overlays;
+    }
+
 private:
     //-----------------------
     //  Mouse events.

@@ -17,6 +17,7 @@ bool Mesh::loadMesh ( const QString& filePath )
     _mesh.request_face_normals();
     _mesh.request_face_colors();
     _mesh.request_vertex_normals();
+    _mesh.request_vertex_colors();
     _mesh.request_vertex_texcoords2D();
 
     std::string file = filePath.toStdString();
@@ -38,6 +39,8 @@ bool Mesh::loadMesh ( const QString& filePath )
     {
         std::cout << "No vertex normals" << std::endl;
     }
+
+    updateBoundingBox();
 
     computeIndices();
     return true;
@@ -69,7 +72,6 @@ void Mesh::points ( Eigen::MatrixXd& V )
         {
             V ( v_it->idx(), ci ) = p[ci];
         }
-
     }
 }
 
@@ -88,7 +90,31 @@ void Mesh::setPoints ( const Eigen::MatrixXd& V )
         _mesh.point ( *v_it ) = p;
     }
 
+    updateBoundingBox();
+
     emit updated();
+}
+
+void Mesh::facePoints ( Eigen::MatrixXd& V )
+{
+    V.resize ( 3 * numFaces(), 3 );
+
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+    MeshData::FaceVertexIter fv_it;
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        int vi = 0;
+        for ( fv_it = _mesh.fv_begin ( f_it ); fv_it.is_valid(); ++fv_it )
+        {
+            MeshData::Point p = _mesh.point ( *fv_it );
+            for ( int ci = 0; ci < 3; ci++ )
+            {
+                V ( 3 * f_it->idx() + vi, ci ) = p[ci];
+            }
+            ++vi;
+        }
+    }
 }
 
 void Mesh::vertexNormals ( Eigen::MatrixXd& N )
@@ -121,10 +147,80 @@ void Mesh::setVertexNormals ( const Eigen::MatrixXd& N )
             n[ci] = N ( v_it->idx(), ci );
         }
 
-        _mesh.point ( *v_it ) = n;
+        _mesh.set_normal ( *v_it, n );
     }
 
     emit updated();
+}
+
+void Mesh::vertexColors ( Eigen::MatrixXd& C )
+{
+    MeshData::VertexIter v_it, v_end ( _mesh.vertices_end() );
+
+    for ( v_it = _mesh.vertices_begin(); v_it != v_end; ++v_it )
+    {
+        MeshData::Color c = _mesh.color ( *v_it );
+
+        for ( int ci = 0; ci < 3; ci++ )
+        {
+            C ( v_it->idx(), ci ) = c[ci] / 255.0;
+        }
+    }
+}
+
+void Mesh::setVertexColors ( const Eigen::MatrixXd& C )
+{
+    MeshData::VertexIter v_it, v_end ( _mesh.vertices_end() );
+
+    for ( v_it = _mesh.vertices_begin(); v_it != v_end; ++v_it )
+    {
+        MeshData::Color c;
+        for ( int ci = 0; ci < 3; ci++ )
+        {
+            c[ci] = 255 * C ( v_it->idx(), ci );
+        }
+
+        _mesh.set_color ( *v_it, c );
+    }
+
+    emit updated();
+}
+
+void Mesh::faceColors ( Eigen::MatrixXd& C )
+{
+    C.resize ( numFaces(), 3 );
+
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        MeshData::Color c = _mesh.color ( *f_it );
+
+        for ( int ci = 0; ci < 3; ci++ )
+        {
+            C ( f_it->idx(), ci ) = c[ci] / 255.0;
+        }
+
+    }
+}
+
+void Mesh::setFaceColors ( const Eigen::MatrixXd& C )
+{
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        MeshData::Color c;
+
+        for ( int ci = 0; ci < 3; ci++ )
+        {
+
+            c[ci] = 255 * C ( f_it->idx(), ci );
+        }
+
+        _mesh.set_color ( *f_it, c );
+
+    }
 }
 
 void Mesh::faceNormals ( Eigen::MatrixXd& N )
@@ -182,11 +278,17 @@ void Mesh::gl ( DisplayMode displayMode )
     case Mesh::SHADING:
         glShadingMode ();
         break;
-    case Mesh::COLOR:
-        glColorMode();
+    case Mesh::VERTEX_COLOR:
+        glVertexColorMode();
+        break;
+    case Mesh::FACE_COLOR:
+        glFaceColorMode();
         break;
     case Mesh::WIREFRAME:
         glWireframeMode ( );
+        break;
+    case Mesh::POINTS:
+        glPoints();
         break;
     default:
         break;
@@ -197,6 +299,7 @@ void Mesh::glShadingMode ()
 {
     glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
     glEnableClientState ( GL_VERTEX_ARRAY );
+
     glVertexPointer ( 3, GL_FLOAT, 0, _mesh.points() );
 
     glEnableClientState ( GL_NORMAL_ARRAY );
@@ -211,13 +314,20 @@ void Mesh::glShadingMode ()
     glDisableClientState ( GL_NORMAL_ARRAY );
 }
 
-void Mesh::glColorMode ( )
+void Mesh::glVertexColorMode ()
 {
+    if ( !_mesh.has_vertex_colors() )
+    {
+        glShadingMode();
+        return;
+    }
+
+    glDisable ( GL_LIGHTING );
     glEnableClientState ( GL_VERTEX_ARRAY );
     glVertexPointer ( 3, GL_FLOAT, 0, _mesh.points() );
 
     glEnableClientState ( GL_COLOR_ARRAY );
-    glColorPointer ( 3, GL_FLOAT, 0, _mesh.vertex_colors() );
+    glColorPointer ( 3, GL_UNSIGNED_BYTE, 0, _mesh.vertex_colors() );
 
     glDrawElements ( GL_TRIANGLES,
                      _indices.size(),
@@ -226,6 +336,54 @@ void Mesh::glColorMode ( )
 
     glDisableClientState ( GL_VERTEX_ARRAY );
     glDisableClientState ( GL_COLOR_ARRAY );
+}
+
+void Mesh::glFaceColorMode ( )
+{
+    if ( !_mesh.has_face_colors() )
+    {
+        glShadingMode();
+        return;
+    }
+
+    glDisable ( GL_LIGHTING );
+
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+    MeshData::FaceVertexIter fv_it;
+
+    glBegin ( GL_TRIANGLES );
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        MeshData::Color c = _mesh.color ( *f_it );
+
+        for ( fv_it = _mesh.fv_begin ( f_it ); fv_it.is_valid(); ++fv_it )
+        {
+            MeshData::Point p =  _mesh.point ( *fv_it );
+            glColor3ubv ( c.data() );
+            glVertex3fv ( p.data() );
+        }
+    }
+
+    glEnd();
+}
+
+void Mesh::glPoints ( )
+{
+    glPolygonMode ( GL_FRONT_AND_BACK, GL_POINT );
+    glEnableClientState ( GL_VERTEX_ARRAY );
+    glVertexPointer ( 3, GL_FLOAT, 0, _mesh.points() );
+
+    glEnableClientState ( GL_NORMAL_ARRAY );
+    glNormalPointer ( GL_FLOAT, 0, _mesh.vertex_normals() );
+
+    glDrawElements ( GL_TRIANGLES,
+                     _indices.size(),
+                     GL_UNSIGNED_INT,
+                     &_indices [0] );
+
+    glDisableClientState ( GL_VERTEX_ARRAY );
+    glDisableClientState ( GL_NORMAL_ARRAY );
 }
 
 void Mesh::glWireframeMode ( )
@@ -246,6 +404,12 @@ void Mesh::glWireframeMode ( )
     glDisableClientState ( GL_NORMAL_ARRAY );
 }
 
+void Mesh::updateBoundingBox()
+{
+    _bb.clear();
+    _bb.expand ( * ( openMeshData() ) );
+}
+
 void Mesh::computeIndices()
 {
     int numFaces = _mesh.n_faces();
@@ -259,7 +423,6 @@ void Mesh::computeIndices()
 
     for ( ; fIt != fEnd; ++fIt )
     {
-        //fvIt = _mesh.cfv_iter ( *fIt );
         fvIt = _mesh.cfv_iter ( *fIt );
         _indices[triID] = fvIt->idx();
         ++triID;

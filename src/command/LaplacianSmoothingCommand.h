@@ -11,7 +11,7 @@
 
 #include "BaseCommand.h"
 
-#include "CommandParameters.h"
+#include "SceneParameters.h"
 
 //! LaplacianSmoothingCommand implementation.
 class LaplacianSmoothingCommand : public BaseCommand

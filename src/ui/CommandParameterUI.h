@@ -11,7 +11,7 @@
 
 #include <QWidget>
 
-#include "CommandParameters.h"
+#include "SceneParameters.h"
 
 class QSlider;
 class QLineEdit;
@@ -82,6 +82,35 @@ private:
     double _sliderScale;
 };
 
+//! VectorParameterUI implementation.
+class VectorParameterUI : public QWidget
+{
+    Q_OBJECT
+public :
+    //! Constructor.
+    VectorParameterUI ( VectorParameter* param )
+        : _param ( param )
+    {
+        createUI();
+    }
+
+    //! Destructor.
+    virtual ~VectorParameterUI() {}
+
+signals:
+    void valueChanged();
+
+private slots:
+    void childValueChanged ();
+
+private:
+    void createUI();
+
+private:
+    VectorParameter* _param;
+    QVector<DoubleParameter*> _childParams;
+};
+
 //! BoolParameterUI implementation.
 class BoolParameterUI : public QWidget
 {
@@ -148,7 +177,7 @@ class CommandParameterUI : public QWidget
     Q_OBJECT
 public :
     //! Constructor.
-    CommandParameterUI ( const QString& name, CommandParameters& params, const QString& description = "" )
+    CommandParameterUI ( const QString& name, SceneParameters& params, const QString& description = "" )
         : _name ( name ), _description ( description ), _params ( &params )
     {
         createUI();
@@ -166,7 +195,7 @@ private:
     void createUI();
 
 private:
-    CommandParameters* _params;
+    SceneParameters* _params;
 
     QString _name;
     QString _description;

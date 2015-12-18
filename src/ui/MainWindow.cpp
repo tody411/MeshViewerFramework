@@ -13,6 +13,7 @@
 #include "Scene.h"
 #include "Commands.h"
 #include "ModelView.h"
+#include "BaseOverlay.h"
 
 
 MainWindow::MainWindow ()
@@ -39,10 +40,27 @@ void MainWindow::createMenue()
 
     menuBar()->addMenu ( _fileMenus );
 
-    _operationMenus = new MenuGroup ( tr ( "&Opearations" ), this );
+    _operationMenus = new MenuGroup ( tr ( "&Operations" ), this );
+    _operationMenus->addCommand ( new NoiseCommand ( _scene ) );
     _operationMenus->addCommand ( new LaplacianSmoothingCommand ( _scene ) );
-
+    _operationMenus->addCommand ( new FlipNormalCommand ( _scene ) );
+    _operationMenus->addCommand ( new NormalizeMeshCommand ( _scene ) );
     menuBar()->addMenu ( _operationMenus );
+
+    MenuGroup* coloringMenus = new MenuGroup ( tr ( "&Coloring" ), this );
+    coloringMenus->addCommand ( new NormalColorCommand ( _scene ) );
+    coloringMenus->addCommand ( new PositionColorCommand ( _scene ) );
+    menuBar()->addMenu ( coloringMenus );
+
+
+    _overlayMenus = new MenuGroup ( tr ( "&Overlay" ), this );
+
+    foreach ( BaseOverlay* overlay, _view->overlays() )
+    {
+        _overlayMenus->addOverlayCommand ( new OverlayCommand ( overlay ) );
+    }
+
+    menuBar()->addMenu ( _overlayMenus );
 
     _renderMenus = new MenuGroup ( tr ( "&Render" ), this );
     _renderMenus->addCommand ( new RenderCommand ( _scene, _view ) );

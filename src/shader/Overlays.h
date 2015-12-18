@@ -12,5 +12,8 @@
 #include "SceneInfoOverlay.h"
 #include "CoordinateSystemOverlay.h"
 
+#include "WireframeOverlay.h"
+#include "PointsOverlay.h"
+
 #endif
 

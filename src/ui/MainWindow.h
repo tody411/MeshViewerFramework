@@ -55,6 +55,9 @@ private:
     //! Opeartion menus.
     MenuGroup* _operationMenus;
 
+    //! Overlay menus.
+    MenuGroup* _overlayMenus;
+
     //! Render menus.
     MenuGroup* _renderMenus;
 };

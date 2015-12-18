@@ -11,6 +11,7 @@
 
 #include "BaseOverlay.h"
 
+#include "ModelView.h"
 #include "CameraTool.h"
 
 //! CoordinateSystemOverlay implementation.
@@ -18,8 +19,8 @@ class CoordinateSystemOverlay  : public BaseOverlay
 {
 public :
     //! Constructor.
-    CoordinateSystemOverlay ( Scene* scene, CameraTool* cameraTool )
-        : BaseOverlay ( "CoordinateSystem", scene ), _cameraTool ( cameraTool )
+    CoordinateSystemOverlay ( Scene* scene, CameraTool* cameraTool, ModelView* view )
+        : BaseOverlay ( "CoordinateSystem", scene ), _cameraTool ( cameraTool ), _view ( view )
     {}
 
     //! Destructor.
@@ -30,6 +31,7 @@ public :
 private:
     CameraTool* _cameraTool;
 
+    ModelView* _view;
 
 
 };

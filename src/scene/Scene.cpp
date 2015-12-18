@@ -20,7 +20,7 @@
 #include "Logger.h"
 
 Scene::Scene ( QObject* parent )
-    : QObject ( parent )
+    : QObject ( parent ), _meshDisplayMode ( Mesh::DisplayMode::SHADING )
 {
     _mesh = new Mesh ( this );
     _light = new Light ( this );
@@ -33,15 +33,6 @@ bool Scene::loadMesh ( const QString& filePath )
     {
         return false;
     }
-
-    Logger::getLogger ( "Scene" )->info ( "Load Mesh", filePath );
-
-    _bb.clear();
-    _bb.expand ( * ( _mesh->openMeshData() ) );
-
-    Logger::getLogger ( "Scene" )->info ( "Bounding Box", _bb.dump() );
-
-    emit updated();
 
     return true;
 }
@@ -56,7 +47,7 @@ void Scene::render()
 {
     glEnable ( GL_LIGHTING );
 
-    _mesh->gl ( Mesh::DisplayMode::WIREFRAME );
+    _mesh->gl ( _meshDisplayMode );
 
     glFlush();
 }
@@ -64,7 +55,7 @@ void Scene::render()
 
 void Scene::focusGL()
 {
-    _bb.focusGL();
+    _mesh->focusGL();
 }
 
 void  Scene::showMessage ( const QString& message, int timeout )

@@ -31,8 +31,6 @@ void SceneInfoOverlay::renderPainterImp ( QPainter* painter )
     text += QString ( "  Num Edges     : %1\n" ).arg ( mesh->numEdges() );
     text += QString ( "  Num Faces     : %1\n" ).arg ( mesh->numFaces() );
 
-    text += QString ( "  Bounding Box  : (%1, %2, %3)\n" ).arg ( bb.min() ( 0 ) ).arg ( bb.min() ( 1 ) ).arg ( bb.min() ( 2 ) );
-
     painter->drawText ( QRectF ( x, y, text_width, text_height ), text );
 
 }

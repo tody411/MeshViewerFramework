@@ -22,7 +22,7 @@ public :
         : SceneObject ( scene )
     {
         lightNo = 0;
-        lightPosition = Eigen::Vector4f ( 0.2, 0.3, 0.6, 0.0 );
+        lightPosition = Eigen::Vector4f ( 10.0, 30.0, 60.0, 0.0 );
 
         ambient  = Eigen::Vector4f ( 1.0, 1.0, 1.0, 1.0 );
         diffuse  = Eigen::Vector4f (  1.0, 1.0, 1.0, 1.0 );

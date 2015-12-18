@@ -34,7 +34,9 @@ void ModelView::setScene ( Scene* scene )
     connect ( _scene, &Scene::updated, this, &ModelView::render );
 
     _overlays.append ( new SceneInfoOverlay ( scene ) );
-    _overlays.append ( new CoordinateSystemOverlay ( scene, _cameraTool ) );
+    _overlays.append ( new CoordinateSystemOverlay ( scene, _cameraTool, this ) );
+    _overlays.append ( new WireframeOverlay ( scene ) );
+    _overlays.append ( new PointsOverlay ( scene ) );
 }
 
 void ModelView::render()
@@ -93,6 +95,12 @@ void ModelView::renderGL()
 
     _scene->render();
 
+    foreach ( BaseOverlay* overlay, _overlays )
+    {
+        overlay->renderSceneOverlay();
+    }
+    glFlush();
+
     glDisable ( GL_DEPTH_TEST );
     glEnable ( GL_BLEND );
     glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -128,7 +136,7 @@ void ModelView::resizeGL ( int width, int height )
 
     float aspect = width / ( float )  height;
 
-    glOrtho ( -aspect , aspect , -1 , 1 , -4.0 , 4.0 );
+    glOrtho ( -aspect , aspect , -1 , 1 , -10.0 , 10.0 );
 
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();

@@ -61,10 +61,17 @@ public :
 
     const BoundingBox boundingBox() const
     {
-        return _bb;
+        return _mesh->boundingBox();
     }
 
     void  showMessage ( const QString& message, int timeout = 0 );
+
+    void updateBoundingBox();
+
+    void setMeshDisplayMode ( Mesh::DisplayMode displayMode )
+    {
+        _meshDisplayMode = displayMode;
+    }
 
 signals:
     void updated();
@@ -74,10 +81,10 @@ signals:
 private:
     Light*   _light;
     Mesh*    _mesh;
-    BoundingBox _bb;
+
     Material* _material;
 
-
+    Mesh::DisplayMode _meshDisplayMode;
 };
 
 #endif

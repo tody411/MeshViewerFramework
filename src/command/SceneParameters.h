@@ -1,8 +1,8 @@
 
 /*!
-  \file     CommandParameters.h
+  \file     SceneParameters.h
   \author   Tody
-  CommandParameters definition.
+  SceneParameters definition.
   \date     2015/09/19
 */
 
@@ -13,6 +13,8 @@
 #include  <QList>
 #include  <QStringList>
 #include  <QMap>
+
+#include <Eigen/Dense>
 
 //! BaseParameter
 class BaseParameter : QObject
@@ -122,6 +124,94 @@ private:
 
 typedef NumericParameter<int> IntParameter;
 typedef NumericParameter<double> DoubleParameter;
+
+class VectorParameter : public BaseParameter
+{
+public:
+    //! Constructor.
+    VectorParameter() {}
+
+    //! Constructor.
+    VectorParameter ( const QString& name,
+                      const Eigen::VectorXf& v_min, const Eigen::VectorXf v_max, const Eigen::VectorXf v_default = Eigen::VectorXf::Zero(),
+                      const QString& description = "" )
+        : BaseParameter ( name, description ), _v_min ( v_min ), _v_max ( v_max ), _v_default ( v_default ), _v ( v_default )
+    {}
+
+    void create ( const Eigen::VectorXf& v_min, const Eigen::VectorXf& v_max, const Eigen::VectorXf& v_default = Eigen::VectorXf::Zero() )
+    {
+        _v_min = v_min;
+        _v_max = v_max;
+        _v_default = v_default;
+        _v = v_default;
+    }
+
+    //! Set MinValue
+    void setMinValue ( const Eigen::VectorXf& v_min ) { _v_min = v_min;}
+
+    //! Set MaxValue
+    void setMaxValue ( const Eigen::VectorXf& v_max ) { _v_max = v_max;}
+
+    //! Out minValue.
+    const Eigen::VectorXf minValue() const { return _v_min;}
+
+    //! Out maxValue.
+    const Eigen::VectorXf maxValue() const { return _v_max;}
+
+    //! Set Value.
+    void setValue ( double  v, int index )
+    {
+        _v[index] = v;
+    }
+
+    //! Set Value.
+    void setValue ( const Eigen::VectorXf&  v )
+    {
+        _v = v;
+        for ( int i = 0; i < _v.size(); i++ )
+        {
+            if ( v[i] < _v_min[i] ) _v[i] = _v_min[i];
+            if ( v[i] > _v_max[i] ) _v[i] = _v_max[i];
+        }
+    }
+
+    //! Out Value.
+    const Eigen::VectorXf value() const { return _v;}
+
+    //! Return the size.
+    int size() const { return _v_min.size();}
+
+    //! Return string representation.
+    const QString str() const
+    {
+        QString info = QString ( "%1=(" ).arg ( _name );
+
+        for ( int i = 0; i < _v.size(); i++ )
+        {
+            info += QString ( "%1" ).arg ( _v [ i ] );
+
+            if ( i != _v.size() - 1 )
+            {
+                info += ", ";
+            }
+        }
+        info += ")";
+        return info;
+    }
+
+private:
+    //! Min value.
+    Eigen::VectorXf _v_min;
+
+    //! Max value.
+    Eigen::VectorXf _v_max;
+
+    //! Default value.
+    Eigen::VectorXf _v_default;
+
+    //! Value.
+    Eigen::VectorXf _v;
+};
 
 //! StringParameter
 class StringParameter : public BaseParameter
@@ -233,15 +323,15 @@ private:
     QStringList _enumNames;
 };
 
-//! CommandParameters implementation.
-class CommandParameters
+//! SceneParameters implementation.
+class SceneParameters
 {
 public :
     //! Constructor.
-    CommandParameters() {}
+    SceneParameters() {}
 
     //! Destructor.
-    virtual ~CommandParameters() {}
+    virtual ~SceneParameters() {}
 
     //! Add IntParameter.
     void addInt ( IntParameter* param )
@@ -278,7 +368,7 @@ public :
         _enumParameters[param->name()] = param;
     }
 
-    //! Return if CommandParameters are empty.
+    //! Return if SceneParameters are empty.
     bool empty() const { return _paramNames.empty();}
 
     //! Out paramNames.

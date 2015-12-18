@@ -13,6 +13,7 @@
 #include <QAction>
 
 #include "BaseCommand.h"
+#include "OverlayCommand.h"
 
 //! MenuGroup implementation.
 class MenuGroup : public QMenu
@@ -30,6 +31,9 @@ public :
 
     //! Add command to the menu group.
     void addCommand ( BaseCommand* command );
+
+    //! Add overlay command.
+    void addOverlayCommand ( OverlayCommand* command );
 
 private:
     //! Menu group name.

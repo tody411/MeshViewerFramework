@@ -12,9 +12,17 @@
 #include "LoadCommand.h"
 #include "SaveCommand.h"
 
+#include "NoiseCommand.h"
 #include "LaplacianSmoothingCommand.h"
+#include "FlipNormalCommand.h"
+#include "NormalizeMeshCommand.h"
+
+#include "NormalColorCommand.h"
+#include "PositionColorCommand.h"
 
 #include "RenderCommand.h"
+
+#include "OverlayCommand.h"
 
 #endif
 

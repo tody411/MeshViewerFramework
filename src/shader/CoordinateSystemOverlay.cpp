@@ -50,4 +50,20 @@ void CoordinateSystemOverlay::renderViewOverlayImp()
     glVertex3fv ( xyzs[2].data() );
 
     glEnd();
+
+    QFont font ( "Arial", 9, QFont::Bold );
+
+    for ( int i = 0; i < 3; i++ )
+    {
+        xyzs[i] *= 1.3;
+    }
+
+    glColor3f ( 1.0, 0.0, 0.0 );
+    _view->renderText ( xyzs[0][0], xyzs[0][1], xyzs[0][2], "x", font );
+
+    glColor3f ( 0.0, 1.0, 0.0 );
+    _view->renderText ( xyzs[1][0], xyzs[1][1], xyzs[1][2], "y" , font );
+
+    glColor3f ( 0.0, 0.0, 1.0 );
+    _view->renderText ( xyzs[2][0], xyzs[2][1], xyzs[2][2], "z", font );
 }

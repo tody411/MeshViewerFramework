@@ -14,7 +14,7 @@
 
 #include "Scene.h"
 
-#include "CommandParameters.h"
+#include "SceneParameters.h"
 #include "CommandParameterUI.h"
 
 //! BaseCommand implementation.
@@ -127,7 +127,7 @@ protected:
     QString _performanceInfo;
 
     //! Command parameters.
-    CommandParameters _params;
+    SceneParameters _params;
 
     //! Interactive mode.
     bool _isInteractive;

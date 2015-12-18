@@ -107,6 +107,32 @@ void DoubleParameterUI::textChanged ( )
     emit valueChanged();
 }
 
+void VectorParameterUI::createUI()
+{
+    QLabel* labelUI =  new QLabel ( _param->name() , this );
+
+    QGridLayout* layout = new QGridLayout();
+    for ( int i = 0; i < _param->size(); i++ )
+    {
+        DoubleParameter* childParam = new DoubleParameter();
+        _childParams.append ( childParam );
+
+        DoubleParameterUI* childUI = new DoubleParameterUI ( childParam );
+        layout->addWidget ( childUI, i, 0 );
+
+        connect ( childUI, &DoubleParameterUI::valueChanged, this, &VectorParameterUI::childValueChanged );
+    }
+
+    setLayout ( layout );
+}
+
+void VectorParameterUI::childValueChanged ()
+{
+    for ( int i = 0; i < _param->size(); i++ )
+    {
+        _param->setValue ( _childParams[i]->value(), i );
+    }
+}
 
 void BoolParameterUI::createUI()
 {

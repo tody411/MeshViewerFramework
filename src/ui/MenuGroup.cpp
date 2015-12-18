@@ -16,3 +16,12 @@ void MenuGroup::addCommand ( BaseCommand* command )
     connect ( commandAction, &QAction::triggered, command, &BaseCommand::actionSlot );
     addAction ( commandAction );
 }
+
+void MenuGroup::addOverlayCommand ( OverlayCommand* command )
+{
+    QAction* commandAction = new QAction ( command->name(), nullptr );
+    commandAction->setCheckable ( true );
+    commandAction->setChecked ( command->isShow() );
+    connect ( commandAction, &QAction::toggled, command, &OverlayCommand::toggeldSlot );
+    addAction ( commandAction );
+}

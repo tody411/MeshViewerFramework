@@ -15,7 +15,7 @@
 #include <Eigen/Sparse>
 
 #include "MeshData.h"
-
+#include "BoundingBox.h"
 #include "SceneObject.h"
 
 //! Mesh implementation.
@@ -27,8 +27,10 @@ public :
     enum DisplayMode
     {
         SHADING,
-        COLOR,
-        WIREFRAME
+        VERTEX_COLOR,
+        FACE_COLOR,
+        WIREFRAME,
+        POINTS
     };
 
     //! Constructor.
@@ -74,11 +76,26 @@ public :
     //! Set the point matrix to the vertices of this mesh.
     void setPoints ( const Eigen::MatrixXd& V );
 
+    //! Return the face point matrix.
+    void facePoints ( Eigen::MatrixXd& V );
+
     //! Return the normal matrix.
     void vertexNormals ( Eigen::MatrixXd& N );
 
     //! Set the normal matrix to the vertices of this mesh.
     void setVertexNormals ( const Eigen::MatrixXd& N );
+
+    //! Return the color matrix.
+    void vertexColors ( Eigen::MatrixXd& C );
+
+    //! Set the color matrix to the vertices of this mesh.
+    void setVertexColors ( const Eigen::MatrixXd& C );
+
+    //! Return the face colors.
+    void faceColors ( Eigen::MatrixXd& C );
+
+    //! Set the color matrix to the vertices of this mesh.
+    void setFaceColors ( const Eigen::MatrixXd& C );
 
     //! Return the face normal matrix.
     void faceNormals ( Eigen::MatrixXd& N );
@@ -93,7 +110,13 @@ public :
     void glShadingMode ( );
 
     //! OpenGL calls for coloring.
-    void glColorMode ( );
+    void glVertexColorMode ( );
+
+    //! OpenGL calls for coloring.
+    void glFaceColorMode ( );
+
+    //! OpenGK calls for points.
+    void glPoints ( );
 
     //! OpenGL calls for wireframe.
     void glWireframeMode ( );
@@ -106,6 +129,19 @@ public :
         return &_mesh;
     }
 
+    //! Return the bounding box.
+    const BoundingBox boundingBox() const
+    {
+        return _bb;
+    }
+
+    void updateBoundingBox();
+
+    void focusGL()
+    {
+        return _bb.focusGL();
+    }
+
 private:
     //! Compute triangle index list for OpenGL calls.
     void computeIndices();
@@ -114,8 +150,14 @@ private:
     //! OpenMesh data.
     MeshData    _mesh;
 
+    //! Bounding box.
+    BoundingBox _bb;
+
     //! Traianble index list for OpenGL calls.
     std::vector<unsigned int> _indices;
+
+    //! Vertex color for OpenGL calls.
+    Eigen::MatrixXf _C;
 };
 
 #endif

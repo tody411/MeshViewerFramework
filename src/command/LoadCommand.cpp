@@ -8,6 +8,8 @@
 
 #include "LoadCommand.h"
 
+#include "NormalizeMeshCommand.h"
+
 #include <QFileDialog>
 
 void LoadCommand::doImp ()

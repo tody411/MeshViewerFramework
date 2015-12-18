@@ -19,8 +19,8 @@ class BaseOverlay
 {
 public :
     //! Constructor.
-    BaseOverlay ( const QString& name, Scene* scene )
-        : _name ( name ), _scene ( scene )
+    BaseOverlay ( const QString& name, Scene* scene, bool show = true )
+        : _name ( name ), _scene ( scene ), _isShow ( show )
     {}
 
     //! Destructor.
@@ -34,9 +34,29 @@ public :
         _scene = scene;
     }
 
+    bool isShow() const
+    {
+        return _isShow;
+    }
+
+    void setIsShow ( bool isShow )
+    {
+        _isShow = isShow;
+    }
+
+    void renderSceneOverlay()
+    {
+        if ( _scene == nullptr || !_isShow )
+        {
+            return;
+        }
+
+        renderSceneOverlayImp();
+    }
+
     void renderViewOverlay()
     {
-        if ( _scene == nullptr )
+        if ( _scene == nullptr || !_isShow )
         {
             return;
         }
@@ -46,7 +66,7 @@ public :
 
     void renderPainter ( QPainter* painter )
     {
-        if ( _scene == nullptr )
+        if ( _scene == nullptr || !_isShow )
         {
             return;
         }
@@ -55,6 +75,8 @@ public :
     }
 
 protected:
+    virtual void renderSceneOverlayImp() {}
+
     virtual void renderViewOverlayImp() {}
 
     virtual void renderPainterImp ( QPainter* painter ) {}
@@ -62,6 +84,7 @@ protected:
 protected:
     QString    _name;
     Scene*    _scene;
+    bool        _isShow;
 };
 
 #endif
