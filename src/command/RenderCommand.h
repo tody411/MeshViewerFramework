@@ -19,7 +19,7 @@ class RenderCommand : public BaseCommand
 public :
     //! Constructor.
     RenderCommand ( Scene* scene, ModelView* view,  const QString& outputFile = ""  )
-        : BaseCommand ( "Render Current Screen", scene ), _view ( view ), _outputFile ( outputFile )
+        : BaseCommand ( "Render Current View", scene ), _view ( view ), _outputFile ( outputFile )
     {}
 
     //! Destructor.

@@ -30,7 +30,8 @@ public :
         VERTEX_COLOR,
         FACE_COLOR,
         WIREFRAME,
-        POINTS
+        POINTS,
+        GLSL
     };
 
     //! Constructor.

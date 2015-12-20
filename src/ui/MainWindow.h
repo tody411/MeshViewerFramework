@@ -30,6 +30,9 @@ public :
 
     void release();
 
+    //! Render screen shot of the current view.
+    void renderScreenShot ( const QString& filePath );
+
 private:
 
     void createMenue();

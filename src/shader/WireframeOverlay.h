@@ -24,16 +24,8 @@ public :
     //! Destructor.
     virtual ~WireframeOverlay() {}
 
+protected:
     void renderSceneOverlayImp();
-
-private:
-
-// inputs.
-
-
-// outputs.
-
-
 
 };
 

@@ -22,9 +22,12 @@
 Scene::Scene ( QObject* parent )
     : QObject ( parent ), _meshDisplayMode ( Mesh::DisplayMode::SHADING )
 {
+    _camera = new Camera ( this );
     _mesh = new Mesh ( this );
     _light = new Light ( this );
     _material = new Material ( this );
+    _selection = new SelectionInfo ( this );
+    _shader = new ShaderObject ( this );
 }
 
 bool Scene::loadMesh ( const QString& filePath )
@@ -47,9 +50,28 @@ void Scene::render()
 {
     glEnable ( GL_LIGHTING );
 
+    if ( _meshDisplayMode == Mesh::DisplayMode::GLSL )
+    {
+        _shader->bind();
+
+    }
+
     _mesh->gl ( _meshDisplayMode );
 
+    _selection->gl();
+
+    if ( _meshDisplayMode == Mesh::DisplayMode::GLSL )
+    {
+        _shader->release();
+    }
+
     glFlush();
+}
+
+void Scene::glCamera()
+{
+    _camera->gl();
+    //_mesh->focusGL();
 }
 
 

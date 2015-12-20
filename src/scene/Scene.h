@@ -12,10 +12,13 @@
 #include <QObject>
 #include <QString>
 
+#include "Camera.h"
 #include "Light.h"
 #include "BoundingBox.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "ShaderObject.h"
+#include "SelectionInfo.h"
 
 //! Scene implementation.
 class Scene : public QObject
@@ -42,11 +45,18 @@ public :
 
     void render();
 
+    void glCamera();
+
     void focusGL();
 
     Mesh* mesh()
     {
         return _mesh;
+    }
+
+    Camera* camera()
+    {
+        return _camera;
     }
 
     Light* light()
@@ -57,6 +67,16 @@ public :
     Material* material()
     {
         return _material;
+    }
+
+    SelectionInfo* selectionInfo()
+    {
+        return _selection;
+    }
+
+    ShaderObject* shader()
+    {
+        return _shader;
     }
 
     const BoundingBox boundingBox() const
@@ -79,12 +99,26 @@ signals:
     void messageUpdated ( const QString& message, int timeout );
 
 private:
+    //! Camera object.
+    Camera* _camera;
+
+    //! Light object.
     Light*   _light;
+
+    //! Mesh object.
     Mesh*    _mesh;
 
+    //! Materials.
     Material* _material;
 
+    //! Selection info.
+    SelectionInfo* _selection;
+
+    //! Mesh display mode.
     Mesh::DisplayMode _meshDisplayMode;
+
+    //! Shader program.
+    ShaderObject* _shader;
 };
 
 #endif

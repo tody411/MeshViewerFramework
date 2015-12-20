@@ -19,7 +19,9 @@ class RayCasting
 {
 public :
     //! Constructor.
-    RayCasting() {}
+    RayCasting ( MeshData* mesh )
+        : _mesh ( mesh )
+    {}
 
     //! Destructor.
     virtual ~RayCasting() {}
@@ -29,7 +31,7 @@ public :
         _mesh = mesh;
     }
 
-    bool closestIntersection ( const Eigen::Vector3f& raySource, const  Eigen::Vector3f& rayDirection, PointOnFace& o_point );
+    bool closestIntersection ( const Eigen::Vector3d& raySource, const  Eigen::Vector3d& rayDirection, PointOnFace& o_point );
 
 private:
     //! OpenMesh data.

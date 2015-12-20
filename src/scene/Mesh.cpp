@@ -90,6 +90,8 @@ void Mesh::setPoints ( const Eigen::MatrixXd& V )
         _mesh.point ( *v_it ) = p;
     }
 
+    _mesh.update_normals();
+
     updateBoundingBox();
 
     emit updated();
@@ -278,6 +280,9 @@ void Mesh::gl ( DisplayMode displayMode )
     case Mesh::SHADING:
         glShadingMode ();
         break;
+    case Mesh::GLSL:
+        glShadingMode ();
+        break;
     case Mesh::VERTEX_COLOR:
         glVertexColorMode();
         break;
@@ -291,6 +296,7 @@ void Mesh::gl ( DisplayMode displayMode )
         glPoints();
         break;
     default:
+        glShadingMode ();
         break;
     }
 }

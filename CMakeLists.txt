@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 # Project setting
 #=======================
 project(SimpleMeshViewer)
+
 file(GLOB _project_SOURCE ${PROJECT_SOURCE_DIR}/src/*.h ${PROJECT_SOURCE_DIR}/src/*.cpp
         ${PROJECT_SOURCE_DIR}/src/command/*h ${PROJECT_SOURCE_DIR}/src/command/*cpp
         ${PROJECT_SOURCE_DIR}/src/core/*h ${PROJECT_SOURCE_DIR}/src/core/*cpp

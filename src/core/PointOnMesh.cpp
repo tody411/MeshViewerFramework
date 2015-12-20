@@ -8,6 +8,7 @@
 
 #include "PointOnMesh.h"
 
+#include <sstream>
 
 bool PointOnFace::isValid() const { return ( mesh != nullptr );}
 
@@ -20,7 +21,7 @@ const Eigen::Vector3f PointOnFace::point() const
         return p;
     }
 
-    MeshData::FaceVertexIter fvIt = mesh->fv_begin ( fh );
+    MeshData::FaceVertexIter fvIt = mesh->fv_iter ( fh );
     OpenMesh::Vec3f v1, v2, v3;
 
     v1 = mesh->point ( *fvIt );
@@ -47,7 +48,7 @@ const Eigen::Vector3f PointOnFace::normal() const
         return n;
     }
 
-    MeshData::FaceVertexIter fvIt = mesh->fv_begin ( fh );
+    MeshData::FaceVertexIter fvIt = mesh->fv_iter ( fh );
     OpenMesh::Vec3f n1, n2, n3;
 
     n1 = mesh->normal (  *fvIt );
@@ -74,7 +75,7 @@ const Eigen::Vector2f PointOnFace::uv() const
         return u;
     }
 
-    MeshData::FaceVertexIter fvIt = mesh->fv_begin ( fh );
+    MeshData::FaceVertexIter fvIt = mesh->fv_iter ( fh );
     OpenMesh::Vec2f u1, u2, u3;
 
     u1 = mesh->texcoord2D (  *fvIt );
@@ -91,4 +92,35 @@ const Eigen::Vector2f PointOnFace::uv() const
         u[i] = u_om[i];
     }
     return u;
+}
+
+int PointOnFace::index() const
+{
+    return fh.idx();
+}
+
+void PointOnFace::points ( Eigen::Matrix3f& V )
+{
+    MeshData::FaceVertexIter fvIt = mesh->fv_iter ( fh );
+
+
+    for ( int i = 0; i < 3; i++ )
+    {
+        OpenMesh::Vec3f v = mesh->point ( *fvIt );
+
+        for ( int j = 0; j < 3; j++ )
+        {
+            V ( i, j ) = v[j];
+        }
+
+        ++fvIt;
+    }
+}
+
+
+const std::string PointOnFace::str() const
+{
+    std::stringstream ss;
+    ss << "faceID: " << index() << ", w1: " << w1 << ", w2:" << w2;
+    return ss.str();
 }

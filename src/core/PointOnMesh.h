@@ -33,6 +33,11 @@ public :
 
     const Eigen::Vector2f uv() const;
 
+    int index() const;
+
+    void points ( Eigen::Matrix3f& V );
+
+    const std::string str() const;
 
 public:
     float w1;

@@ -17,10 +17,15 @@
 #include "FlipNormalCommand.h"
 #include "NormalizeMeshCommand.h"
 
+#include "DefaultShadingCommand.h"
 #include "NormalColorCommand.h"
 #include "PositionColorCommand.h"
 
+#include "NormalShaderCommand.h"
+#include "ToonShaderCommand.h"
+
 #include "RenderCommand.h"
+#include "RenderWindowCommand.h"
 
 #include "OverlayCommand.h"
 

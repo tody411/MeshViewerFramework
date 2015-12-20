@@ -15,25 +15,19 @@
 #include <QDebug>
 #include <QTimer>
 
+#include "Scene.h"
+
 void CameraTool::reset()
 {
     _scalingFactor = 0.001;
-    _scale = 1.0;
 
     _rotationFactor = 0.2;
-    _rotation = Eigen::Vector2f ( 0, 0 );
 
     _translateFactor = 0.01;
-    _translation = Eigen::Vector2f ( 0, 0 );
-    _presPos = Eigen::Vector2f ( 0, 0 );
-}
 
-void CameraTool::gl()
-{
-    glTranslatef ( _translation[0], _translation[1], 0.0f );
-    glScalef ( _scale, _scale, _scale );
-    glRotatef ( _rotation[0], 1.0f, 0.0f, 0.0f );
-    glRotatef ( _rotation[1], 0.0f, 1.0f, 0.0f );
+    camera()->focus();
+
+    _presPos = Eigen::Vector2d ( 0, 0 );
 }
 
 void CameraTool::mousePressEvent ( QMouseEvent* event )
@@ -57,25 +51,25 @@ void  CameraTool::mouseMoveEvent ( QMouseEvent* event )
     }
 }
 
-void CameraTool::mouseReleaseEvent ( QMouseEvent* event )
-{
-}
-
 void CameraTool::wheelEvent ( QWheelEvent* event )
 {
+    float scale = camera()->scale() [0];
+
     double factor = pow ( 2.0, event->delta() / 240.0 );
 
-    if ( _scale < 0.5 && factor < 1 )
+    if ( scale < 0.5 && factor < 1 )
     {
         return;
     }
 
-    if ( _scale > 100 && factor > 1 )
+    if ( scale > 100 && factor > 1 )
     {
         return;
     }
 
-    _scale *= factor;
+    scale *= factor;
+
+    camera()->setScale ( Eigen::Vector3f ( scale, scale, scale ) );
 }
 
 void CameraTool::keyPressEvent ( QKeyEvent* event )
@@ -86,37 +80,44 @@ void CameraTool::keyPressEvent ( QKeyEvent* event )
     }
 }
 
-void CameraTool::keyReleaseEvent ( QKeyEvent* event )
+void CameraTool::animate()
 {
+
 }
 
-const Eigen::Vector2f CameraTool::mousePosition ( QMouseEvent* event )
+Camera* CameraTool::camera()
 {
-    QPoint p = event->pos();
-    return Eigen::Vector2f ( p.x(), p.y() );
+    return _scene->camera();
 }
 
-const Eigen::Vector2f CameraTool::mouseMovement ( QMouseEvent* event )
+
+const Eigen::Vector2d CameraTool::mouseMovement ( QMouseEvent* event )
 {
     return mousePosition ( event ) - _presPos;
 }
 
 void CameraTool::translateDrag ( QMouseEvent* event )
 {
-    Eigen::Vector2f dxy = mouseMovement ( event );
+    Eigen::Vector2d dxy = mouseMovement ( event );
 
-    _translation[0] += _translateFactor * dxy[0];
-    _translation[1] += - _translateFactor * dxy[1];
+    Eigen::Vector3f tranlation = camera()->translation();
+    tranlation[0] += _translateFactor * dxy[0];
+    tranlation[1] += - _translateFactor * dxy[1];
+
+    camera()->setTranslation ( tranlation );
 
     _presPos = mousePosition ( event );
 }
 
 void CameraTool::rotateDrag ( QMouseEvent* event )
 {
-    Eigen::Vector2f dxy = mouseMovement ( event );
+    Eigen::Vector2d dxy = mouseMovement ( event );
 
-    _rotation[0] += _rotationFactor * dxy[1];
-    _rotation[1] += _rotationFactor * dxy[0];
+    Eigen::Vector3f rotation = camera()->rotation();
+    rotation[0] += _rotationFactor * dxy[1];
+    rotation[1] += _rotationFactor * dxy[0];
+
+    camera()->setRotation ( rotation );
 
     _presPos = mousePosition ( event );
 }

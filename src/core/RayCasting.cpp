@@ -8,12 +8,12 @@
 
 #include "RayCasting.h"
 
-bool intersection ( const Eigen::Vector3f& raySource, const  Eigen::Vector3f& rayDirection,
+bool intersection ( const Eigen::Vector3d& raySource, const  Eigen::Vector3d& rayDirection,
                     MeshData::FaceIter& fIt, MeshData* mesh,
                     float& o_dist,
                     PointOnFace& o_point )
 {
-    /*OpenMesh::Vec3f rs ( raySource[0], raySource[1], raySource[2] );
+    OpenMesh::Vec3f rs ( raySource[0], raySource[1], raySource[2] );
     OpenMesh::Vec3f rd ( rayDirection[0], rayDirection[1], rayDirection[2] );
 
     OpenMesh::Vec3f e1, e2, pvec, tvec, qvec;
@@ -21,13 +21,13 @@ bool intersection ( const Eigen::Vector3f& raySource, const  Eigen::Vector3f& ra
     MeshData::FaceVertexIter fvIt;
     MeshData::Point point;
 
-    fvIt = mesh->fv_iter ( fIt );
+    fvIt = mesh->fv_iter ( *fIt );
 
-    OpenMesh::Vec3f v0 = mesh->point ( fvIt );
+    OpenMesh::Vec3f v0 = mesh->point ( *fvIt );
     ++fvIt;
-    OpenMesh::Vec3f v1 = mesh->point ( fvIt );
+    OpenMesh::Vec3f v1 = mesh->point ( *fvIt );
     ++fvIt;
-    OpenMesh::Vec3f v2 = mesh->point ( fvIt );
+    OpenMesh::Vec3f v2 = mesh->point ( *fvIt );
     ++fvIt;
 
     float det;
@@ -86,13 +86,13 @@ bool intersection ( const Eigen::Vector3f& raySource, const  Eigen::Vector3f& ra
     o_point.fh = *fIt;
     o_point.w1 = u;
     o_point.w2 = v;
-    o_point.mesh = mesh;*/
+    o_point.mesh = mesh;
 
     return true;    //hit!!
 
 }
 
-bool RayCasting::closestIntersection ( const Eigen::Vector3f& raySource, const  Eigen::Vector3f& rayDirection, PointOnFace& o_point )
+bool RayCasting::closestIntersection ( const Eigen::Vector3d& raySource, const  Eigen::Vector3d& rayDirection, PointOnFace& o_point )
 {
     float  Infinity = 1.0e10f;
     MeshData::FaceIter fIt;

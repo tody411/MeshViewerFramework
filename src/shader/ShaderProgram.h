@@ -58,6 +58,9 @@ public:
         _program.setUniformValue ( location, value );
     }
 
+private:
+    const QString filePath ( const QString& name );
+
 protected:
     QGLShaderProgram _program;
 

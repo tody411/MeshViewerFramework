@@ -18,6 +18,7 @@
 
 class Scene;
 class CameraTool;
+class BaseTool;
 
 //! 3D Model View implementation.
 class ModelView :  public QGLWidget
@@ -33,11 +34,16 @@ public :
     //! Set the scene to this view.
     void setScene ( Scene* scene );
 
+    //! Set tool.
+    void setTool ( BaseTool* tool = nullptr );
+
 public slots:
     //! Render the current scene.
     void render();
 
 public:
+    const QImage screenShot();
+
     //! Render screen shot of the current view.
     void renderScreenShot ( const QString& filePath );
 
@@ -46,6 +52,12 @@ public:
     {
         return _overlays;
     }
+
+    //! Return the current mouse position.
+    const Eigen::Vector2d mousePosition ( QMouseEvent* event );
+
+    //! Unproject the screen postion.
+    void unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  Eigen::Vector3d& ray );
 
 private:
     //-----------------------
@@ -83,11 +95,6 @@ private:
     //! Overlay rendering with for _overlays.
     virtual void renderOverlay();
 
-    //! Return the current mouse position.
-    const Eigen::Vector2d mousePosition ( QMouseEvent* event );
-
-    void unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  Eigen::Vector3d& ray );
-
 
 private:
     //! Render bachground.
@@ -96,6 +103,9 @@ private:
 private:
     //! Camera tool.
     CameraTool* _cameraTool;
+
+    //! Activated tool.
+    BaseTool* _tool;
 
     //! Scene data.
     Scene* _scene;

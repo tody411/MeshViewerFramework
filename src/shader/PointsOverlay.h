@@ -8,6 +8,7 @@
 
 #ifndef POINTSOVERLAY_H
 #define POINTSOVERLAY_H
+
 #include "BaseOverlay.h"
 
 //! PointsOverlay implementation.
@@ -23,6 +24,7 @@ public :
     //! Destructor.
     virtual ~PointsOverlay() {}
 
+protected:
     void renderSceneOverlayImp();
 
 

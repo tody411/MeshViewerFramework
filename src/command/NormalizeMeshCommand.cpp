@@ -12,6 +12,7 @@
 void NormalizeMeshCommand::doImp ()
 {
     Mesh* mesh = _scene->mesh();
+    BoundingBox bb = _scene->boundingBox();
 
     int numVertices = mesh->numVertices();
 

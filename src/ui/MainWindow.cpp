@@ -32,6 +32,31 @@ void MainWindow::release()
 {
 }
 
+//! Render screen shot of the current view.
+void MainWindow::renderScreenShot ( const QString& filePath )
+{
+    QPixmap image = grab();
+    QRect viewRect = _view->geometry();
+    QRect winRect = geometry();
+
+    QImage viewImage = _view->screenShot();
+
+    QPoint p_view = _view->mapTo ( this, _view->pos() );
+    QPoint p_win = geometry().topLeft();
+
+    qDebug() << "viewImage.size()" << viewImage.size();
+    qDebug() << "viewRect" << viewRect;
+    qDebug() << "winRect" << winRect;
+
+    qDebug() << "view pos" << p_view;
+    qDebug() << "win pos" << p_win;
+
+    QPainter painter ( &image );
+    painter.drawImage ( p_view - p_win, viewImage );
+
+    image.save ( filePath );
+}
+
 void MainWindow::createMenue()
 {
     _fileMenus = new MenuGroup ( tr ( "&File" ), this );
@@ -48,10 +73,15 @@ void MainWindow::createMenue()
     menuBar()->addMenu ( _operationMenus );
 
     MenuGroup* coloringMenus = new MenuGroup ( tr ( "&Coloring" ), this );
+    coloringMenus->addCommand ( new DefaultShadingCommand ( _scene ) );
     coloringMenus->addCommand ( new NormalColorCommand ( _scene ) );
     coloringMenus->addCommand ( new PositionColorCommand ( _scene ) );
     menuBar()->addMenu ( coloringMenus );
 
+    MenuGroup* shaderMenus = new MenuGroup ( tr ( "&Shader" ), this );
+    shaderMenus->addCommand ( new NormalShaderCommand ( _scene ) );
+    shaderMenus->addCommand ( new ToonShaderCommand ( _scene ) );
+    menuBar()->addMenu ( shaderMenus );
 
     _overlayMenus = new MenuGroup ( tr ( "&Overlay" ), this );
 
@@ -64,6 +94,7 @@ void MainWindow::createMenue()
 
     _renderMenus = new MenuGroup ( tr ( "&Render" ), this );
     _renderMenus->addCommand ( new RenderCommand ( _scene, _view ) );
+    _renderMenus->addCommand ( new RenderWindowCommand ( _scene, this ) );
 
     menuBar()->addMenu ( _renderMenus );
 

@@ -14,6 +14,7 @@
 
 #include "WireframeOverlay.h"
 #include "PointsOverlay.h"
+#include "NormalVectorOverlay.h"
 
 #endif
 

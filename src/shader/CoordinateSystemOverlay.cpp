@@ -24,8 +24,9 @@ void CoordinateSystemOverlay::renderViewOverlayImp()
                         Vector3f ( 0, 0, axisLength )
                        };
 
-    Eigen::Vector2f rotation = _cameraTool->rotation();
-    double aspect = _cameraTool->aspect();
+    Eigen::Vector3f rotation = _scene->camera()->rotation();
+
+    double aspect = _scene->camera()->aspect();
 
     Vector3f center ( - aspect * 0.8, -0.8, 0.0 );
 

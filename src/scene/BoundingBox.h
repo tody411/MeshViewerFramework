@@ -27,6 +27,13 @@ public :
         clear();
     }
 
+    //! Constructor.
+    BoundingBox ( const BoundingBox& bb )
+    {
+        _min = bb._min;
+        _max = bb._max;
+    }
+
     //! Destructor.
     virtual ~BoundingBox() {}
 

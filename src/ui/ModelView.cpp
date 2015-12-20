@@ -12,6 +12,8 @@
 #include <GL/GLU.h>
 
 #include "Scene.h"
+#include "BaseTool.h"
+#include "SelectTool.h"
 #include "Overlays.h"
 #include "CameraTool.h"
 #include "Logger.h"
@@ -19,13 +21,11 @@
 #include <iostream>
 
 ModelView::ModelView ( QWidget* parent )
-    : QGLWidget ( QGLFormat ( QGL::SampleBuffers | QGL::AlphaChannel ), parent ), _scene ( nullptr )
+    : QGLWidget ( QGLFormat ( QGL::SampleBuffers | QGL::AlphaChannel ), parent ), _scene ( nullptr ), _tool ( nullptr )
 {
     setMouseTracking ( true );
     setFocusPolicy ( Qt::StrongFocus );
     setAutoFillBackground ( false );
-
-    _cameraTool = new CameraTool ( this );
 }
 
 void ModelView::setScene ( Scene* scene )
@@ -37,6 +37,16 @@ void ModelView::setScene ( Scene* scene )
     _overlays.append ( new CoordinateSystemOverlay ( scene, _cameraTool, this ) );
     _overlays.append ( new WireframeOverlay ( scene ) );
     _overlays.append ( new PointsOverlay ( scene ) );
+    _overlays.append ( new NormalVectorOverlay ( scene ) );
+
+    _cameraTool = new CameraTool ( _scene, this );
+
+    setTool ( new SelectTool ( _scene, this ) );
+}
+
+void ModelView::setTool ( BaseTool* tool )
+{
+    _tool = tool;
 }
 
 void ModelView::render()
@@ -44,10 +54,16 @@ void ModelView::render()
     update();
 }
 
-void ModelView::renderScreenShot ( const QString& filePath )
+const QImage ModelView::screenShot()
 {
     QImage image = grabFrameBuffer ( true );
     image = image.convertToFormat ( QImage::Format_ARGB32 );
+    return image;
+}
+
+void ModelView::renderScreenShot ( const QString& filePath )
+{
+    QImage image = screenShot();
     image.save ( filePath );
 }
 
@@ -86,7 +102,7 @@ void ModelView::renderGL()
     _scene->light()->gl();
     _scene->material()->gl();
 
-    _cameraTool->gl();
+    _scene->glCamera();
     _scene->focusGL();
 
     glEnable ( GL_BLEND );
@@ -95,10 +111,13 @@ void ModelView::renderGL()
 
     _scene->render();
 
+    _tool->renderSceneOverlay();
+
     foreach ( BaseOverlay* overlay, _overlays )
     {
         overlay->renderSceneOverlay();
     }
+
     glFlush();
 
     glDisable ( GL_DEPTH_TEST );
@@ -117,6 +136,7 @@ void ModelView::renderOverlay()
     {
         overlay->renderViewOverlay();
     }
+    _tool->renderViewOverlay();
     glPopAttrib();
 
     QPainter painter ( this );
@@ -125,6 +145,8 @@ void ModelView::renderOverlay()
     {
         overlay->renderPainter ( &painter );
     }
+
+    _tool->renderPainter ( &painter );
     painter.end();
 }
 
@@ -141,43 +163,60 @@ void ModelView::resizeGL ( int width, int height )
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
 
-    _cameraTool->setAspect ( aspect );
+    _scene->camera()->setAspect ( aspect );
 }
 
 
 void ModelView::mousePressEvent ( QMouseEvent* event )
 {
+    if ( ! ( event->modifiers() & Qt::AltModifier ) )
+    {
+        if ( _tool ) _tool->mousePressEvent ( event );
+    }
+
+
     _cameraTool->mousePressEvent ( event );
 }
 void ModelView::mouseMoveEvent ( QMouseEvent* event )
 {
+    if ( ! ( event->modifiers() & Qt::AltModifier ) )
+    {
+        if ( _tool ) _tool->mouseMoveEvent ( event );
+    }
+
     _cameraTool->mouseMoveEvent ( event );
     update();
 
-    Eigen::Vector3d pNear, ray;
-    unproject ( mousePosition ( event ), pNear, ray );
 
-    QString message = "Pos: ";
-    message += QString ( "(%1, %2, %3)" ).arg ( pNear[0] ).arg ( pNear[1] ).arg ( pNear[2] );
-    _scene->showMessage ( message );
 }
 void ModelView::mouseReleaseEvent ( QMouseEvent* event )
 {
+    if ( ! ( event->modifiers() & Qt::AltModifier ) )
+    {
+        if ( _tool ) _tool->mouseReleaseEvent ( event );
+    }
+
     _cameraTool->mouseReleaseEvent ( event );
 }
 void ModelView::wheelEvent ( QWheelEvent* event )
 {
+    if ( _tool ) _tool->wheelEvent ( event );
+
     _cameraTool->wheelEvent ( event );
     update();
 }
 
 void ModelView::keyPressEvent ( QKeyEvent* event )
 {
+    if ( _tool ) _tool->keyPressEvent ( event );
+
     _cameraTool->keyPressEvent ( event );
     update();
 }
 void ModelView::keyReleaseEvent ( QKeyEvent* event )
 {
+    if ( _tool ) _tool->keyReleaseEvent ( event );
+
     _cameraTool->keyReleaseEvent ( event );
 }
 
@@ -191,7 +230,7 @@ void ModelView::unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  E
 {
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
-    _cameraTool->gl();
+    _scene->glCamera();
     _scene->focusGL();
 
     GLdouble projectionMat[16];
