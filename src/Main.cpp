@@ -9,15 +9,15 @@ int main ( int argc, char* argv[] )
 {
     QApplication app ( argc, argv );
 
-    app.setApplicationName ( "SimpleMeshViewer" );
+    app.setApplicationName ( "MeshViewerFramework" );
     app.setApplicationVersion ( "1.0" );
 
     QCommandLineParser parser;
-    parser.setApplicationDescription ( "Simple Mesh Viewer." );
+    parser.setApplicationDescription ( "Simple Development Framework for Mesh Viewer." );
     parser.addHelpOption();
     parser.addVersionOption();
 
-    parser.addPositionalArgument ( "input", "Input Mesh file path."  );
+    parser.addPositionalArgument ( "input", "Input Mesh File Path."  );
 
     parser.process ( app );
     const QStringList args = parser.positionalArguments();
@@ -34,8 +34,8 @@ int main ( int argc, char* argv[] )
         {
             QString inputFile ( inputInfo.absoluteFilePath() );
 
-            Logger::getLogger ( "SimpleMeshViewer" )->info ( inputFile );
-            Logger::getLogger ( "SimpleMeshViewer" )->setIndent ( 1 );
+            Logger::getLogger ( "MeshViewerFramework" )->info ( inputFile );
+            Logger::getLogger ( "MeshViewerFramework" )->setIndent ( 1 );
 
         }
 

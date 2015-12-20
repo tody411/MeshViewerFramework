@@ -1,16 +1,46 @@
 
-Simple 3D Mesh Viewer. (C++)
+Simple Development Framework for 3D Mesh Viewer. (C++)
 ====
 
-Simple 3D mesh viewer developed with C++ on Windows.
+This package provides a simple framework to develop a 3D mesh viewer with C++ on Windows.
+The framework is in active development, and
+I plan to focus on exploring a better development scheme for mesh analysis functions.
 
-### Features.
-* Load 3D mesh files supported by OpenMesh library (`*.obj, *.ply, *.off`, etc.).
-    - `File -> Load 3D Mesh File` or `Drag & Drop`: load the 3D model file into the 3D model view.
-* Edit the 3D mesh with simple commands.
-    - `Laplacian Smooting`
-* Save the 3D mesh to a target file (`*.obj, *.ply, *.off`, etc.).
-    - `File -> Save 3D Mesh File`: save the 3D
+### GUI Features
+#### Main Window
+Main window provides a simple 3D mesh viewer and menus.
+
+* **Camera Control**
+    - **Rotate**: Alt + Left Drag.
+    - **Move**: Alt + Middle Drag.
+    - **Zoom**: Mouse Wheel.
+
+![Main Window](images/MainWindow.png)
+
+#### Menus.
+* **File**: read and write 3D mesh file.
+    - **Load 3D Mesh File**: supported files (`*.obj, *.ply, *.off`, etc.).
+    - **Save 3D Mesh File**: supported files (`*.obj, *.ply, *.off`, etc.).
+* **Operations**: edit 3D mesh.
+    - **Noise**: add noise to the mesh.
+       ![Noise](images/Noise.png)
+    - **Laplacian Smooting**: smooth the mesh via Laplacian smoothing.
+        ![LaplacianSmoothing](images/LaplacianSmoothing.png)
+* **Coloring**: visualize a 3D mesh feature with computed vertex or face colors (updated on command).
+    - **Normal Color**: show normal colors.
+       ![NormalColor](images/NormalColor.png)
+    - **Position Color**: show position colors.
+* **Shader**: visualize a 3D mesh with GLSL shaders (interactive updates).
+    - **Normal Shader**: shading with normal colors.
+    - **Toon Shader**: visualize mesh with toon shading.
+       ![ToonShader](images/ToonShader.png)
+* **Overlay**: switch the overlay modes.
+    - **Show Wireframe**: show wireframe.
+       ![Wireframe](images/Wireframe.png)
+    - **Show Points**: show points.
+       ![ShowPoints](images/ShowPoints.png)
+    - **Show Normals**: show normal vectors.
+       ![ShowNormals](images/ShowNormals.png)
 
 ### Dependencies.
 For CMake build process:

@@ -113,7 +113,7 @@ void MainWindow::createUI()
     //addDockWidget ( Qt::RightDockWidgetArea, rightDock );
     connect ( _scene, &Scene::messageUpdated, statusBar(), &QStatusBar::showMessage );
 
-    this->setWindowTitle ( "Simple Mesh Viewer" );
+    this->setWindowTitle ( "Mesh Viewer" );
 }
 
 void MainWindow::dragEnterEvent ( QDragEnterEvent* event )

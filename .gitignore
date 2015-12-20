@@ -54,3 +54,6 @@ build
 bin/*.dll
 bin/*.exe
 bin/*.pdb
+
+# Images
+*.pptx
