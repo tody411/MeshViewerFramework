@@ -21,7 +21,7 @@
 #include <iostream>
 
 ModelView::ModelView ( QWidget* parent )
-    : QGLWidget ( QGLFormat ( QGL::SampleBuffers | QGL::AlphaChannel ), parent ), _scene ( nullptr ), _tool ( nullptr )
+    : QGLWidget ( QGLFormat ( QGL::SampleBuffers | QGL::AlphaChannel ), parent ), _scene ( nullptr ), _tool ( nullptr ), _renderBuffer ( nullptr )
 {
     setMouseTracking ( true );
     setFocusPolicy ( Qt::StrongFocus );
@@ -63,7 +63,46 @@ const QImage ModelView::screenShot()
 
 void ModelView::renderScreenShot ( const QString& filePath )
 {
+    /*update();
     QImage image = screenShot();
+    image.save ( filePath );*/
+
+    makeCurrent();
+
+    updateRenderBuffer();
+
+    _renderBuffer->bind();
+
+    glPushAttrib ( GL_ALL_ATTRIB_BITS );
+    glViewport ( 0, 0, width(), height() );
+    glMatrixMode ( GL_PROJECTION );
+    glLoadIdentity();
+
+    float aspect = width() / ( float )  height();
+
+    glOrtho ( -aspect , aspect , -1 , 1 , -10.0 , 10.0 );
+
+    glMatrixMode ( GL_MODELVIEW );
+    glLoadIdentity();
+
+    glClearColor ( 0.0, 0.0, 0.0, 0.0 );
+    glColorMask ( TRUE, TRUE, TRUE, TRUE );
+    glClear ( GL_COLOR_BUFFER_BIT );
+    renderBackGround();
+    renderGL();
+    glPopAttrib();
+
+    renderOverlay();
+
+    QPainter painter ( _renderBuffer );
+
+    renderPainter ( &painter );
+    painter.end();
+
+    _renderBuffer->release();
+
+    QImage image = _renderBuffer->toImage();
+
     image.save ( filePath );
 }
 
@@ -99,15 +138,15 @@ void ModelView::renderGL()
 {
     if ( _scene == nullptr ) return;
 
+    glEnable ( GL_BLEND );
+    glEnable ( GL_DEPTH_TEST );
+    glDisable ( GL_CULL_FACE );
+
     _scene->light()->gl();
     _scene->material()->gl();
 
     _scene->glCamera();
     _scene->glFocus();
-
-    glEnable ( GL_BLEND );
-    glEnable ( GL_DEPTH_TEST );
-    glDisable ( GL_CULL_FACE );
 
     _scene->render();
 
@@ -139,12 +178,7 @@ void ModelView::renderOverlay()
 
     QPainter painter ( this );
 
-    foreach ( BaseOverlay* overlay, _overlays )
-    {
-        overlay->renderPainter ( &painter );
-    }
-
-    _tool->renderPainter ( &painter );
+    renderPainter ( &painter );
     painter.end();
 }
 
@@ -283,4 +317,29 @@ void ModelView::renderBackGround()
     glEnd();
 }
 
+void ModelView::renderPainter ( QPainter* painter )
+{
+    foreach ( BaseOverlay* overlay, _overlays )
+    {
+        overlay->renderPainter ( painter );
+    }
 
+    _tool->renderPainter ( painter );
+}
+
+void ModelView::updateRenderBuffer()
+{
+    if ( _renderBuffer == nullptr )
+    {
+        _renderBuffer = new QGLFramebufferObject ( size(), QGLFramebufferObject::Depth );
+    }
+
+    if ( _renderBuffer != nullptr )
+    {
+        if ( _renderBuffer->size() != size() )
+        {
+            delete _renderBuffer;
+            _renderBuffer = new QGLFramebufferObject ( size(), QGLFramebufferObject::Depth );
+        }
+    }
+}

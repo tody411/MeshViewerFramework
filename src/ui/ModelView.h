@@ -100,6 +100,10 @@ private:
     //! Render bachground.
     void renderBackGround();
 
+    void renderPainter ( QPainter* painter );
+
+    void updateRenderBuffer();
+
 private:
     //! Camera tool.
     CameraTool* _cameraTool;
@@ -113,6 +117,7 @@ private:
     //! Overlay renderers.
     QVector<BaseOverlay*> _overlays;
 
+    QGLFramebufferObject* _renderBuffer;
 };
 
 #endif
