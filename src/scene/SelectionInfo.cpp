@@ -54,7 +54,7 @@ void SelectionInfo::glVertexSelection()
 
     MeshData* mesh = _scene->mesh()->openMeshData();
     BoundingBox bb =  _scene->mesh()->boundingBox();
-    double bb_size = bb.size();
+    float bb_size = bb.size();
 
     glDisable ( GL_LIGHTING );
     glEnable ( GL_DEPTH_TEST );
@@ -63,7 +63,7 @@ void SelectionInfo::glVertexSelection()
 
     glBegin ( GL_POINTS );
 
-    double epsilon = 1e-3;
+    float epsilon = 1e-3;
 
     std::vector<int> indices;
     vertexSelection ( indices );
@@ -92,12 +92,12 @@ void SelectionInfo::glFaceSelection()
 
     BoundingBox bb =  _scene->boundingBox();
 
-    double bb_size = bb.size();
+    float bb_size = bb.size();
 
     MeshData::FaceVertexIter fvIt;
     MeshData::FaceHandle fh;
 
-    double epsilon = 1e-4;
+    float epsilon = 1e-4;
 
     std::vector<int> indices;
     faceSelection ( indices );
@@ -121,7 +121,7 @@ void SelectionInfo::glFaceSelection()
             OpenMesh::Vec3f v = mesh->point ( *fvIt );
             OpenMesh::Vec3f n = mesh->normal ( *fvIt );
 
-            v += epsilon * bb_size * n;
+            v += ( epsilon * bb_size ) * n;
 
             glVertex3fv ( v.data() );
             ++fvIt;
