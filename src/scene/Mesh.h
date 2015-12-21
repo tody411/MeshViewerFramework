@@ -104,6 +104,12 @@ public :
     //! Return the vertex Laplacian matrix.
     void vertexLaplacian ( Eigen::SparseMatrix<double>& L );
 
+    //! Return the face Laplacian matrix.
+    void faceLaplacian ( Eigen::SparseMatrix<double>& L, double sigma = 0.5 );
+
+    //! Return  the face Distance matrix.
+    void W_ff ( Eigen::SparseMatrix<double>& W, double sigma = 0.5 );
+
     //! OpenGL calls for rendering.
     void gl ( DisplayMode displayMode = SHADING );
 
@@ -138,9 +144,9 @@ public :
 
     void updateBoundingBox();
 
-    void focusGL()
+    void glFocus()
     {
-        return _bb.focusGL();
+        return _bb.glFocus();
     }
 
 private:

@@ -14,8 +14,12 @@
 
 #include "NoiseCommand.h"
 #include "LaplacianSmoothingCommand.h"
+#include "SmoothNormalCommand.h"
 #include "FlipNormalCommand.h"
 #include "NormalizeMeshCommand.h"
+
+#include "NormalKmeansCommand.h"
+#include "SpectralClusteringCommand.h"
 
 #include "DefaultShadingCommand.h"
 #include "NormalColorCommand.h"
@@ -28,6 +32,8 @@
 #include "RenderWindowCommand.h"
 
 #include "OverlayCommand.h"
+
+#include "DemoCommand.h"
 
 #endif
 

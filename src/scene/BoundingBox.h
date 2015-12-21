@@ -83,7 +83,7 @@ public :
         return ( _max - _min ).norm();
     }
 
-    void focusGL();
+    void glFocus();
 
     const QString dump()
     {

@@ -41,6 +41,5 @@ void NoiseCommand::doImp ()
         V_new.row ( vi ) += Eigen::Vector3d ( randPosition ( mt ), randPosition ( mt ), randPosition ( mt ) );
     }
 
-
     mesh->setPoints ( V_new );
 }

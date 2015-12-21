@@ -8,6 +8,7 @@
 
 #ifndef NORMALSHADERCOMMAND_H
 #define NORMALSHADERCOMMAND_H
+
 #include "BaseCommand.h"
 
 //! NormalShaderCommand implementation.

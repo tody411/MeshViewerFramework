@@ -68,9 +68,15 @@ void MainWindow::createMenue()
     _operationMenus = new MenuGroup ( tr ( "&Operations" ), this );
     _operationMenus->addCommand ( new NoiseCommand ( _scene ) );
     _operationMenus->addCommand ( new LaplacianSmoothingCommand ( _scene ) );
+    _operationMenus->addCommand ( new SmoothNormalCommand ( _scene ) );
     _operationMenus->addCommand ( new FlipNormalCommand ( _scene ) );
     _operationMenus->addCommand ( new NormalizeMeshCommand ( _scene ) );
     menuBar()->addMenu ( _operationMenus );
+
+    MenuGroup* clusteringMenus = new MenuGroup ( tr ( "&Clustering" ), this );
+    clusteringMenus->addCommand ( new NormalKmeansCommand ( _scene ) );
+    clusteringMenus->addCommand ( new SpectralClusteringCommand ( _scene ) );
+    menuBar()->addMenu ( clusteringMenus );
 
     MenuGroup* coloringMenus = new MenuGroup ( tr ( "&Coloring" ), this );
     coloringMenus->addCommand ( new DefaultShadingCommand ( _scene ) );
@@ -95,8 +101,13 @@ void MainWindow::createMenue()
     _renderMenus = new MenuGroup ( tr ( "&Render" ), this );
     _renderMenus->addCommand ( new RenderCommand ( _scene, _view ) );
     _renderMenus->addCommand ( new RenderWindowCommand ( _scene, this ) );
-
     menuBar()->addMenu ( _renderMenus );
+
+    MenuGroup* demoMenus = new MenuGroup ( tr ( "&Demo" ), this );
+    demoMenus->addCommand ( new DemoCommand ( _scene, _view ) );
+    menuBar()->addMenu ( demoMenus );
+
+
 
 }
 

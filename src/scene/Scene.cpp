@@ -71,13 +71,13 @@ void Scene::render()
 void Scene::glCamera()
 {
     _camera->gl();
-    //_mesh->focusGL();
+    //_mesh->glFocus();
 }
 
 
-void Scene::focusGL()
+void Scene::glFocus()
 {
-    _mesh->focusGL();
+    _mesh->glFocus();
 }
 
 void  Scene::showMessage ( const QString& message, int timeout )

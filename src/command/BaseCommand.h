@@ -61,6 +61,29 @@ public slots:
         }
     }
 
+    void doDefault()
+    {
+        setupImp() ;
+        doSlot();
+
+    }
+
+    void doSlot()
+    {
+        _inputInfo = _params.str();
+
+        QElapsedTimer timer;
+        timer.start();
+
+        doImp();
+
+        _performanceInfo = QString ( "%1 sec" ).arg ( timer.elapsed() / 1000.0f );
+
+        _scene->showMessage ( str() );
+    }
+
+public:
+
     //! Return the command information.
     const QString str() const
     {
@@ -82,21 +105,6 @@ public slots:
         }
 
         return info;
-    }
-
-private slots:
-    void doSlot()
-    {
-        _inputInfo = _params.str();
-
-        QElapsedTimer timer;
-        timer.start();
-
-        doImp();
-
-        _performanceInfo = QString ( "%1 sec" ).arg ( timer.elapsed() / 1000.0f );
-
-        _scene->showMessage ( str() );
     }
 
 protected:

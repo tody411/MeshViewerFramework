@@ -103,7 +103,7 @@ void ModelView::renderGL()
     _scene->material()->gl();
 
     _scene->glCamera();
-    _scene->focusGL();
+    _scene->glFocus();
 
     glEnable ( GL_BLEND );
     glEnable ( GL_DEPTH_TEST );
@@ -123,8 +123,6 @@ void ModelView::renderGL()
     glDisable ( GL_DEPTH_TEST );
     glEnable ( GL_BLEND );
     glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-
 }
 
 void ModelView::renderOverlay()
@@ -231,7 +229,7 @@ void ModelView::unproject ( const Eigen::Vector2d& p, Eigen::Vector3d& pNear,  E
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
     _scene->glCamera();
-    _scene->focusGL();
+    _scene->glFocus();
 
     GLdouble projectionMat[16];
     GLdouble modelviewMat[16];

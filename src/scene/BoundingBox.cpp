@@ -37,7 +37,7 @@ void BoundingBox::expand ( const MeshData& mesh )
     }
 }
 
-void BoundingBox::focusGL()
+void BoundingBox::glFocus()
 {
 
     float scale = 2.0 / size();

@@ -57,3 +57,6 @@ bin/*.pdb
 
 # Images
 *.pptx
+
+# 3D models.
+models/*

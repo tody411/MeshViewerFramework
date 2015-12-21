@@ -47,7 +47,7 @@ public :
 
     void glCamera();
 
-    void focusGL();
+    void glFocus();
 
     Mesh* mesh()
     {

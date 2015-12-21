@@ -12,6 +12,8 @@
 
 #include <OpenMesh/Core/IO/MeshIO.hh>
 
+#include "MeshMatrix.h"
+
 bool Mesh::loadMesh ( const QString& filePath )
 {
     _mesh.request_face_normals();
@@ -223,6 +225,8 @@ void Mesh::setFaceColors ( const Eigen::MatrixXd& C )
         _mesh.set_color ( *f_it, c );
 
     }
+
+    emit updated();
 }
 
 void Mesh::faceNormals ( Eigen::MatrixXd& N )
@@ -269,6 +273,47 @@ void Mesh::vertexLaplacian ( Eigen::SparseMatrix<double>& L )
     }
 
     L.makeCompressed();
+}
+
+void Mesh::faceLaplacian ( Eigen::SparseMatrix<double>& L, double sigma )
+{
+    int numRows = numFaces();
+    int numCols = numRows;
+
+    L.resize ( numRows, numCols );
+
+    L.reserve ( Eigen::VectorXi::Constant ( numCols, 8 ) );
+
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+    MeshData::FaceFaceIter ff_it;
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        double w_sum = 0.0;
+
+        OpenMesh::Vec3f N_p = _mesh.normal ( *f_it );
+
+        for ( ff_it = _mesh.ff_begin ( f_it ); ff_it.is_valid(); ++ff_it )
+        {
+            OpenMesh::Vec3f N_q = _mesh.normal ( *ff_it );
+
+            double d = 1.0 - OpenMesh::dot ( N_p, N_q );
+
+            double w = exp ( - ( d * d ) / ( sigma * sigma ) );
+            //double w = 1.0;
+            L.insert ( f_it->idx(), ff_it->idx() ) = -w;
+            w_sum += w;
+        }
+
+        L.insert ( f_it->idx(), f_it->idx() ) = w_sum;
+    }
+
+    L.makeCompressed();
+}
+
+void Mesh::W_ff ( Eigen::SparseMatrix<double>& W, double sigma )
+{
+    MeshMatrix ( _mesh ).W_ff ( W, sigma );
 }
 
 void Mesh::gl ( DisplayMode displayMode )
