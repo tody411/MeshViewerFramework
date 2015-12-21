@@ -19,24 +19,17 @@ void SpectralClusteringCommand::setupImp()
     Mesh* mesh = _scene->mesh();
 
     Eigen::SparseMatrix<double> L;
-    mesh->W_ff ( L, 2.0 );
+    mesh->faceLaplacian ( L, 1.0 );
 
+    computeSparse ( L, numCenters );
 
-    RedSVD::RedSymEigen<Eigen::SparseMatrix<double>> solver ( L, numCenters );
-
-    _U = solver.eigenvectors().transpose();
-
-    Eigen::VectorXd l = solver.eigenvalues();
-
-    std::cout << "Eigen Vector Shape: " << _U.rows() << "," << _U.cols() << std::endl;
-    std::cout << "Eigen Values: " << l << std::endl;
 }
 
 void SpectralClusteringCommand::doImp ()
 {
     int numCenters = _numCenters.value();
 
-    if ( numCenters != _U.rows() ) setupImp();
+    //if ( numCenters != _U.rows() ) setupImp();
 
     int clusderID = _clusterID.value();
 
@@ -71,4 +64,39 @@ void SpectralClusteringCommand::doImp ()
     Mesh* mesh = _scene->mesh();
     mesh->setFaceColors ( C );
     _scene->setMeshDisplayMode ( Mesh::DisplayMode::FACE_COLOR );
+}
+
+void SpectralClusteringCommand::computeDense ( const Eigen::SparseMatrix<double>& L, int numCenters )
+{
+    Eigen::MatrixXd L_dens = L;
+
+    Eigen::EigenSolver<Eigen::MatrixXd> solver ( L_dens );
+
+    _U = solver.eigenvectors().real().transpose();
+
+    //Eigen::VectorXd l = solver.eigenvalues();
+
+    std::cout << "Eigen Vector Shape: " << _U.rows() << "," << _U.cols() << std::endl;
+    //std::cout << "Eigen Values: " << l << std::endl;
+}
+
+void SpectralClusteringCommand::computeSparse ( const Eigen::SparseMatrix<double>& L, int numCenters )
+{
+    std::cout << "L.norm: "  << L.norm() << std::endl;
+    RedSVD::RedSymEigen<Eigen::SparseMatrix<double>> solver ( L, numCenters );
+
+    _U = solver.eigenvectors().transpose();
+
+    Eigen::VectorXd l = solver.eigenvalues();
+
+    std::cout << "Eigen Vector Shape: " << _U.rows() << "," << _U.cols() << std::endl;
+    std::cout << "Eigen Values: " << l << std::endl;
+
+    RedSVD::RedSVD<Eigen::SparseMatrix<double>> svdSolver ( L, numCenters );
+
+    Eigen::MatrixXd U_svd = svdSolver.matrixU().transpose();
+    Eigen::MatrixXd V_svd = svdSolver.matrixV().transpose();
+
+    std::cout << "U_svd: " << U_svd.rows() << "," << U_svd.cols() << std::endl;
+    std::cout << "V_svd: " << V_svd.rows() << "," << V_svd.cols() << std::endl;
 }

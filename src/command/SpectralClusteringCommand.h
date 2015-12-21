@@ -35,6 +35,11 @@ public :
     void doImp ();
 
 private:
+    void computeDense ( const Eigen::SparseMatrix<double>& L, int numCenters );
+
+    void computeSparse ( const Eigen::SparseMatrix<double>& L, int numCenters );
+
+private:
     IntParameter _numCenters;
     IntParameter _clusterID;
 
