@@ -10,12 +10,14 @@
 
 #include "ColorMap.h"
 
+#include <iostream>
+
 void BiharmonicNormalClusteringCommand::setupImp()
 {
     Mesh* mesh = _scene->mesh();
 
     Eigen::SparseMatrix<double> L;
-    mesh->faceLaplacian ( L, 0.7 );
+    mesh->faceLaplacian ( L, 0.5 );
 
     _M = L.transpose() * L;
 }
