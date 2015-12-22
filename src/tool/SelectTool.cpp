@@ -41,6 +41,7 @@ void SelectTool::mousePressEvent ( QMouseEvent* event )
     {
         message += "no intersection";
         _scene->showMessage ( message );
+        _scene->selectionInfo()->clearFaceSelection();
     }
 
     _scene->showMessage ( message );

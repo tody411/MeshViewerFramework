@@ -20,6 +20,7 @@
 #include "NormalizeMeshCommand.h"
 
 #include "NormalKmeansCommand.h"
+#include "BiharmonicNormalClusteringCommand.h"
 #include "NormalVariationClusteringCommand.h"
 #include "SpectralClusteringCommand.h"
 
@@ -27,6 +28,7 @@
 #include "NormalColorCommand.h"
 #include "PositionColorCommand.h"
 
+#include "LambertShaderCommand.h"
 #include "NormalShaderCommand.h"
 #include "ToonShaderCommand.h"
 
@@ -35,7 +37,6 @@
 
 #include "OverlayCommand.h"
 
-#include "DemoCommand.h"
 
 #endif
 

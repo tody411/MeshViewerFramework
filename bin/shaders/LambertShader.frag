@@ -1,19 +1,17 @@
-uniform sampler2D normalTex;
+varying vec3 Nw;
 
 void main (void)
 {
-	vec4 N_color = texture2D(normalTex, gl_TexCoord[0].st);
-	vec3 N = normalize( 2.0 * N_color.xyz - vec3(1.0, 1.0, 1.0) );
+	vec3 N = normalize( Nw );
 
-	vec3 L = gl_LightSource[0].position.xyz;
-	vec4 Ka = gl_LightSource[0].ambient;
-	vec4 Kd = gl_LightSource[0].diffuse;
+	vec3 L = normalize(gl_LightSource[0].position.xyz);
+	vec4 Ka = gl_LightSource[0].ambient * gl_FrontMaterial.ambient;
+	vec4 Kd = gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse;
 
-    float LdN = clamp(dot( L, N ), 0.0, 1.0);
-	vec4 c = Ka + Kd * LdN;
+	float Id = dot( L, N );
+	Id = max(Id, 0.0);
 
-	float alpha = N_color.a;
-	c.a = min(alpha, c.a);
-
+	vec4 c = Ka + Kd * Id;
+	c = clamp(c, 0.0, 1.0);
 	gl_FragColor = c;
 }

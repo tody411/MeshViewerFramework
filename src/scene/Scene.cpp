@@ -20,7 +20,7 @@
 #include "Logger.h"
 
 Scene::Scene ( QObject* parent )
-    : QObject ( parent ), _meshDisplayMode ( Mesh::DisplayMode::SHADING )
+    : QObject ( parent ), _meshDisplayMode ( Mesh::DisplayMode::GLSL )
 {
     _camera = new Camera ( this );
     _mesh = new Mesh ( this );
@@ -32,10 +32,14 @@ Scene::Scene ( QObject* parent )
 
 bool Scene::loadMesh ( const QString& filePath )
 {
+    _selection->clear();
+
     if ( !_mesh->loadMesh ( filePath ) )
     {
         return false;
     }
+
+    _meshDisplayMode =  Mesh::DisplayMode::GLSL;
 
     return true;
 }
@@ -48,22 +52,21 @@ bool Scene::saveMesh ( const QString& filePath )
 
 void Scene::render()
 {
-    glEnable ( GL_LIGHTING );
-
     if ( _meshDisplayMode == Mesh::DisplayMode::GLSL )
     {
         _shader->bind();
 
     }
+    glEnable ( GL_LIGHTING );
 
     _mesh->gl ( _meshDisplayMode );
-
-    _selection->gl();
 
     if ( _meshDisplayMode == Mesh::DisplayMode::GLSL )
     {
         _shader->release();
     }
+
+    _selection->gl();
 
     glFlush();
 }

@@ -43,6 +43,7 @@ public slots:
 
         if ( _params.empty() )
         {
+            setupImp() ;
             doSlot();
         }
 

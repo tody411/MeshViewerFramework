@@ -52,6 +52,12 @@ public :
 
     void gl();
 
+    void clear()
+    {
+        _vertexSelection.clear();
+        _faceSelection.clear();
+    }
+
     void clearVertexSelection()
     {
         _vertexSelection.clear();

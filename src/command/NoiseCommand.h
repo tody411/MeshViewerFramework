@@ -19,7 +19,7 @@ class NoiseCommand: public BaseCommand
 public :
     //! Constructor.
     NoiseCommand ( Scene* scene )
-        : BaseCommand ( "Noise", scene ), _sigma ( "sigma", 0.0, 0.1, 0.05, "Noise" )
+        : BaseCommand ( "Noise", scene ), _sigma ( "sigma", 0.0, 0.05, 0.01, "Noise" )
     {
         _params.addDouble ( &_sigma );
         setInteractive ( true );

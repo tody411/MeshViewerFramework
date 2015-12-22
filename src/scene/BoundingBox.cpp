@@ -40,7 +40,7 @@ void BoundingBox::expand ( const MeshData& mesh )
 void BoundingBox::glFocus()
 {
 
-    float scale = 2.0 / size();
+    float scale = 2.0 * sqrt ( 2.0 ) / size();
 
     glScalef ( scale, scale, scale );
     glTranslatef ( - center() ( 0 ), - center() ( 1 ), - center() ( 2 ) );

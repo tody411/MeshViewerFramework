@@ -120,6 +120,11 @@ void ModelView::initializeGL()
     glEnable ( GL_LIGHTING );
     glEnable ( GL_LIGHT0 );
     glEnable ( GL_MULTISAMPLE );
+
+    if ( _scene )
+    {
+        _scene->shader()->linkShaders ( "SimpleTransform.vert", "LambertShader.frag" );
+    }
 }
 
 void ModelView::paintEvent ( QPaintEvent* event )

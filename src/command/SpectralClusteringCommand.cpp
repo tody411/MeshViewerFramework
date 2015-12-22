@@ -21,10 +21,6 @@ void SpectralClusteringCommand::setupImp()
     Eigen::MatrixXd N;
     mesh->faceNormals ( N );
 
-    Eigen::MatrixXd W;
-    fullWeightMatrix ( N, W );
-    return;
-
     Eigen::SparseMatrix<double> L;
     mesh->W_ff ( L, 1.0 );
 

@@ -12,6 +12,8 @@
 
 #include "Scene.h"
 #include "Commands.h"
+#include "DemoCommand.h"
+
 #include "ModelView.h"
 #include "BaseOverlay.h"
 
@@ -76,7 +78,7 @@ void MainWindow::createMenue()
 
     MenuGroup* clusteringMenus = new MenuGroup ( tr ( "&Clustering" ), this );
     clusteringMenus->addCommand ( new NormalKmeansCommand ( _scene ) );
-    clusteringMenus->addCommand ( new NormalVariationClusteringCommand ( _scene ) );
+    clusteringMenus->addCommand ( new BiharmonicNormalClusteringCommand ( _scene ) );
     clusteringMenus->addCommand ( new SpectralClusteringCommand ( _scene ) );
     menuBar()->addMenu ( clusteringMenus );
 
@@ -87,6 +89,7 @@ void MainWindow::createMenue()
     menuBar()->addMenu ( coloringMenus );
 
     MenuGroup* shaderMenus = new MenuGroup ( tr ( "&Shader" ), this );
+    shaderMenus->addCommand ( new LambertShaderCommand ( _scene ) );
     shaderMenus->addCommand ( new NormalShaderCommand ( _scene ) );
     shaderMenus->addCommand ( new ToonShaderCommand ( _scene ) );
     menuBar()->addMenu ( shaderMenus );
