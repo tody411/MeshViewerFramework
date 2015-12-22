@@ -80,6 +80,8 @@ public :
         return _shader;
     }
 
+    void setDefaultShader();
+
     Project* project()
     {
         return &_project;

@@ -44,8 +44,8 @@ void DemoCommand::doImp ()
         _view->renderScreenShot ( testFilePath );
         mesh->setPoints ( V0 );
 
-        _scene->shader()->linkShaders ( "SimpleTransform.vert", "LambertShader.frag" );
-        _scene->setMeshDisplayMode ( Mesh::DisplayMode::GLSL );
+        //_scene->setDefaultShader();
+        //_scene->setMeshDisplayMode ( Mesh::DisplayMode::GLSL );
     }
 
     /*BaseCommand* command = new NoiseCommand ( _scene );

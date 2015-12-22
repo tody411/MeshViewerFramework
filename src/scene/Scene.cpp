@@ -39,6 +39,7 @@ bool Scene::loadMesh ( const QString& filePath )
         return false;
     }
 
+    setDefaultShader();
     _meshDisplayMode =  Mesh::DisplayMode::GLSL;
 
     return true;
@@ -57,7 +58,19 @@ void Scene::render()
         _shader->bind();
 
     }
+
+    glEnable ( GL_BLEND );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+    glEnable ( GL_DEPTH_TEST );
+    glDisable ( GL_CULL_FACE );
     glEnable ( GL_LIGHTING );
+
+    _light->gl();
+    _material->gl();
+
+    glCamera();
+    glFocus();
 
     _mesh->gl ( _meshDisplayMode );
 
@@ -65,10 +78,8 @@ void Scene::render()
     {
         _shader->release();
     }
-
-    _selection->gl();
-
     glFlush();
+    _selection->gl();
 }
 
 void Scene::glCamera()
@@ -86,4 +97,9 @@ void Scene::glFocus()
 void  Scene::showMessage ( const QString& message, int timeout )
 {
     emit messageUpdated ( message, timeout );
+}
+
+void Scene::setDefaultShader()
+{
+    shader()->linkShaders ( "SimpleTransform.vert", "LambertShader.frag" );
 }

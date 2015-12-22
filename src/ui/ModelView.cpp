@@ -73,7 +73,7 @@ void ModelView::renderScreenShot ( const QString& filePath )
 
     _renderBuffer->bind();
 
-    glPushAttrib ( GL_ALL_ATTRIB_BITS );
+    //glPushAttrib ( GL_ALL_ATTRIB_BITS );
     glViewport ( 0, 0, width(), height() );
     glMatrixMode ( GL_PROJECTION );
     glLoadIdentity();
@@ -87,10 +87,20 @@ void ModelView::renderScreenShot ( const QString& filePath )
 
     glClearColor ( 0.0, 0.0, 0.0, 0.0 );
     glColorMask ( TRUE, TRUE, TRUE, TRUE );
-    glClear ( GL_COLOR_BUFFER_BIT );
-    renderBackGround();
+    glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    glEnable ( GL_DEPTH_TEST );
+    glDisable ( GL_CULL_FACE );
+
+    glShadeModel ( GL_SMOOTH );
+    glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
+
+    glEnable ( GL_LIGHTING );
+    glEnable ( GL_LIGHT0 );
+    glEnable ( GL_MULTISAMPLE );
+    //renderBackGround();
     renderGL();
-    glPopAttrib();
+    //glPopAttrib();
 
     renderOverlay();
 
@@ -123,7 +133,7 @@ void ModelView::initializeGL()
 
     if ( _scene )
     {
-        _scene->shader()->linkShaders ( "SimpleTransform.vert", "LambertShader.frag" );
+        _scene->setDefaultShader();
     }
 }
 
@@ -131,10 +141,11 @@ void ModelView::paintEvent ( QPaintEvent* event )
 {
     makeCurrent();
 
-    glPushAttrib ( GL_ALL_ATTRIB_BITS );
-    renderBackGround();
+    //glPushAttrib ( GL_ALL_ATTRIB_BITS );
+    glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
     renderGL();
-    glPopAttrib();
+    //glPopAttrib();
 
     renderOverlay();
 }
@@ -143,17 +154,12 @@ void ModelView::renderGL()
 {
     if ( _scene == nullptr ) return;
 
-    glEnable ( GL_BLEND );
-    glEnable ( GL_DEPTH_TEST );
-    glDisable ( GL_CULL_FACE );
-
-    _scene->light()->gl();
-    _scene->material()->gl();
-
-    _scene->glCamera();
-    _scene->glFocus();
+    glMatrixMode ( GL_MODELVIEW );
+    glLoadIdentity();
 
     _scene->render();
+
+    renderBackGround();
 
     _tool->renderSceneOverlay();
 
@@ -162,16 +168,13 @@ void ModelView::renderGL()
         overlay->renderSceneOverlay();
     }
 
-    glFlush();
-
     glDisable ( GL_DEPTH_TEST );
-    glEnable ( GL_BLEND );
-    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
 }
 
 void ModelView::renderOverlay()
 {
-    glPushAttrib ( GL_ALL_ATTRIB_BITS );
+    //glPushAttrib ( GL_ALL_ATTRIB_BITS );
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
     foreach ( BaseOverlay* overlay, _overlays )
@@ -179,7 +182,7 @@ void ModelView::renderOverlay()
         overlay->renderViewOverlay();
     }
     _tool->renderViewOverlay();
-    glPopAttrib();
+    //glPopAttrib();
 
     QPainter painter ( this );
 
@@ -300,25 +303,24 @@ void ModelView::renderBackGround()
 {
     float aspect = width() / ( float )  height();
 
-    glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
 
-    glDisable ( GL_DEPTH_TEST );
+    glEnable ( GL_DEPTH_TEST );
     glDisable ( GL_LIGHTING );
 
     glBegin ( GL_QUADS );
     glColor3f ( 0.1f, 0.1f, 0.1f );
-    glVertex2f ( -aspect, -1.0f );
+    glVertex3f ( -aspect, -1.0f, -9.0f );
 
     glColor3f ( 0.1f, 0.1f, 0.1f );
-    glVertex2f ( aspect, -1.0f );
+    glVertex3f ( aspect, -1.0f, -9.0f );
 
     glColor3f ( 0.5f, 0.6f, 0.7f );
-    glVertex2f ( aspect, 1.0f );
+    glVertex3f ( aspect, 1.0f, -9.0f );
 
     glColor3f ( 0.5f, 0.6f, 0.7f );
-    glVertex2f ( -aspect, 1.0f );
+    glVertex3f ( -aspect, 1.0f, -9.0f );
     glEnd();
 }
 
