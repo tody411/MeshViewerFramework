@@ -16,31 +16,35 @@
 
 bool Mesh::loadMesh ( const QString& filePath )
 {
-    _mesh.request_face_normals();
-    _mesh.request_face_colors();
-    _mesh.request_vertex_normals();
-    _mesh.request_vertex_colors();
-    _mesh.request_vertex_texcoords2D();
+    MeshData mesh;
+
+    mesh.request_face_normals();
+    mesh.request_face_colors();
+    mesh.request_vertex_normals();
+    mesh.request_vertex_colors();
+    mesh.request_vertex_texcoords2D();
 
     std::string file = filePath.toStdString();
 
-    if ( !OpenMesh::IO::read_mesh ( _mesh, file ) )
+    if ( !OpenMesh::IO::read_mesh ( mesh, file ) )
     {
         std::cerr << "read error" << std::endl;
         return false;
     }
 
-    _mesh.update_normals();
+    mesh.update_normals();
 
-    if ( !_mesh.is_triangles() )
+    if ( !mesh.is_triangles() )
     {
-        _mesh.triangulate();
+        mesh.triangulate();
     }
 
-    if ( !_mesh.has_vertex_normals() )
+    if ( !mesh.has_vertex_normals() )
     {
         std::cout << "No vertex normals" << std::endl;
     }
+
+    _mesh = mesh;
 
     updateBoundingBox();
 
