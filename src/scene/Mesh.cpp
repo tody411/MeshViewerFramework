@@ -262,7 +262,7 @@ void Mesh::vertexLaplacian ( Eigen::SparseMatrix<double>& L )
     for ( v_it = _mesh.vertices_begin(); v_it != v_end; ++v_it )
     {
         double w_sum = 0.0;
-        for ( vv_it = _mesh.vv_begin ( v_it ); vv_it.is_valid(); ++vv_it )
+        for ( vv_it = _mesh.vv_begin ( *v_it ); vv_it.is_valid(); ++vv_it )
         {
             double w = 1.0;
             L.insert ( v_it->idx(), vv_it->idx() ) = -w;
@@ -293,7 +293,7 @@ void Mesh::faceLaplacian ( Eigen::SparseMatrix<double>& L, double sigma )
 
         OpenMesh::Vec3f N_p = _mesh.normal ( *f_it );
 
-        for ( ff_it = _mesh.ff_begin ( f_it ); ff_it.is_valid(); ++ff_it )
+        for ( ff_it = _mesh.ff_begin ( *f_it ); ff_it.is_valid(); ++ff_it )
         {
             OpenMesh::Vec3f N_q = _mesh.normal ( *ff_it );
 
@@ -309,6 +309,11 @@ void Mesh::faceLaplacian ( Eigen::SparseMatrix<double>& L, double sigma )
     }
 
     L.makeCompressed();
+}
+
+void Mesh::Area_f ( Eigen::VectorXd& A )
+{
+    MeshMatrix ( _mesh ).Area_f ( A );
 }
 
 void Mesh::W_ff ( Eigen::SparseMatrix<double>& W, double sigma )
@@ -408,7 +413,7 @@ void Mesh::glFaceColorMode ( )
     {
         MeshData::Color c = _mesh.color ( *f_it );
 
-        for ( fv_it = _mesh.fv_begin ( f_it ); fv_it.is_valid(); ++fv_it )
+        for ( fv_it = _mesh.fv_begin ( *f_it ); fv_it.is_valid(); ++fv_it )
         {
             MeshData::Point p =  _mesh.point ( *fv_it );
             glColor3ubv ( c.data() );

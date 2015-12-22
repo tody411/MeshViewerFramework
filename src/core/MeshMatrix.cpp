@@ -24,7 +24,7 @@ void MeshMatrix::L_vv ( Eigen::SparseMatrix<double>& L )
     for ( v_it = _mesh.vertices_begin(); v_it != v_end; ++v_it )
     {
         double w_sum = 0.0;
-        for ( vv_it = _mesh.vv_begin ( v_it ); vv_it.is_valid(); ++vv_it )
+        for ( vv_it = _mesh.vv_begin ( *v_it ); vv_it.is_valid(); ++vv_it )
         {
             double w = 1.0;
             L.insert ( v_it->idx(), vv_it->idx() ) = -w;
@@ -55,7 +55,7 @@ void MeshMatrix::L_ff ( Eigen::SparseMatrix<double>& L, double w_u, double w_a, 
 
         OpenMesh::Vec3f N_p = _mesh.normal ( *f_it );
 
-        for ( ff_it = _mesh.ff_begin ( f_it ); ff_it.is_valid(); ++ff_it )
+        for ( ff_it = _mesh.ff_begin ( *f_it ); ff_it.is_valid(); ++ff_it )
         {
             OpenMesh::Vec3f N_q = _mesh.normal ( *ff_it );
 
@@ -91,7 +91,7 @@ void MeshMatrix::W_ff ( Eigen::SparseMatrix<double>& W, double sigma )
 
         OpenMesh::Vec3f N_p = _mesh.normal ( *f_it );
 
-        for ( ff_it = _mesh.ff_begin ( f_it ); ff_it.is_valid(); ++ff_it )
+        for ( ff_it = _mesh.ff_begin ( *f_it ); ff_it.is_valid(); ++ff_it )
         {
             OpenMesh::Vec3f N_q = _mesh.normal ( *ff_it );
 
@@ -105,4 +105,26 @@ void MeshMatrix::W_ff ( Eigen::SparseMatrix<double>& W, double sigma )
     }
 
     W.makeCompressed();
+}
+
+void MeshMatrix::Area_f ( Eigen::VectorXd& A )
+{
+    A.resize ( numFaces() );
+
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+    MeshData::FaceVertexIter fv_it;
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        fv_it = _mesh.fv_begin ( *f_it );
+
+        OpenMesh::Vec3f v1 = _mesh.point ( *fv_it );
+        ++fv_it;
+        OpenMesh::Vec3f v2 = _mesh.point ( *fv_it );
+        ++fv_it;
+        OpenMesh::Vec3f v3 = _mesh.point ( *fv_it );
+        ++fv_it;
+
+        A ( f_it->idx() ) = 0.5f * OpenMesh::cross ( v2 - v1, v3 - v1 ).norm();
+    }
 }

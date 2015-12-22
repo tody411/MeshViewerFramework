@@ -107,6 +107,9 @@ public :
     //! Return the face Laplacian matrix.
     void faceLaplacian ( Eigen::SparseMatrix<double>& L, double sigma = 0.5 );
 
+    //! Return  the face Area vector.
+    void Area_f ( Eigen::VectorXd& A );
+
     //! Return  the face Distance matrix.
     void W_ff ( Eigen::SparseMatrix<double>& W, double sigma = 0.5 );
 

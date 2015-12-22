@@ -53,6 +53,9 @@ public :
     //! Return  the face Distance matrix.
     void W_ff ( Eigen::SparseMatrix<double>& W, double sigma = 0.5 );
 
+    //! Return  the face Area vector.
+    void Area_f ( Eigen::VectorXd& A );
+
 private:
     //! OpenMesh data.
     MeshData&    _mesh;

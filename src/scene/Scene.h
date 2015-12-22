@@ -19,6 +19,7 @@
 #include "Material.h"
 #include "ShaderObject.h"
 #include "SelectionInfo.h"
+#include "Project.h"
 
 //! Scene implementation.
 class Scene : public QObject
@@ -79,6 +80,11 @@ public :
         return _shader;
     }
 
+    Project* project()
+    {
+        return &_project;
+    }
+
     const BoundingBox boundingBox() const
     {
         return _mesh->boundingBox();
@@ -119,6 +125,9 @@ private:
 
     //! Shader program.
     ShaderObject* _shader;
+
+    //! Project.
+    Project _project;
 };
 
 #endif
