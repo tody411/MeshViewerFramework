@@ -62,6 +62,7 @@ void MainWindow::createMenue()
     _fileMenus = new MenuGroup ( tr ( "&File" ), this );
     _fileMenus->addCommand ( new LoadCommand ( _scene ) );
     _fileMenus->addCommand ( new SaveCommand ( _scene ) );
+    _fileMenus->addCommand ( new SetProjectCommand ( _scene ) );
 
     menuBar()->addMenu ( _fileMenus );
 
@@ -75,6 +76,7 @@ void MainWindow::createMenue()
 
     MenuGroup* clusteringMenus = new MenuGroup ( tr ( "&Clustering" ), this );
     clusteringMenus->addCommand ( new NormalKmeansCommand ( _scene ) );
+    clusteringMenus->addCommand ( new NormalVariationClusteringCommand ( _scene ) );
     clusteringMenus->addCommand ( new SpectralClusteringCommand ( _scene ) );
     menuBar()->addMenu ( clusteringMenus );
 
