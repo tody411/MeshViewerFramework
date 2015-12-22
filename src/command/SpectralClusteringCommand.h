@@ -19,10 +19,14 @@ public :
     SpectralClusteringCommand ( Scene* scene )
         :  BaseCommand ( "Spectral Clustering", scene ),
            _numCenters ( "numCenters", 2, 20, 6 ),
-           _clusterID ( "clusterID", 0, 20, 0 )
+           _clusterID ( "clusterID", 0, 20, 0 ),
+           _isSparse ( "isSparse", true )
     {
         _params.addInt ( &_numCenters );
         _params.addInt ( &_clusterID );
+        _params.addBool ( &_isSparse );
+
+        _isSparseOld = true;
 
         setInteractive ( true );
     }
@@ -39,11 +43,16 @@ private:
 
     void computeSparse ( const Eigen::SparseMatrix<double>& L, int numCenters );
 
+    void fullWeightMatrix ( const  Eigen::MatrixXd& N, Eigen::MatrixXd& W );
+
 private:
     IntParameter _numCenters;
     IntParameter _clusterID;
+    BoolParameter _isSparse;
 
     Eigen::MatrixXd _U;
+
+    bool _isSparseOld;
 };
 
 #endif

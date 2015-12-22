@@ -16,7 +16,7 @@
 
 void DemoCommand::doImp ()
 {
-    qDebug() << demoDir();
+
 
     //_view->resize ( QSize ( 512, 512 ) );
 
@@ -29,17 +29,9 @@ void DemoCommand::doImp ()
 
     _view->update();
 
-    QString testFilePath = demoDir().absoluteFilePath ( "test.png" );
+    QString testFilePath = _scene->project()->imageDir().absoluteFilePath ( "test.png" );
 
     _view->renderScreenShot ( testFilePath );
 
     //mesh->setPoints ( V0 );
-}
-
-QDir DemoCommand::demoDir()
-{
-    QDir appDir = QApplication::applicationDirPath();
-
-    QDir _demoDir ( appDir.absoluteFilePath ( "../images" ) );
-    return QDir ( _demoDir.absolutePath() );
 }

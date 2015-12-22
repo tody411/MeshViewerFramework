@@ -11,6 +11,7 @@
 
 #include "LoadCommand.h"
 #include "SaveCommand.h"
+#include "SetProjectCommand.h"
 
 #include "NoiseCommand.h"
 #include "LaplacianSmoothingCommand.h"
@@ -19,6 +20,7 @@
 #include "NormalizeMeshCommand.h"
 
 #include "NormalKmeansCommand.h"
+#include "NormalVariationClusteringCommand.h"
 #include "SpectralClusteringCommand.h"
 
 #include "DefaultShadingCommand.h"

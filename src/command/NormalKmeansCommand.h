@@ -17,9 +17,12 @@ class NormalKmeansCommand : public BaseCommand
 public :
     //! Constructor.
     NormalKmeansCommand ( Scene* scene )
-        :  BaseCommand ( "Normal Kmeans", scene ), _numCenters ( "numCenters", 2, 20, 6 )
+        :  BaseCommand ( "Normal Kmeans", scene ),
+           _numCenters ( "numCenters", 2, 20, 6 ),
+           _withPosition ( "withPosition", false )
     {
         _params.addInt ( &_numCenters );
+        _params.addBool ( &_withPosition );
     }
 
     //! Destructor.
@@ -35,11 +38,12 @@ private:
 
     void project ( const Eigen::MatrixXd& N_centers, const Eigen::VectorXi& ID, Eigen::MatrixXd& N );
 
-    void updateCenters ( const Eigen::MatrixXd& N, const Eigen::VectorXi& ID, Eigen::MatrixXd& N_centers );
+    void updateCenters ( const Eigen::MatrixXd& N, const Eigen::VectorXi& ID, const Eigen::VectorXd& A_f, Eigen::MatrixXd& N_centers );
 
 
 private:
     IntParameter _numCenters;
+    BoolParameter _withPosition;
 };
 
 #endif

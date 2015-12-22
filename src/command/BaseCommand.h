@@ -25,7 +25,7 @@ public :
     //! Constructor.
     BaseCommand ( const QString& name, Scene* scene )
         :
-        _scene ( scene ), _name ( name ), _isInteractive ( false )
+        _scene ( scene ), _name ( name ), _isInteractive ( false ), _isCheckSceneEmtpy ( true )
     {}
 
     //! Destructor.
@@ -39,7 +39,7 @@ public :
 public slots:
     void actionSlot()
     {
-        if ( _scene->empty() ) return;
+        if ( _isCheckSceneEmtpy && ( _scene->empty() ) ) return;
 
         if ( _params.empty() )
         {
@@ -65,7 +65,6 @@ public slots:
     {
         setupImp() ;
         doSlot();
-
     }
 
     void doSlot()
@@ -83,7 +82,6 @@ public slots:
     }
 
 public:
-
     //! Return the command information.
     const QString str() const
     {
@@ -118,6 +116,11 @@ protected:
         _isInteractive = isInteractive;
     }
 
+    void setIsCheckSceneEmpty ( bool isCheckSceneEmpty )
+    {
+        _isCheckSceneEmtpy = isCheckSceneEmpty;
+    }
+
 protected:
     //! Command name.
     QString     _name;
@@ -139,6 +142,9 @@ protected:
 
     //! Interactive mode.
     bool _isInteractive;
+
+    //! Checking scene empty.
+    bool _isCheckSceneEmtpy;
 };
 
 #endif

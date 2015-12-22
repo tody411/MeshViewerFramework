@@ -30,8 +30,6 @@ public :
 
     void doImp ();
 
-private:
-    QDir demoDir();
 
 private:
     ModelView* _view;

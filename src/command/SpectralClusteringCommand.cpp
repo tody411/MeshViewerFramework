@@ -18,16 +18,36 @@ void SpectralClusteringCommand::setupImp()
 
     Mesh* mesh = _scene->mesh();
 
+    Eigen::MatrixXd N;
+    mesh->faceNormals ( N );
+
+    Eigen::MatrixXd W;
+    fullWeightMatrix ( N, W );
+    return;
+
     Eigen::SparseMatrix<double> L;
-    mesh->faceLaplacian ( L, 1.0 );
+    mesh->W_ff ( L, 1.0 );
 
-    computeSparse ( L, numCenters );
+    if ( _isSparse.value() )
+    {
+        computeSparse ( L, numCenters );
+    }
 
+    else
+    {
+        computeDense ( L, numCenters );
+    }
+    _isSparseOld = _isSparse.value();
 }
 
 void SpectralClusteringCommand::doImp ()
 {
     int numCenters = _numCenters.value();
+
+    if ( _isSparseOld != _isSparse.value() )
+    {
+        setupImp();
+    }
 
     //if ( numCenters != _U.rows() ) setupImp();
 
@@ -99,4 +119,27 @@ void SpectralClusteringCommand::computeSparse ( const Eigen::SparseMatrix<double
 
     std::cout << "U_svd: " << U_svd.rows() << "," << U_svd.cols() << std::endl;
     std::cout << "V_svd: " << V_svd.rows() << "," << V_svd.cols() << std::endl;
+}
+
+void SpectralClusteringCommand::fullWeightMatrix ( const  Eigen::MatrixXd& N, Eigen::MatrixXd& W )
+{
+    Eigen::MatrixXd D = N * N.transpose();
+    D = Eigen::MatrixXd::Ones ( D.rows(), D.cols() ) - D;
+
+    std::cout << "D: " << D.rows() << "," << D.cols() << std::endl;
+
+    double sigma = 0.5;
+
+    D = - ( 1.0 / ( sigma * sigma ) ) * D;
+
+    W = Eigen::exp ( D.array() );
+
+    for ( int i = 0; i < W.rows(); i++ )
+    {
+        W ( i, i ) = 0.0;
+    }
+
+    Eigen::EigenSolver<Eigen::MatrixXd> solver ( W );
+
+    _U = solver.eigenvectors().real().transpose();
 }

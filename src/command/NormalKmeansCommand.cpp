@@ -21,6 +21,9 @@ void NormalKmeansCommand::doImp ()
     Eigen::MatrixXd N;
     mesh->faceNormals ( N );
 
+    Eigen::VectorXd A_f;
+    mesh->Area_f ( A_f );
+
     Eigen::MatrixXd N_centers;
     computeRandomCenters ( numCenters, N_centers );
 
@@ -34,9 +37,8 @@ void NormalKmeansCommand::doImp ()
     {
         clustering ( N_centers, N, ID );
         project ( N_centers, ID, N_new );
-        updateCenters ( N, ID, N_centers );
+        updateCenters ( N, ID, A_f, N_centers );
     }
-
 
     Eigen::MatrixXd C;
     NormalColor::normalToColor ( N_new, C );
@@ -96,7 +98,7 @@ void NormalKmeansCommand::project ( const Eigen::MatrixXd& N_centers, const Eige
 }
 
 
-void NormalKmeansCommand::updateCenters ( const Eigen::MatrixXd& N, const Eigen::VectorXi& ID, Eigen::MatrixXd& N_centers )
+void NormalKmeansCommand::updateCenters ( const Eigen::MatrixXd& N, const Eigen::VectorXi& ID, const Eigen::VectorXd& A_f, Eigen::MatrixXd& N_centers )
 {
     N_centers = Eigen::MatrixXd::Zero ( N_centers.rows(), N_centers.cols() );
 
@@ -104,7 +106,7 @@ void NormalKmeansCommand::updateCenters ( const Eigen::MatrixXd& N, const Eigen:
     {
         int ci = ID ( vi );
 
-        N_centers.row ( ci ) += N.row ( vi );
+        N_centers.row ( ci ) += A_f ( vi ) * N.row ( vi );
     }
 
     N_centers.rowwise().normalize();

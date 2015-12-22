@@ -10,12 +10,15 @@
 
 #include "NormalizeMeshCommand.h"
 
+#include <QApplication>
 #include <QFileDialog>
 
 void LoadCommand::doImp ()
 {
     if ( _inputFile == "" )
     {
+        QFileDialog().setDirectory ( _modelDir );
+
         _inputFile = QFileDialog::getOpenFileName ( nullptr,
                      "Open 3D Mesh File", QString(), "Mesh File (*.obj *.off *.ply)" );
     }
@@ -24,5 +27,13 @@ void LoadCommand::doImp ()
 
     _scene->loadMesh ( _inputFile );
 
+    _modelDir = QFileInfo ( _inputFile ).absoluteDir();
+
     _inputFile = "";
+}
+
+
+void LoadCommand::defaultModelDir()
+{
+    _modelDir = _scene->project()->modelDir();
 }
