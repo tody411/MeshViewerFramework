@@ -90,6 +90,7 @@ void MainWindow::createMenue()
 
     MenuGroup* shaderMenus = new MenuGroup ( tr ( "&Shader" ), this );
     shaderMenus->addCommand ( new LambertShaderCommand ( _scene ) );
+    shaderMenus->addCommand ( new PhongShaderCommand ( _scene ) );
     shaderMenus->addCommand ( new NormalShaderCommand ( _scene ) );
     shaderMenus->addCommand ( new ToonShaderCommand ( _scene ) );
     menuBar()->addMenu ( shaderMenus );

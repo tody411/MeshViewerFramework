@@ -78,8 +78,9 @@ void Scene::render()
     {
         _shader->release();
     }
-    glFlush();
+
     _selection->gl();
+
 }
 
 void Scene::glCamera()

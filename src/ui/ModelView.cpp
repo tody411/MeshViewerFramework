@@ -161,6 +161,11 @@ void ModelView::renderGL()
 
     renderBackGround();
 
+    glFlush();
+
+    _scene->glCamera();
+    _scene->glFocus();
+
     _tool->renderSceneOverlay();
 
     foreach ( BaseOverlay* overlay, _overlays )
@@ -174,6 +179,7 @@ void ModelView::renderGL()
 
 void ModelView::renderOverlay()
 {
+    glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
     //glPushAttrib ( GL_ALL_ATTRIB_BITS );
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();

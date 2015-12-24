@@ -50,6 +50,7 @@ public slots:
         else
         {
             setupImp() ;
+
             CommandParameterUI* paramUI = new CommandParameterUI ( _name, _params );
             paramUI->show();
 

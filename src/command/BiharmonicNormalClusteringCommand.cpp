@@ -147,11 +147,6 @@ void BiharmonicNormalClusteringCommand::computeWeightConstraint ( Eigen::SparseM
 
     b = Eigen::MatrixXd::Zero ( numFaces, numConstraints );
 
-    int f1 = faceIDs[0];
-    int f2 = faceIDs[1];
-
-
-
     MeshData* mesh = _scene->mesh()->openMeshData();
 
     MeshData::FaceIter f_it;

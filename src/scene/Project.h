@@ -43,6 +43,11 @@ public :
         return _projectDir.absoluteFilePath ( "images" );
     }
 
+    const QDir sceneDir() const
+    {
+        return _projectDir.absoluteFilePath ( "scenes" );
+    }
+
 private:
     QDir _projectDir;
 

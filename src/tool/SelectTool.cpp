@@ -63,5 +63,7 @@ void SelectTool::renderSceneOverlay()
         glBegin ( GL_POINTS );
         glVertex3fv ( _intersectedPoint.point().data() );
         glEnd();
+
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
     }
 }

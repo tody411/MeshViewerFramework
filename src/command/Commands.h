@@ -29,6 +29,7 @@
 #include "PositionColorCommand.h"
 
 #include "LambertShaderCommand.h"
+#include "PhongShaderCommand.h"
 #include "NormalShaderCommand.h"
 #include "ToonShaderCommand.h"
 

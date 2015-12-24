@@ -28,10 +28,30 @@ void ColorMap::generateRandomColors ( int numColors, Eigen::MatrixXd& C )
 
 void ColorMap::generateIDColors ( int numColors, Eigen::MatrixXd& C )
 {
+    if ( numColors == 1 )
+    {
+        C = Eigen::Vector3d ( 1, 0, 0 );
+        return;
+    }
+
+    if ( numColors == 2 )
+    {
+        C.resize ( 2, 3 );
+        C.row ( 0 ) = Eigen::Vector3d ( 1, 0, 0 );
+        C.row ( 1 ) = Eigen::Vector3d ( 0, 0, 1 );
+        return;
+    }
+
     Eigen::Matrix3d RGB;
     RGB.row ( 0 ) = Eigen::Vector3d ( 1, 0, 0 );
     RGB.row ( 1 ) = Eigen::Vector3d ( 0, 1, 0 );
     RGB.row ( 2 ) = Eigen::Vector3d ( 0, 0, 1 );
+
+    if ( numColors == 3 )
+    {
+        C = RGB;
+        return;
+    }
 
     Eigen::MatrixXd W ( numColors, 3 );
 
