@@ -17,7 +17,7 @@ void BiharmonicNormalClusteringCommand::setupImp()
     Mesh* mesh = _scene->mesh();
 
     Eigen::SparseMatrix<double> L;
-    mesh->faceLaplacian ( L, 0.5 );
+    mesh->faceLaplacian ( L, 0.0, 1.0,  0.5 );
 
     _M = L.transpose() * L;
 }
@@ -35,14 +35,14 @@ void BiharmonicNormalClusteringCommand::doImp ()
 
     Mesh* mesh = _scene->mesh();
 
-    double lambda = 1000.0;
+    double lambda = 100.0;
 
     Eigen::SparseMatrix<double> I = Eigen::MatrixXd::Identity (  _M.rows(),  _M.cols() ).sparseView();
     Eigen::SparseMatrix<double> A_cons;
     Eigen::MatrixXd b_cons;
 
     computeWeightConstraint ( A_cons, b_cons );
-    double w_cons = 1.0;
+    double w_cons = 1.0 * lambda;
     double w_R = 0.001;
 
     Eigen::SparseMatrix<double> A = w_cons * A_cons + lambda *  _M + w_R * I;
@@ -107,24 +107,6 @@ void BiharmonicNormalClusteringCommand::doImp ()
             C.row ( i ) = Cid.row ( maxID );
         }
     }
-
-    //Eigen::Vector3d blue ( 0.0, 0.0, 1.0 );
-
-    //Eigen::Vector3d red ( 1.0, 0.0, 0.0 );
-
-    //for ( int fi = 0; fi < C.rows(); fi++ )
-    //{
-    //    double w1 = W ( fi, 0 );
-    //    double w2 = W ( fi, 1 );
-
-    //    C.row ( fi ) = w1 * blue + w2 * red;
-
-    //    /* double w_sum = w1 + w2;
-    //     if ( w_sum > 0.0 )
-    //     {
-    //         C.row ( fi ) /= w_sum;
-    //     }*/
-    //}
 
     mesh->setFaceColors (  C );
 

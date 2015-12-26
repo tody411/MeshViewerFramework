@@ -78,6 +78,7 @@ void MainWindow::createMenue()
 
     MenuGroup* clusteringMenus = new MenuGroup ( tr ( "&Clustering" ), this );
     clusteringMenus->addCommand ( new NormalKmeansCommand ( _scene ) );
+    clusteringMenus->addCommand ( new FindExtremePoiintsCommand ( _scene ) );
     clusteringMenus->addCommand ( new BiharmonicNormalClusteringCommand ( _scene ) );
     clusteringMenus->addCommand ( new SpectralClusteringCommand ( _scene ) );
     menuBar()->addMenu ( clusteringMenus );

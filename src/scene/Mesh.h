@@ -105,7 +105,7 @@ public :
     void vertexLaplacian ( Eigen::SparseMatrix<double>& L );
 
     //! Return the face Laplacian matrix.
-    void faceLaplacian ( Eigen::SparseMatrix<double>& L, double sigma = 0.5 );
+    void faceLaplacian ( Eigen::SparseMatrix<double>& L, double w_u = 0.0, double w_a = 1.0, double sigma_a = 0.5 );
 
     //! Return  the face Area vector.
     void Area_f ( Eigen::VectorXd& A );

@@ -279,40 +279,9 @@ void Mesh::vertexLaplacian ( Eigen::SparseMatrix<double>& L )
     L.makeCompressed();
 }
 
-void Mesh::faceLaplacian ( Eigen::SparseMatrix<double>& L, double sigma )
+void Mesh::faceLaplacian ( Eigen::SparseMatrix<double>& L, double w_u, double w_a, double sigma_a )
 {
-    int numRows = numFaces();
-    int numCols = numRows;
-
-    L.resize ( numRows, numCols );
-
-    L.reserve ( Eigen::VectorXi::Constant ( numCols, 8 ) );
-
-    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
-    MeshData::FaceFaceIter ff_it;
-
-    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
-    {
-        double w_sum = 0.0;
-
-        OpenMesh::Vec3f N_p = _mesh.normal ( *f_it );
-
-        for ( ff_it = _mesh.ff_begin ( *f_it ); ff_it.is_valid(); ++ff_it )
-        {
-            OpenMesh::Vec3f N_q = _mesh.normal ( *ff_it );
-
-            double d = 1.0 - OpenMesh::dot ( N_p, N_q );
-
-            double w = exp ( - ( d * d ) / ( sigma * sigma ) );
-            //double w = 1.0;
-            L.insert ( f_it->idx(), ff_it->idx() ) = -w;
-            w_sum += w;
-        }
-
-        L.insert ( f_it->idx(), f_it->idx() ) = w_sum;
-    }
-
-    L.makeCompressed();
+    MeshMatrix ( _mesh ).L_ff ( L, w_u, w_a, sigma_a );
 }
 
 void Mesh::Area_f ( Eigen::VectorXd& A )

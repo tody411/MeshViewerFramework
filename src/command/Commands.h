@@ -20,6 +20,7 @@
 #include "NormalizeMeshCommand.h"
 
 #include "NormalKmeansCommand.h"
+#include "FindExtremePoiintsCommand.h"
 #include "BiharmonicNormalClusteringCommand.h"
 #include "NormalVariationClusteringCommand.h"
 #include "SpectralClusteringCommand.h"

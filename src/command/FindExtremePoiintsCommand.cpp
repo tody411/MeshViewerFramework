@@ -8,26 +8,29 @@
 
 #include "FindExtremePoiintsCommand.h"
 
+#include <iostream>
+
+#include "EigenUtil.h"
 
 void FindExtremePoiintsCommand::setupImp()
 {
     Mesh* mesh = _scene->mesh();
 
     Eigen::SparseMatrix<double> L;
-    mesh->faceLaplacian ( L, 3.0 );
+    mesh->faceLaplacian ( L, 1.0, 0.0 );
     _M = L.transpose() * L;
 }
 
 void FindExtremePoiintsCommand::doImp ()
 {
-    double lambda = 1000.0;
+    double lambda = 100.0;
 
     Eigen::SparseMatrix<double> I = Eigen::MatrixXd::Identity (  _M.rows(),  _M.cols() ).sparseView();
     Eigen::SparseMatrix<double> A_cons;
     Eigen::MatrixXd b_cons;
 
     computeWeightConstraint ( A_cons, b_cons );
-    double w_cons = 1.0;
+    double w_cons = lambda * 10.0;
     double w_R = 0.001;
 
     Eigen::SparseMatrix<double> A = w_cons * A_cons + lambda *  _M + w_R * I;
@@ -42,6 +45,12 @@ void FindExtremePoiintsCommand::doImp ()
     }
 
     Eigen::MatrixXd W = solver.solve ( b );
+
+    std::cout <<  EigenUtil::info ( W, "W" );
+    /* Mesh* mesh = _scene->mesh();
+     mesh->setFaceColors (  C );*/
+
+    _scene->setMeshDisplayMode ( Mesh::DisplayMode::FACE_COLOR );
 }
 
 void FindExtremePoiintsCommand::computeWeightConstraint ( Eigen::SparseMatrix<double>& A, Eigen::MatrixXd& b )

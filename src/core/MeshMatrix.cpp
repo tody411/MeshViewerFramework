@@ -59,10 +59,11 @@ void MeshMatrix::L_ff ( Eigen::SparseMatrix<double>& L, double w_u, double w_a, 
         {
             OpenMesh::Vec3f N_q = _mesh.normal ( *ff_it );
 
-            double d = 1.0 - OpenMesh::dot ( N_p, N_q );
+            //double theta = acos ( OpenMesh::dot ( N_p, N_q ) );
+            double theta = 1.0 - OpenMesh::dot ( N_p, N_q );
 
-            double w = w_u + w_a * exp ( - ( d * d ) / ( sigma_a * sigma_a ) );
-            //double w = 1.0;
+            double w = w_u + w_a * exp ( - ( theta * theta ) / ( sigma_a * sigma_a ) );
+
             L.insert ( f_it->idx(), ff_it->idx() ) = -w;
             w_sum += w;
         }

@@ -25,9 +25,9 @@ public :
 
         diffuse  = Eigen::Vector4f ( 0.4, 0.4, 0.8, 1.0 );
 
-        specular  = Eigen::Vector4f ( 0.0, 0.0, 0.0, 1.0 );
+        specular  = Eigen::Vector4f ( 0.6, 0.6, 0.95, 1.0 );
 
-        shininess = 0.0;
+        shininess = 50.0;
     }
 
     //! Destructor.
