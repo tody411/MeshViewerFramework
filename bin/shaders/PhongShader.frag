@@ -17,9 +17,8 @@ void main (void)
 	Id = max(Id, 0.0);
 
     float Is = dot( L, RV );
+    Is = pow( Is, shininess);
     Is = max(Is, 0.0);
-
-    //Is = pow( Is, shininess);
 
 	vec4 c = Ka + Kd * Id + Ks * Is;
 	c = clamp(c, 0.0, 1.0);
