@@ -17,7 +17,7 @@ void BiharmonicNormalClusteringCommand::setupImp()
     Mesh* mesh = _scene->mesh();
 
     Eigen::SparseMatrix<double> L;
-    mesh->faceLaplacian ( L, 0.5 );
+    mesh->faceLaplacian ( L, 1.0 );
 
     _M = L.transpose() * L;
 }
@@ -42,7 +42,7 @@ void BiharmonicNormalClusteringCommand::doImp ()
     Eigen::MatrixXd b_cons;
 
     computeWeightConstraint ( A_cons, b_cons );
-    double w_cons = 1.0;
+    double w_cons = lambda * 0.5;
     double w_R = 0.001;
 
     Eigen::SparseMatrix<double> A = w_cons * A_cons + lambda *  _M + w_R * I;

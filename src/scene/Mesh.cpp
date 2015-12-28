@@ -304,7 +304,7 @@ void Mesh::faceLaplacian ( Eigen::SparseMatrix<double>& L, double sigma )
             double d = 1.0 - OpenMesh::dot ( N_p, N_q );
 
             double w = exp ( - ( d * d ) / ( sigma * sigma ) );
-            //double w = 1.0;
+
             L.insert ( f_it->idx(), ff_it->idx() ) = -w;
             w_sum += w;
         }
