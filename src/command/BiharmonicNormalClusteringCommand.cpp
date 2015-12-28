@@ -152,6 +152,4 @@ void BiharmonicNormalClusteringCommand::computeWeightConstraint ( Eigen::SparseM
     }
 
     A.makeCompressed();
-
-
 }
