@@ -9,6 +9,7 @@
 #include "SpectralClusteringCommand.h"
 
 #include "RedSVD.h"
+#include "EigenSolver.h"
 
 #include <iostream>
 
@@ -22,7 +23,7 @@ void SpectralClusteringCommand::setupImp()
     mesh->faceNormals ( N );
 
     Eigen::SparseMatrix<double> L;
-    mesh->W_ff ( L, 1.0 );
+    mesh->W_ff ( L, 0.5 );
 
     if ( _isSparse.value() )
     {
@@ -97,6 +98,20 @@ void SpectralClusteringCommand::computeDense ( const Eigen::SparseMatrix<double>
 }
 
 void SpectralClusteringCommand::computeSparse ( const Eigen::SparseMatrix<double>& L, int numCenters )
+{
+    std::cout << "L.norm: "  << L.norm() << std::endl;
+    EigenSolver<Eigen::SparseMatrix<double>> solver ( L, numCenters );
+
+    _U = solver.eigenvectors().transpose();
+    _U = Eigen::abs ( _U.array() );
+
+    Eigen::VectorXd l = solver.eigenvalues();
+
+    std::cout << "Eigen Vector Shape: " << _U.rows() << "," << _U.cols() << std::endl;
+    std::cout << "Eigen Values: " << l << std::endl;
+}
+
+void SpectralClusteringCommand::computeSparseRedSVD ( const Eigen::SparseMatrix<double>& L, int numCenters )
 {
     std::cout << "L.norm: "  << L.norm() << std::endl;
     RedSVD::RedSymEigen<Eigen::SparseMatrix<double>> solver ( L, numCenters );

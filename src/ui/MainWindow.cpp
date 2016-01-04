@@ -169,3 +169,8 @@ void MainWindow::dropEvent ( QDropEvent* event )
         }
     }
 }
+
+void MainWindow::closeEvent ( QCloseEvent* event )
+{
+    QApplication::closeAllWindows();
+}

@@ -98,11 +98,20 @@ void MeshMatrix::W_ff ( Eigen::SparseMatrix<double>& W, double sigma )
 
             double d = 1.0 - OpenMesh::dot ( N_p, N_q );
             double w = exp ( - ( d * d ) / ( sigma * sigma ) );
-
             W.insert ( f_it->idx(), ff_it->idx() ) = w;
+            w_sum += w;
         }
 
-        W.insert ( f_it->idx(), f_it->idx() ) = 1.0;
+        /*for ( ff_it = _mesh.ff_begin ( *f_it ); ff_it.is_valid(); ++ff_it )
+        {
+            OpenMesh::Vec3f N_q = _mesh.normal ( *ff_it );
+
+            double d = 1.0 - OpenMesh::dot ( N_p, N_q );
+            double w = exp ( - ( d * d ) / ( sigma * sigma ) ) / w_sum;
+            W.insert ( f_it->idx(), ff_it->idx() ) = -w;
+        }*/
+
+        //W.insert ( f_it->idx(), f_it->idx() ) = w_sum;
     }
 
     W.makeCompressed();

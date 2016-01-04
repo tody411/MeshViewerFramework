@@ -43,6 +43,8 @@ private:
 
     void computeSparse ( const Eigen::SparseMatrix<double>& L, int numCenters );
 
+    void computeSparseRedSVD ( const Eigen::SparseMatrix<double>& L, int numCenters );
+
     void fullWeightMatrix ( const  Eigen::MatrixXd& N, Eigen::MatrixXd& W );
 
 private:
@@ -51,6 +53,7 @@ private:
     BoolParameter _isSparse;
 
     Eigen::MatrixXd _U;
+    Eigen::MatrixXd _O;
 
     bool _isSparseOld;
 };

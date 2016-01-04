@@ -45,6 +45,9 @@ private:
     //! Support drag & drop for the mesh file.
     void dropEvent ( QDropEvent* event );
 
+    //! Close all sub windows.
+    void closeEvent ( QCloseEvent* event );
+
 private:
     //! Scene data.
     Scene* _scene;
