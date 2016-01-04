@@ -34,9 +34,10 @@ public :
         compute ( A, rank );
     }
 
+    //! Compute eigenvalues and eigenvectors in large part.
     void compute ( const SparseMatrix& A, const Index rank )
     {
-        computeQRIteration  ( A, rank );
+        computePowerIteration  ( A, rank );
     }
 
     //! Compute eigenvalues and eigenvectos in large part by Power Iteration.
@@ -66,7 +67,7 @@ public :
         Scalar lambda = 0;
 
         int maxIter = 100;
-        int sigmaIter = 500;
+        int sigmaIter = 1000;
 
         SparseMatrix B = A;
 
@@ -78,7 +79,7 @@ public :
             for ( int iter = 0; iter < sigmaIter; iter++ )
             {
                 orthoToExistingEivenvectors ( x, i );
-                powerIteration ( B, x );
+                powerIteration ( B, x, i );
             }
 
             orthoToExistingEivenvectors ( x, i );
@@ -115,7 +116,6 @@ public :
             _eigenvectors.col ( i ) = x;
             _eigenvalues ( i ) = lambda;
 
-            //deflationMatrix ( B, x, B );
         }
 
         checkOrthogonal();
@@ -139,7 +139,7 @@ public :
         Scalar tol = 1e-10;
         Scalar epsilon = 1e-14;
 
-        int maxIter = 100;
+        int maxIter = 3000;
         for ( int iter = 0; iter < maxIter; iter++ )
         {
             for ( int i = 1; i < k; i++ )
@@ -150,7 +150,10 @@ public :
             }
 
             _eigenvectors = A * _eigenvectors;
+            normalizeEigenvectors();
         }
+
+        checkEigenvalueRange ( A );
     }
 
     //! Return computed eigenvalues.
@@ -175,14 +178,43 @@ private:
         }
     }
 
+    inline void removeExistingEigenvectorEntries ( ScalarVector& x, int i )
+    {
+        for ( int j = 0; j < i; j++ )
+        {
+            const ScalarVector u = _eigenvectors.col ( j );
+            Scalar u_max = u.array().abs().maxCoeff();
+            for ( int k = 0; k < u.size(); k++ )
+            {
+                if ( fabs ( u ( k ) ) > 0.5 * u_max )
+                {
+                    x ( k ) = 0.0;
+                }
+            }
+        }
+    }
+
+    inline void normalizeEigenvectors()
+    {
+        for ( int i = 0; i < _eigenvectors.cols(); i++ )
+        {
+            _eigenvectors.col ( i ).normalize();
+        }
+    }
+
     inline Scalar computeSigma ( const SparseMatrix& A, const ScalarVector& x )
     {
         return x.dot ( A * x ) / ( x.dot ( x ) );
     }
 
-    inline void powerIteration ( const SparseMatrix& A, ScalarVector& x )
+    inline void powerIteration ( const SparseMatrix& A, ScalarVector& x, int i )
     {
         x = A * x;
+        /*for ( int j = 0; j < i; j++ )
+        {
+            Scalar lambda = _eigenvalues ( j );
+            x = x - lambda * x;
+        }*/
         x.normalize();
     }
 
@@ -242,6 +274,30 @@ private:
             }
         }
     }
+
+    inline void checkEigenvectorRange()
+    {
+        for ( int i = 0; i < _eigenvectors.cols(); i++ )
+        {
+            const ScalarVector ui = _eigenvectors.col ( i );
+
+            std::cout << "Eigenvector " << i << ":" << ui.minCoeff() << ", " << ui.maxCoeff() << std::endl;
+        }
+    }
+
+    inline void checkEigenvalueRange ( const SparseMatrix& A )
+    {
+        for ( int i = 0; i < _eigenvectors.cols(); i++ )
+        {
+            const ScalarVector ui = _eigenvectors.col ( i );
+
+            ScalarVector x = A * ui;
+            Scalar lambda = ui.dot ( x );
+            std::cout << "Eigenvalue " << i << ":" << x.minCoeff() << ", " << x.maxCoeff() << ", " << lambda << std::endl;
+        }
+    }
+
+
 
 private:
     //! Eigenvalues.

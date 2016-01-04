@@ -50,8 +50,14 @@ public :
     //! Return the face Laplacian matrix.
     void L_ff ( Eigen::SparseMatrix<double>& L, double w_u = 0.0, double w_a = 1.0, double sigma_a = 0.5 );
 
-    //! Return  the face Distance matrix.
+    //! Return the face Distance matrix.
     void W_ff ( Eigen::SparseMatrix<double>& W, double sigma = 0.5 );
+
+    //! Return the face Adjacent matrix.
+    void Adj_ff ( Eigen::SparseMatrix<double>& A );
+
+    //! Return the N-ring adjacent matrix.
+    void Nadj_ff ( Eigen::SparseMatrix<double>& A, int n );
 
     //! Return  the face Area vector.
     void Area_f ( Eigen::VectorXd& A );
