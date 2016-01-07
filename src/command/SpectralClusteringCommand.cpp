@@ -10,6 +10,7 @@
 
 #include "RedSVD.h"
 #include "EigenSolver.h"
+#include "SpectralWeightSolver.h"
 
 #include <iostream>
 
@@ -27,7 +28,7 @@ void SpectralClusteringCommand::setupImp()
 
     if ( _isSparse.value() )
     {
-        computeSparse ( L, numCenters );
+        computeSpectralWeightSolver ( L, numCenters );
     }
 
     else
@@ -50,7 +51,7 @@ void SpectralClusteringCommand::doImp ()
 
     int clusderID = _clusterID.value();
 
-    clusderID = std::min<int> ( clusderID, numCenters - 1 );
+    clusderID = std::min<int> ( clusderID, _U.rows() - 1 );
 
     Eigen::VectorXd U = _U.row ( clusderID );
 
@@ -109,6 +110,12 @@ void SpectralClusteringCommand::computeSparse ( const Eigen::SparseMatrix<double
 
     std::cout << "Eigen Vector Shape: " << _U.rows() << "," << _U.cols() << std::endl;
     std::cout << "Eigen Values: " << l << std::endl;
+}
+
+void SpectralClusteringCommand::computeSpectralWeightSolver ( const Eigen::SparseMatrix<double>& L, int numCenters )
+{
+    SpectralWeightSolver<Eigen::SparseMatrix<double>> solver ( L );
+    _U = solver.weights().transpose();
 }
 
 void SpectralClusteringCommand::computeSparseRedSVD ( const Eigen::SparseMatrix<double>& L, int numCenters )

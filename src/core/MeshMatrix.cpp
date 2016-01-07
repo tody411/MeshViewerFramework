@@ -103,6 +103,11 @@ void MeshMatrix::W_ff ( Eigen::SparseMatrix<double>& W, double sigma )
         }
     }
 
+    for ( int fi = 0; fi < numFaces(); fi++ )
+    {
+        W.insert ( fi, fi ) = 1.0;
+    }
+
     /*MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
     MeshData::FaceFaceIter ff_it;
 

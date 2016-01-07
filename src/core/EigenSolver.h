@@ -73,11 +73,13 @@ public :
 
         for ( int i = 0; i < k; i++ )
         {
-            ScalarVector x = ScalarVector::Random ( n, 1 );
+
+            ScalarVector x = ScalarVector::Ones ( n, 1 );
             x.normalize();
 
             for ( int iter = 0; iter < sigmaIter; iter++ )
             {
+                positiveVector ( x );
                 orthoToExistingEivenvectors ( x, i );
                 powerIteration ( B, x, i );
             }
@@ -88,11 +90,11 @@ public :
 
             for ( int iter = 0; iter < maxIter; iter++ )
             {
-                orthoToExistingEivenvectors ( x, i );
+                positiveVector ( x );
+                orthoToExistingEivenvectors ( x, i ) ;
 
                 sigma = computeSigma ( B, x );
                 inverseIteration ( B, x, sigma );
-
                 Scalar error = computeError ( B, x );
 
                 if ( error <  tol )
@@ -106,6 +108,10 @@ public :
                     std::cout << "Error " << iter << ": " << error << std::endl;
                 }
             }
+
+            //positiveVector ( x );
+            orthoToExistingEivenvectors ( x, i ) ;
+            x.normalize();
 
             sigma = computeSigma ( B, x );
             std::cout << "Sigma (result) " << i << ":" << sigma << std::endl;
@@ -139,12 +145,13 @@ public :
         Scalar tol = 1e-10;
         Scalar epsilon = 1e-14;
 
-        int maxIter = 3000;
+        int maxIter = 5000;
         for ( int iter = 0; iter < maxIter; iter++ )
         {
             for ( int i = 1; i < k; i++ )
             {
                 ScalarVector ui = _eigenvectors.col ( i );
+                //positiveVector ( ui );
                 orthoToExistingEivenvectors ( ui, i );
                 _eigenvectors.col ( i ) = ui;
             }
@@ -207,14 +214,29 @@ private:
         return x.dot ( A * x ) / ( x.dot ( x ) );
     }
 
+    inline void positiveVector ( ScalarVector& x )
+    {
+        Scalar x_max = x.array().abs().maxCoeff();
+        Scalar x_min = 0.0;
+
+        for ( int i = 0; i < x.size(); i++ )
+        {
+            if ( x ( i ) <  x_min )
+            {
+                x ( i ) = x_min;
+            }
+        }
+    }
+
     inline void powerIteration ( const SparseMatrix& A, ScalarVector& x, int i )
     {
         x = A * x;
-        /*for ( int j = 0; j < i; j++ )
-        {
-            Scalar lambda = _eigenvalues ( j );
-            x = x - lambda * x;
-        }*/
+        /* for ( int j = 0; j < i; j++ )
+         {
+             const ScalarVector u = _eigenvectors.col ( j );
+             Scalar lambda = _eigenvalues ( j );
+             x = x - lambda * x.dot ( u ) * u;
+         }*/
         x.normalize();
     }
 
