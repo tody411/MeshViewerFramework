@@ -26,7 +26,7 @@ public :
     SpectralWeightSolver ( const SparseMatrix& A )
     {
         //int r = ( A.rows() < A.cols() ) ? A.rows() : A.cols();
-        Index r = 30;
+        Index r = 10;
         compute ( A, r );
     }
 
@@ -61,24 +61,97 @@ private:
         Index n = ( A.rows() < A.cols() ) ? A.rows() : A.cols();
 
         _weights = DenseMatrix::Random ( n, k );
-        positiveWeights();
-        //normalizeWeights();
 
-        Scalar tol = 1e-10;
+        //inverseIteration ( A );
+        simultaneousIteration ( A, true );
+    }
+
+    inline void simultaneousIteration ( const SparseMatrix& A, bool isPositive = false )
+    {
+        int maxIter = 1000;
+        for ( int iter = 0; iter < maxIter; iter++ )
+        {
+            if ( iter % 10 == 0 )
+            {
+                std::cout << "simultaneousIteration " << iter << std::endl;
+            }
+
+            orthoWeights ();
+            _weights = A * _weights;
+
+            if ( isPositive )
+            {
+                positiveWeights();
+            }
+            normalizeWeights();
+        }
+    }
+
+    inline void inverseIteration ( const SparseMatrix& A )
+    {
+        Scalar tol = 1e-12;
         Scalar epsilon = 1e-14;
 
-        int maxIter = 1000;
+        Index n = _weights.rows();
+        Index k = _weights.cols();
+
+        SparseMatrix I = DenseMatrix::Identity (  A.rows(),  A.cols() ).sparseView();
+
+        /*int maxIter = 100;
         for ( int iter = 0; iter < maxIter; iter++ )
         {
             orthoWeights ();
             _weights = A * _weights;
-
-            positiveWeights();
             normalizeWeights();
-            //unityWeights();
         }
 
-        //unityWeights();
+        return;*/
+
+        for ( int i = 0; i < k; i++ )
+        {
+            std::cout << "InvIteration " << i << std::endl;
+
+            int maxIter = 500;
+            for ( int iter = 0; iter < maxIter; iter++ )
+            {
+                orthoWeights ( i );
+                _weights.col ( i ) = A * _weights.col ( i );
+                normalizeWeights ( i );
+            }
+
+            ScalarVector w = _weights.col ( i );
+            Scalar lambda = w.dot ( A * w );
+
+            SparseMatrix B = A - lambda * I;
+            Eigen::SimplicialCholesky<SparseMatrix> solver;
+            solver.compute ( B );
+
+            if ( solver.info() != Eigen::Success )
+            {
+                continue;
+            }
+
+            maxIter = 50;
+            for ( int iter = 0; iter < maxIter; iter++ )
+            {
+                _weights.col ( i ) = solver.solve ( _weights.col ( i ) );
+                normalizeWeights ( i );
+
+                w = _weights.col ( i );
+
+                lambda = w.dot ( A * w );
+                Scalar error = ( A * w - lambda * w ).array().abs().maxCoeff();
+
+                std::cout << "  iter" << iter << ": " << error << std::endl;
+
+                if ( error < tol )
+                {
+                    std::cout << "  lambda: " << lambda << std::endl;
+                    break;
+                }
+
+            }
+        }
     }
 
     inline void positiveWeight ( ScalarVector& w )
@@ -106,7 +179,12 @@ private:
 
     inline void orthoWeights ( )
     {
-        for ( int i = 0; i < _weights.cols(); i++ )
+        orthoWeights ( _weights.cols() );
+    }
+
+    inline void orthoWeights ( Index k )
+    {
+        for ( int i = 0; i < k; i++ )
         {
             ScalarVector wi = _weights.col ( i );
             for ( int j = 0; j < i; j++ )
@@ -122,10 +200,15 @@ private:
     {
         for ( int i = 0; i < _weights.cols(); i++ )
         {
-            /* Scalar w_max = _weights.col ( i ).array().abs().maxCoeff();
-             _weights.col ( i ) = _weights.col ( i ) / w_max;*/
-            _weights.col ( i ).normalize();
+            normalizeWeights ( i );
         }
+    }
+
+    inline void normalizeWeights ( Index i )
+    {
+        /* Scalar w_max = _weights.col ( i ).array().abs().maxCoeff();
+             _weights.col ( i ) = _weights.col ( i ) / w_max;*/
+        _weights.col ( i ).normalize();
     }
 
     inline void unityWeights()

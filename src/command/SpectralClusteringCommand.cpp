@@ -58,7 +58,7 @@ void SpectralClusteringCommand::doImp ()
 
     Eigen::MatrixXd C ( U.size(), 3 );
 
-    double U_max = fabs ( U.maxCoeff() );
+    double U_max = U.maxCoeff();
     double U_min = U.minCoeff();
     double U_mean = U.mean();
 
@@ -69,14 +69,15 @@ void SpectralClusteringCommand::doImp ()
 
     for ( int fi = 0; fi < C.rows(); fi++ )
     {
-        //double w = ( U ( fi ) - U_min ) / U_range;
-        double w = fabs ( U ( fi ) ) / U_max;
+        double r = ( U ( fi ) - U_mean ) / ( U_max - U_mean ) ;
+        r = std::min ( 1.0, std::max ( 0.0, r ) );
+        double b = 1.0 - ( U ( fi ) - U_min ) / ( U_mean - U_min );
+        b = std::min ( 1.0, std::max ( 0.0, b ) );
 
-        C.row ( fi ) = Eigen::Vector3d ( w, w, w );
-        /*if ( U ( fi ) > U_mean )
-        {
-            C.row ( fi ) = Eigen::Vector3d::Ones();
-        }*/
+        double g = 1.0 - ( r + b );
+
+        C.row ( fi ) = Eigen::Vector3d ( r, g, b );
+
     }
 
     Mesh* mesh = _scene->mesh();
