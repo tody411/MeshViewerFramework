@@ -47,23 +47,29 @@ void SelectTool::mousePressEvent ( QMouseEvent* event )
     _scene->showMessage ( message );
 }
 
-void SelectTool::renderSceneOverlay()
+void SelectTool::keyPressEvent ( QKeyEvent* event )
 {
-    if ( _intersectedPoint.isValid() )
+    if ( event->key() - Qt::Key_0 < 10 )
     {
-        Eigen::Matrix3f V;
-        _intersectedPoint.points ( V );
-
-        glDisable ( GL_LIGHTING );
-        glDisable ( GL_DEPTH_TEST );
-
-        glPolygonMode ( GL_FRONT_AND_BACK, GL_POINT );
-
-        glColor4f ( 0.5f, 0.2f, 1.0f, 0.5f );
-        glBegin ( GL_POINTS );
-        glVertex3fv ( _intersectedPoint.point().data() );
-        glEnd();
-
-        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
     }
-}
+
+    void SelectTool::renderSceneOverlay()
+    {
+        if ( _intersectedPoint.isValid() )
+        {
+            Eigen::Matrix3f V;
+            _intersectedPoint.points ( V );
+
+            glDisable ( GL_LIGHTING );
+            glDisable ( GL_DEPTH_TEST );
+
+            glPolygonMode ( GL_FRONT_AND_BACK, GL_POINT );
+
+            glColor4f ( 0.5f, 0.2f, 1.0f, 0.5f );
+            glBegin ( GL_POINTS );
+            glVertex3fv ( _intersectedPoint.point().data() );
+            glEnd();
+
+            glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
+        }
+    }

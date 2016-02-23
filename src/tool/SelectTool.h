@@ -27,6 +27,8 @@ public :
 
     void mousePressEvent ( QMouseEvent* event );
 
+    void keyPressEvent ( QKeyEvent* event );
+
     void renderSceneOverlay();
 
 private:
