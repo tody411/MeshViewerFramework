@@ -60,3 +60,7 @@ bin/*.pdb
 
 # 3D models.
 models/*
+
+# Test images.
+images/test.png
+images/test/*
