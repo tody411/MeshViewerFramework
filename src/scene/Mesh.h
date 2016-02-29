@@ -101,6 +101,9 @@ public :
     //! Return the face normal matrix.
     void faceNormals ( Eigen::MatrixXd& N );
 
+    //! Return the face centers matrix.
+    void faceCenters ( Eigen::MatrixXd& V );
+
     //! Return the vertex Laplacian matrix.
     void vertexLaplacian ( Eigen::SparseMatrix<double>& L );
 
@@ -131,13 +134,20 @@ public :
     //! OpenGL calls for wireframe.
     void glWireframeMode ( );
 
-    //! OpenGL calls for
-
     //! Return open mesh data.
     MeshData* openMeshData()
     {
         return &_mesh;
     }
+
+    //-----------------------
+    //  Connectivity.
+    //=======================
+    void Adj_ef ( Eigen::MatrixXi& A );
+
+    //-----------------------
+    //  Bounding box.
+    //=======================
 
     //! Return the bounding box.
     const BoundingBox boundingBox() const
@@ -155,6 +165,11 @@ public :
 private:
     //! Compute triangle index list for OpenGL calls.
     void computeIndices();
+
+    //-----------------------
+    //  Clean up.
+    //=======================
+    void cleanIsolatedFaces ( MeshData& mesh );
 
 private:
     //! OpenMesh data.

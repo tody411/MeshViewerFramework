@@ -44,8 +44,9 @@ void ColorMap::generateIDColors ( int numColors, Eigen::MatrixXd& C )
 
     Eigen::Matrix3d RGB;
     RGB.row ( 0 ) = Eigen::Vector3d ( 1, 0, 0 );
-    RGB.row ( 1 ) = Eigen::Vector3d ( 0, 1, 0 );
-    RGB.row ( 2 ) = Eigen::Vector3d ( 0, 0, 1 );
+    RGB.row ( 1 ) = Eigen::Vector3d ( 0, 0, 1 );
+    RGB.row ( 2 ) = Eigen::Vector3d ( 0, 1, 0 );
+
 
     if ( numColors == 3 )
     {
@@ -53,20 +54,58 @@ void ColorMap::generateIDColors ( int numColors, Eigen::MatrixXd& C )
         return;
     }
 
-    Eigen::MatrixXd W ( numColors, 3 );
+    std::vector<Eigen::Vector3d> colors;
+    colors.push_back ( Eigen::Vector3d ( 0, 0, 0 ) );
+    colors.push_back ( Eigen::Vector3d ( 1, 1, 1 ) );
+    colors.push_back ( Eigen::Vector3d ( 1, 0, 0 ) );
+    colors.push_back ( Eigen::Vector3d ( 0, 0, 1 ) );
+    colors.push_back ( Eigen::Vector3d ( 0, 1, 0 ) );
+
+    int numColorSpace = 16;
+
+    for ( int ci = 0; ci < numColors - 3; ci++ )
+    {
+        Eigen::Vector3d colorNew ( 0, 0, 0 );
+        double dMax = 0.0;
+
+        for ( int ri = 0; ri < numColorSpace; ri++ )
+        {
+            for ( int gi = 0; gi < numColorSpace; gi++ )
+            {
+                for ( int bi = 0; bi < numColorSpace; bi++ )
+                {
+                    Eigen::Vector3d color ( ri / ( double ) ( numColorSpace - 1 ),
+                                            gi / ( double ) ( numColorSpace - 1 ),
+                                            bi / ( double ) ( numColorSpace - 1 ) );
+
+                    double dMin = 3.0;
+
+                    for ( int rci = 0; rci < colors.size(); rci++ )
+                    {
+                        double d = ( color - colors[rci] ).norm();
+
+                        if ( d < dMin )
+                        {
+                            dMin = d;
+                        }
+                    }
+
+                    if ( dMin > dMax )
+                    {
+                        dMax = dMin;
+                        colorNew = color;
+                    }
+                }
+            }
+        }
+
+        colors.push_back ( colorNew );
+    }
+
+    C = Eigen::MatrixXd ( numColors, 3 );
 
     for ( int i = 0; i < numColors; i++ )
     {
-        double w_r = 1.0 -  2.0 * i / ( double ) ( numColors - 1 );
-        double w_b = 2.0 * i / ( double ) ( numColors - 1 ) - 1.0;
-
-        w_r = std::min ( std::max ( w_r, 0.0 ), 1.0 );
-        w_b = std::min ( std::max ( w_b, 0.0 ), 1.0 );
-        double w_g = 1.0 - w_r - w_b;
-        W ( i, 0 ) = w_r;
-        W ( i, 1 ) = w_g;
-        W ( i, 2 ) = w_b;
+        C.row ( i ) = colors[i + 2];
     }
-
-    C = W * RGB;
 }

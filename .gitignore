@@ -60,3 +60,6 @@ bin/*.pdb
 
 # 3D models.
 models/*
+
+# data directory.
+data/*

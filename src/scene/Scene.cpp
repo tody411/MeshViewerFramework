@@ -27,6 +27,7 @@ Scene::Scene ( QObject* parent )
     _light = new Light ( this );
     _material = new Material ( this );
     _selection = new SelectionInfo ( this );
+    _labelData = new LabelData ( this );
     _shader = new ShaderObject ( this );
 }
 
@@ -38,6 +39,8 @@ bool Scene::loadMesh ( const QString& filePath )
     {
         return false;
     }
+
+    _labelData->resize ( _mesh->numFaces() );
 
     setDefaultShader();
     _meshDisplayMode =  Mesh::DisplayMode::GLSL;
@@ -79,14 +82,15 @@ void Scene::render()
         _shader->release();
     }
 
+    _labelData->gl();
     _selection->gl();
+
 
 }
 
 void Scene::glCamera()
 {
     _camera->gl();
-    //_mesh->glFocus();
 }
 
 

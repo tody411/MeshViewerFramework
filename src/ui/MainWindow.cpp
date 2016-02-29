@@ -64,6 +64,9 @@ void MainWindow::createMenue()
     _fileMenus = new MenuGroup ( tr ( "&File" ), this );
     _fileMenus->addCommand ( new LoadCommand ( _scene ) );
     _fileMenus->addCommand ( new SaveCommand ( _scene ) );
+    _fileMenus->addCommand ( new ImportLabelDataCommand ( _scene ) );
+    _fileMenus->addCommand ( new ExportLabelDataCommand ( _scene ) );
+    _fileMenus->addCommand ( new ExportSeamDataCommand ( _scene ) );
     _fileMenus->addCommand ( new SetProjectCommand ( _scene ) );
 
     menuBar()->addMenu ( _fileMenus );
@@ -82,6 +85,8 @@ void MainWindow::createMenue()
     clusteringMenus->addCommand ( new BiharmonicNormalClusteringCommand ( _scene ) );
     clusteringMenus->addCommand ( new SpectralClusteringCommand ( _scene ) );
     menuBar()->addMenu ( clusteringMenus );
+
+    MenuGroup* textureMenus = new MenuGroup ( tr ( "&Texture" ), this );
 
     MenuGroup* coloringMenus = new MenuGroup ( tr ( "&Coloring" ), this );
     coloringMenus->addCommand ( new DefaultShadingCommand ( _scene ) );

@@ -38,6 +38,11 @@ public :
         return _projectDir.absoluteFilePath ( "models" );
     }
 
+    const QDir dataDir() const
+    {
+        return _projectDir.absoluteFilePath ( "data" );
+    }
+
     const QDir imageDir() const
     {
         return _projectDir.absoluteFilePath ( "images" );

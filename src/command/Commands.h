@@ -11,6 +11,9 @@
 
 #include "LoadCommand.h"
 #include "SaveCommand.h"
+#include "ImportLabelDataCommand.h"
+#include "ExportLabelDataCommand.h"
+#include "ExportSeamDataCommand.h"
 #include "SetProjectCommand.h"
 
 #include "NoiseCommand.h"

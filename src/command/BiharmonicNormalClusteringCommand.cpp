@@ -17,21 +17,17 @@ void BiharmonicNormalClusteringCommand::setupImp()
     Mesh* mesh = _scene->mesh();
 
     Eigen::SparseMatrix<double> L;
-    mesh->faceLaplacian ( L, 0.0, 1.0,  0.5 );
+    mesh->faceLaplacian ( L, 0.0001, 1.0,  0.3 );
+    //mesh->faceLaplacian ( L, 1.0, 0.0,  0.5 );
 
     _M = L.transpose() * L;
 }
 
 void BiharmonicNormalClusteringCommand::doImp ()
 {
-    std::vector<int> faceIDs;
+    LabelData* labelData = _scene->labelData();
 
-    _scene->selectionInfo()->faceSelection ( faceIDs );
-
-    if ( faceIDs.size() < 2 )
-    {
-        return;
-    }
+    if ( labelData->empty() ) return;
 
     Mesh* mesh = _scene->mesh();
 
@@ -42,8 +38,8 @@ void BiharmonicNormalClusteringCommand::doImp ()
     Eigen::MatrixXd b_cons;
 
     computeWeightConstraint ( A_cons, b_cons );
-    double w_cons = 1.0 * lambda;
-    double w_R = 0.001;
+    double w_cons = 10.0 * lambda;
+    double w_R = 0.000001;
 
     Eigen::SparseMatrix<double> A = w_cons * A_cons + lambda *  _M + w_R * I;
     Eigen::MatrixXd b = ( w_cons + w_R ) * b_cons;
@@ -59,25 +55,65 @@ void BiharmonicNormalClusteringCommand::doImp ()
 
     Eigen::MatrixXd W = solver.solve ( b );
 
+    /*   w_R = lambda;
+       A = lambda *  _M + w_R * I;
+       b = w_R * W;
+
+       solver.compute ( A );
+
+       if ( solver.info() != Eigen::Success )
+       {
+           std::cout << "Solver Fail" << std::endl;
+           return;
+       }
+
+       W = solver.solve ( b );*/
+
     for ( int i = 0; i < W.rows(); i++ )
     {
-        double w_sum = 0.0001;
+        double w_sum = 0.00000001;
+
+        //double w_min = W.row ( i ).minCoeff();
+
         for ( int j = 0; j < W.cols(); j++ )
         {
             double w = W ( i, j );
             if ( w < 0.0 )
             {
-                W ( i, j ) = 0.0;
+                w = 0.0;
             }
 
             if ( w > 1.0 )
             {
-                W ( i, j ) = 1.0;
+                w = 1.0;
             }
 
+            W ( i, j ) = w;
             w_sum += w;
         }
+
+        W.row ( i ) = W.row ( i ) / w_sum;
     }
+
+    std::vector<int> faceLabels ( W.rows() );
+
+    for ( int i = 0; i < W.rows(); i++ )
+    {
+        int maxID = LabelData::UNLABELED;
+        double w_max = 0.0;
+        for ( int j = 0; j < W.cols(); j++ )
+        {
+            if ( W ( i, j ) > w_max )
+            {
+                w_max = W ( i, j );
+                maxID = j;
+            }
+        }
+
+        faceLabels[i] = maxID;
+    }
+
+    labelData->setFaceLabelData ( faceLabels );
 
     Eigen::MatrixXd C ( _scene->mesh()->numFaces(), 3 );
 
@@ -108,24 +144,26 @@ void BiharmonicNormalClusteringCommand::doImp ()
         }
     }
 
-    mesh->setFaceColors (  C );
+    //mesh->setFaceColors (  C );
 
-    _scene->setMeshDisplayMode ( Mesh::DisplayMode::FACE_COLOR );
+    //_scene->setMeshDisplayMode ( Mesh::DisplayMode::FACE_COLOR );
 }
 
 void BiharmonicNormalClusteringCommand::computeWeightConstraint ( Eigen::SparseMatrix<double>& A, Eigen::MatrixXd& b )
 {
-    std::vector<int> faceIDs;
+    LabelData* labelData = _scene->labelData();
 
-    _scene->selectionInfo()->faceSelection ( faceIDs );
+    if ( labelData->empty() ) return;
 
-    if ( faceIDs.size() < 2 )
-    {
-        return;
-    }
+    std::vector<int> faceLabels;
+    labelData->faceLabelData ( faceLabels );
+
+    std::vector<double> faceLabelConfidents;
+    labelData->faceLabelConfidentsData ( faceLabelConfidents );
 
     int numFaces =  _scene->mesh()->numFaces();
-    int numConstraints = faceIDs.size();
+
+    int numConstraints = labelData->numLabels();
 
     b = Eigen::MatrixXd::Zero ( numFaces, numConstraints );
 
@@ -136,19 +174,15 @@ void BiharmonicNormalClusteringCommand::computeWeightConstraint ( Eigen::SparseM
 
     A.resize ( numFaces, numFaces );
 
-    for ( int ci = 0; ci < numConstraints; ci++ )
+    for ( int fi = 0; fi < numFaces; fi++ )
     {
-        int fID = faceIDs[ci];
-        A.insert ( fID, fID ) = 1.0;
-        b ( fID, ci ) = 1.0;
+        int faceLabel = faceLabels[fi];
+        double w = faceLabelConfidents[fi];
 
-        for ( ff_it = mesh->ff_begin ( mesh->face_handle ( fID ) ); ff_it.is_valid(); ++ff_it )
-        {
-            int ffID = ff_it->idx();
+        if ( faceLabel == LabelData::UNLABELED ) continue;
 
-            A.insert ( ffID, ffID ) = 1.0;
-            b ( ffID, ci ) = 1.0;
-        }
+        A.insert ( fi, fi ) = w;
+        b ( fi, faceLabel ) = w;
     }
 
     A.makeCompressed();

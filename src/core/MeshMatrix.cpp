@@ -165,6 +165,38 @@ void MeshMatrix::Adj_ff ( Eigen::SparseMatrix<double>& A )
     A.makeCompressed();
 }
 
+void MeshMatrix::Adj_ef ( Eigen::MatrixXi& A )
+{
+    int numRows = numEdges();
+    int numCols = 2;
+
+    A.resize ( numRows, numCols );
+
+    A.fill ( - 1 );
+
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+    MeshData::FaceEdgeIter fe_it;
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        int fID = f_it->idx();
+
+        for ( fe_it = _mesh.fe_begin ( *f_it ); fe_it.is_valid(); ++fe_it )
+        {
+            int eID = fe_it->idx();
+
+            if ( A ( eID, 0 ) == -1 )
+            {
+                A ( eID, 0 ) = fID;
+            }
+            else
+            {
+                A ( eID, 1 ) = fID;
+            }
+        }
+    }
+}
+
 void MeshMatrix::Nadj_ff ( Eigen::SparseMatrix<double>& A,  int n  )
 {
     Eigen::SparseMatrix<double> A0;

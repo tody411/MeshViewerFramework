@@ -53,8 +53,11 @@ public :
     //! Return the face Distance matrix.
     void W_ff ( Eigen::SparseMatrix<double>& W, double sigma = 0.5 );
 
-    //! Return the face Adjacent matrix.
+    //! Return the face-face Adjacent matrix.
     void Adj_ff ( Eigen::SparseMatrix<double>& A );
+
+    //! Return the edge-face Adjacent matrix.
+    void Adj_ef ( Eigen::MatrixXi& A );
 
     //! Return the N-ring adjacent matrix.
     void Nadj_ff ( Eigen::SparseMatrix<double>& A, int n );

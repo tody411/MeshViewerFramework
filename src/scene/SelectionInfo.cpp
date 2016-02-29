@@ -130,3 +130,12 @@ void SelectionInfo::glFaceSelection()
 
     glEnd();
 }
+
+
+void SelectionInfoSet::gl()
+{
+    foreach ( SelectionInfo* selectionInfo,  _selectionSet )
+    {
+        selectionInfo->gl();
+    }
+}

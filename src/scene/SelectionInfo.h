@@ -10,6 +10,7 @@
 #define SELECTIONINFO_H
 
 #include "SceneObject.h"
+#include <QVector>
 
 //! IndexSelection implementation.
 class IndexSelection
@@ -115,6 +116,55 @@ private:
 
     //! Selection for faces.
     IndexSelection _faceSelection;
+};
+
+class SelectionInfoSet: public SceneObject
+{
+    Q_OBJECT
+public :
+
+    //! Constructor.
+    SelectionInfoSet ( Scene* scene )
+        : SceneObject ( scene ), _currentSelectionSet ( 0 )
+    {
+        initSelectionSet ( scene );
+    }
+
+    //! Destructor.
+    virtual ~SelectionInfoSet()
+    {}
+
+    void initSelectionSet ( Scene* scene )
+    {
+        for ( int i = 0; i < 10; i++ )
+        {
+            _selectionSet.push_back ( new SelectionInfo ( scene ) );
+        }
+    }
+
+    void selectSelectionSet ( int currentSelectionSet )
+    {
+        _currentSelectionSet = currentSelectionSet;
+        emit updated();
+    }
+
+    SelectionInfo* currentSelectionSet()
+    {
+        return _selectionSet[_currentSelectionSet];
+    }
+
+    void clear()
+    {
+        foreach ( SelectionInfo* selectionInfo, _selectionSet )
+        {
+            selectionInfo->clear();
+        }
+    }
+
+    void gl();
+
+    QVector<SelectionInfo*> _selectionSet;
+    int _currentSelectionSet;
 };
 
 #endif

@@ -12,6 +12,8 @@
 
 #include <OpenMesh/Core/IO/MeshIO.hh>
 
+#include <algorithm>
+
 #include "MeshMatrix.h"
 
 bool Mesh::loadMesh ( const QString& filePath )
@@ -32,10 +34,13 @@ bool Mesh::loadMesh ( const QString& filePath )
         return false;
     }
 
+    cleanIsolatedFaces ( mesh );
+
     mesh.update_normals();
 
-    if ( !mesh.is_triangles() )
+    if ( !mesh.is_trimesh() )
     {
+        std::cout << "triangulate" << std::endl;
         mesh.triangulate();
     }
 
@@ -45,6 +50,8 @@ bool Mesh::loadMesh ( const QString& filePath )
     }
 
     _mesh = mesh;
+
+
 
     updateBoundingBox();
 
@@ -113,7 +120,7 @@ void Mesh::facePoints ( Eigen::MatrixXd& V )
     for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
     {
         int vi = 0;
-        for ( fv_it = _mesh.fv_begin ( f_it ); fv_it.is_valid(); ++fv_it )
+        for ( fv_it = _mesh.fv_begin ( *f_it ); fv_it.is_valid(); ++fv_it )
         {
             MeshData::Point p = _mesh.point ( *fv_it );
             for ( int ci = 0; ci < 3; ci++ )
@@ -248,6 +255,40 @@ void Mesh::faceNormals ( Eigen::MatrixXd& N )
             N ( f_it->idx(), ci ) = n[ci];
         }
 
+    }
+}
+
+void Mesh::faceCenters ( Eigen::MatrixXd& V )
+{
+    V.resize ( numFaces(), 3 );
+
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+    MeshData::FaceVertexIter fv_it;
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        double numVertices = 0;
+
+        MeshData::Point center;
+
+        for ( fv_it = _mesh.fv_begin ( *f_it ); fv_it.is_valid(); ++fv_it )
+        {
+            MeshData::Point p = _mesh.point ( *fv_it );
+
+            center += p;
+
+            numVertices += 1.0;
+        }
+
+        if ( numVertices > 0.0 )
+        {
+            center /= numVertices;
+        }
+
+        for ( int ci = 0; ci < 3; ci++ )
+        {
+            V ( f_it->idx(), ci ) = center[ci];
+        }
     }
 }
 
@@ -433,6 +474,11 @@ void Mesh::glWireframeMode ( )
     glDisableClientState ( GL_NORMAL_ARRAY );
 }
 
+void Mesh::Adj_ef ( Eigen::MatrixXi& A )
+{
+    MeshMatrix ( _mesh ).Adj_ef ( A );
+}
+
 void Mesh::updateBoundingBox()
 {
     _bb.clear();
@@ -464,4 +510,87 @@ void Mesh::computeIndices()
         _indices[triID] = fvIt->idx();
         ++triID;
     }
+}
+
+int closestVertexID ( MeshData& mesh, int vID, double th = 1e-7 )
+{
+    MeshData::VertexIter v_it, v_end ( mesh.vertices_end() );
+
+    MeshData::Point p = mesh.point ( mesh.vertex_handle ( vID ) );
+
+    double dMin = 1e10;
+    int vIDmin = vID;
+
+    for ( v_it = mesh.vertices_begin ();  v_it != v_end; ++v_it )
+    {
+        if ( v_it->idx() == vID ) continue;
+
+        MeshData::Point q = mesh.point ( *v_it );
+
+        double d = ( q - p ).norm();
+
+        if ( d < dMin )
+        {
+            vIDmin = v_it->idx();
+            dMin = d;
+        }
+
+    }
+
+    if ( dMin < th )
+    {
+        std::cout << "closest  vertex: " << vID << " - " << vIDmin << std::endl;
+        return vIDmin;
+    }
+    else
+    {
+        std::cout << "closest  vertex: " << vID << " - " << vID << std::endl;
+        return vID;
+    }
+}
+
+void Mesh::cleanIsolatedFaces ( MeshData& mesh )
+{
+    MeshData::FaceIter f_it, f_end ( mesh.faces_end() );
+    MeshData::FaceFaceIter ff_it;
+    MeshData::FaceVertexIter fv_it;
+
+    for ( f_it = mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        int num_connected_faces = 0;
+
+        for ( ff_it = mesh.ff_begin ( *f_it ); ff_it.is_valid(); ++ff_it )
+        {
+            num_connected_faces += 1;
+        }
+
+        if ( num_connected_faces > 0 ) continue;
+
+        bool isolated = true;
+
+        std::vector<MeshData::VertexHandle> v_hs;
+
+        for ( fv_it = mesh.fv_begin ( *f_it ); fv_it.is_valid(); ++fv_it )
+        {
+            int vID = fv_it->idx() ;
+            int vcID = closestVertexID ( mesh, fv_it->idx() );
+
+            isolated = isolated && vID != vcID;
+
+            v_hs.push_back ( mesh.vertex_handle ( vcID ) );
+        }
+
+        //std::reverse ( v_hs.begin(), v_hs.end() );
+
+        if ( isolated )
+        {
+            std::cout << "Isolated: face " << f_it->idx() << std::endl;
+
+            //mesh.delete_face ( *f_it );
+
+            //mesh.add_face ( v_hs[1], v_hs[2], v_hs[0] );
+        }
+    }
+
+    mesh.garbage_collection();
 }

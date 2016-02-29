@@ -25,7 +25,7 @@ message(STATUS "OpenMesh: location = ${OPENMESH_LOCATION}")
 #=======================
 set(_openMesh_VERSIONS)
 
-foreach(major_version RANGE 4 3 -1)
+foreach(major_version RANGE 5 3 -1)
     foreach(minor_version RANGE 5 1 -1)
         list(APPEND _openMesh_VERSIONS "${major_version}.${minor_version}")
     endforeach()

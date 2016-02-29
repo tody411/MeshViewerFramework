@@ -62,8 +62,8 @@ private:
 
         _weights = DenseMatrix::Random ( n, k );
 
-        //inverseIteration ( A );
-        simultaneousIteration ( A, true );
+        inverseIteration ( A );
+        //simultaneousIteration ( A, true );
     }
 
     inline void simultaneousIteration ( const SparseMatrix& A, bool isPositive = false )

@@ -10,6 +10,7 @@
 
 #include <random>
 
+#include "KMeans.h"
 #include "NormalColor.h"
 
 void NormalKmeansCommand::doImp ()
@@ -21,31 +22,37 @@ void NormalKmeansCommand::doImp ()
     Eigen::MatrixXd N;
     mesh->faceNormals ( N );
 
-    Eigen::VectorXd A_f;
-    mesh->Area_f ( A_f );
+    int numFaces = mesh->numFaces();
 
-    Eigen::MatrixXd N_centers;
-    computeRandomCenters ( numCenters, N_centers );
+    Eigen::MatrixXd X = N;
 
-    Eigen::VectorXi ID;
-
-    Eigen::MatrixXd N_new;
-
-    int numIterations = 20;
-
-    for ( int i = 0; i < numIterations; i++ )
+    if ( _withPosition.value() )
     {
-        clustering ( N_centers, N, ID );
-        project ( N_centers, ID, N_new );
-        updateCenters ( N, ID, A_f, N_centers );
+        Eigen::MatrixXd V;
+        mesh->faceCenters ( V );
+
+        double V_max = V.array().abs().maxCoeff();
+
+        X = Eigen::MatrixXd::Zero ( X.rows(), 6 );
+        X.block ( 0, 0, numFaces, 3 ) = N;
+        X.block ( 0, 3, numFaces, 3 ) = V / V_max / 3.0;
     }
 
-    Eigen::MatrixXd C;
-    NormalColor::normalToColor ( N_new, C );
+    KMeans kmeans;
 
-    mesh->setFaceColors ( C );
+    kmeans.setNumCenters ( numCenters );
+    kmeans.compute ( X );
 
-    _scene->setMeshDisplayMode ( Mesh::DisplayMode::FACE_COLOR );
+    Eigen::VectorXi clusterIDs = kmeans.clusterIDs();
+
+    std::vector<int> faceLabels ( clusterIDs.size() );
+
+    for ( int fi = 0; fi < clusterIDs.size(); fi++ )
+    {
+        faceLabels[fi] = clusterIDs ( fi );
+    }
+
+    _scene->labelData()->setFaceLabelData ( faceLabels );
 }
 
 void NormalKmeansCommand::computeRandomCenters ( int numCenters, Eigen::MatrixXd& N_centers )

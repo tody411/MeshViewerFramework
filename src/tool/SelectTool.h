@@ -19,7 +19,7 @@ class SelectTool : public BaseTool
 public :
     //! Constructor.
     SelectTool ( Scene* scene, ModelView* view, QObject* parent = nullptr )
-        : BaseTool ( "Select Tool", scene, view, parent )
+        : BaseTool ( "Select Tool", scene, view, parent ), _selectionID ( 0 )
     {}
 
     //! Destructor.
@@ -33,7 +33,7 @@ public :
 
 private:
     PointOnFace _intersectedPoint;
-
+    int _selectionID;
 
 };
 

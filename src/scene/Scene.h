@@ -19,6 +19,7 @@
 #include "Material.h"
 #include "ShaderObject.h"
 #include "SelectionInfo.h"
+#include "LabelData.h"
 #include "Project.h"
 
 //! Scene implementation.
@@ -75,6 +76,11 @@ public :
         return _selection;
     }
 
+    LabelData* labelData()
+    {
+        return _labelData;
+    }
+
     ShaderObject* shader()
     {
         return _shader;
@@ -121,6 +127,9 @@ private:
 
     //! Selection info.
     SelectionInfo* _selection;
+
+    //! Label Data.
+    LabelData* _labelData;
 
     //! Mesh display mode.
     Mesh::DisplayMode _meshDisplayMode;

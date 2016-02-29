@@ -27,6 +27,7 @@ void SelectTool::mousePressEvent ( QMouseEvent* event )
 
     if ( rayCasting.closestIntersection ( pNear, ray, _intersectedPoint ) )
     {
+
         message += "intersected";
         message += QString::fromStdString ( _intersectedPoint.str() );
 
@@ -41,6 +42,7 @@ void SelectTool::mousePressEvent ( QMouseEvent* event )
     {
         message += "no intersection";
         _scene->showMessage ( message );
+
         _scene->selectionInfo()->clearFaceSelection();
     }
 
@@ -49,27 +51,37 @@ void SelectTool::mousePressEvent ( QMouseEvent* event )
 
 void SelectTool::keyPressEvent ( QKeyEvent* event )
 {
-    if ( event->key() - Qt::Key_0 < 10 )
+    int labelID = event->key() - Qt::Key_0;
+    if ( labelID < 10 && labelID >= 0 )
     {
-    }
+        QString message = "Labeling: " + QString ( "%d" ).arg ( labelID );
+        LabelData* labelData = _scene->labelData();
 
-    void SelectTool::renderSceneOverlay()
+        std::vector<int> indices;
+        _scene->selectionInfo()->faceSelection ( indices );
+
+        labelData->setFaceLabelData ( indices, labelID );
+        labelData->setFaceLabelConfidents ( indices, 1.0 );
+    }
+}
+
+void SelectTool::renderSceneOverlay()
+{
+    if ( _intersectedPoint.isValid() )
     {
-        if ( _intersectedPoint.isValid() )
-        {
-            Eigen::Matrix3f V;
-            _intersectedPoint.points ( V );
+        Eigen::Matrix3f V;
+        _intersectedPoint.points ( V );
 
-            glDisable ( GL_LIGHTING );
-            glDisable ( GL_DEPTH_TEST );
+        glDisable ( GL_LIGHTING );
+        glDisable ( GL_DEPTH_TEST );
 
-            glPolygonMode ( GL_FRONT_AND_BACK, GL_POINT );
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_POINT );
 
-            glColor4f ( 0.5f, 0.2f, 1.0f, 0.5f );
-            glBegin ( GL_POINTS );
-            glVertex3fv ( _intersectedPoint.point().data() );
-            glEnd();
+        glColor4f ( 0.5f, 0.2f, 1.0f, 0.5f );
+        glBegin ( GL_POINTS );
+        glVertex3fv ( _intersectedPoint.point().data() );
+        glEnd();
 
-            glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
-        }
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
     }
+}
