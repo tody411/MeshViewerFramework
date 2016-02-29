@@ -103,7 +103,7 @@ void LabelData::gl()
     MeshData::FaceVertexIter fvIt;
     MeshData::FaceHandle fh;
 
-    float epsilon = 1e-4;
+    float epsilon = 1e-5;
 
     Eigen::MatrixXd C;
     ColorMap::generateIDColors ( 10, C );

@@ -56,25 +56,17 @@ void KMeans::clustering ( const Eigen::MatrixXd& centers, const Eigen::MatrixXd&
     int numCenters = centers.rows();
     int numData = X.rows();
 
+    Eigen::MatrixXd D ( numData, numCenters );
+
+    for ( int ci = 0; ci < numCenters; ci++ )
+    {
+        D.col ( ci ) = ( X.rowwise() - centers.row ( ci ) ).rowwise().norm();
+    }
+
     for ( int di = 0; di < numData; di++ )
     {
-        Eigen::VectorXd x = X.row ( di );
-
-        double dMin = 1e10;
         int clusterID = 0;
-
-        for ( int ci = 0; ci < numCenters; ci++ )
-        {
-            Eigen::VectorXd center = centers.row ( ci );
-
-            double d = ( x - center ).norm();
-
-            if ( d < dMin )
-            {
-                dMin = d;
-                clusterID = ci;
-            }
-        }
+        D.row ( di ).minCoeff ( &clusterID );
 
         clusterIDs ( di ) = clusterID;
     }

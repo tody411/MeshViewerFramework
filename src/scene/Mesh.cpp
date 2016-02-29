@@ -24,11 +24,21 @@ bool Mesh::loadMesh ( const QString& filePath )
     mesh.request_face_colors();
     mesh.request_vertex_normals();
     mesh.request_vertex_colors();
-    mesh.request_vertex_texcoords2D();
+    //mesh.request_vertex_texcoords2D();
+    mesh.request_face_texture_index();
+    mesh.request_halfedge_texcoords2D();
 
     std::string file = filePath.toStdString();
 
-    if ( !OpenMesh::IO::read_mesh ( mesh, file ) )
+    OpenMesh::IO::Options option;
+    //option += OpenMesh::IO::Options::FaceNormal;
+    //option += OpenMesh::IO::Options::FaceColor;
+    option += OpenMesh::IO::Options::FaceTexCoord;
+    //option += OpenMesh::IO::Options::VertexNormal;
+    //option += OpenMesh::IO::Options::VertexTexCoord;
+    //option += OpenMesh::IO::Options::VertexColor;
+
+    if ( !OpenMesh::IO::read_mesh ( mesh, file, option ) )
     {
         std::cerr << "read error" << std::endl;
         return false;
@@ -49,9 +59,12 @@ bool Mesh::loadMesh ( const QString& filePath )
         std::cout << "No vertex normals" << std::endl;
     }
 
+    if ( !mesh.has_halfedge_texcoords2D() )
+    {
+        std::cout << "No face texture coordinates" << std::endl;
+    }
+
     _mesh = mesh;
-
-
 
     updateBoundingBox();
 
@@ -62,7 +75,32 @@ bool Mesh::loadMesh ( const QString& filePath )
 bool Mesh::saveMesh ( const QString& filePath )
 {
     std::string file = filePath.toStdString();
-    if ( !OpenMesh::IO::write_mesh ( _mesh, file ) )
+
+    OpenMesh::IO::Options option;
+
+    if ( _mesh.has_halfedge_texcoords2D() )
+    {
+        std::cout << "With halfedge uvs" << std::endl;
+        option += OpenMesh::IO::Options::FaceTexCoord;
+    }
+
+    else
+    {
+        std::cout << "No halfedge uvs" << std::endl;
+    }
+
+    if ( _mesh.has_vertex_texcoords2D() )
+    {
+        std::cout << "With vertex uvs" << std::endl;
+        option += OpenMesh::IO::Options::VertexTexCoord;
+    }
+    else
+    {
+        std::cout << "No vertex uvs" << std::endl;
+    }
+
+
+    if ( !OpenMesh::IO::write_mesh ( _mesh, file, option ) )
     {
         std::cerr << "write error" << std::endl;
         return false;
@@ -197,6 +235,8 @@ void Mesh::setVertexColors ( const Eigen::MatrixXd& C )
 
         _mesh.set_color ( *v_it, c );
     }
+
+    _C = C;
 
     emit updated();
 }
@@ -397,7 +437,8 @@ void Mesh::glVertexColorMode ()
     glVertexPointer ( 3, GL_FLOAT, 0, _mesh.points() );
 
     glEnableClientState ( GL_COLOR_ARRAY );
-    glColorPointer ( 3, GL_UNSIGNED_BYTE, 0, _mesh.vertex_colors() );
+    //glColorPointer ( 3, GL_UNSIGNED_BYTE, 0, _mesh.vertex_colors() );
+    glColorPointer ( 3, GL_DOUBLE, 0, _C.data() );
 
     glDrawElements ( GL_TRIANGLES,
                      _indices.size(),

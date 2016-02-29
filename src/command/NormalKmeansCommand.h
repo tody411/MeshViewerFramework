@@ -28,6 +28,8 @@ public :
     //! Destructor.
     virtual ~NormalKmeansCommand() {}
 
+    void setupImp();
+
     void doImp ();
 
 private:
@@ -40,10 +42,14 @@ private:
 
     void updateCenters ( const Eigen::MatrixXd& N, const Eigen::VectorXi& ID, const Eigen::VectorXd& A_f, Eigen::MatrixXd& N_centers );
 
+    void smoothingWeights ( Eigen::VectorXi& clusterIDs );
+
 
 private:
     IntParameter _numCenters;
     BoolParameter _withPosition;
+
+    Eigen::SparseMatrix<double> _M;
 };
 
 #endif

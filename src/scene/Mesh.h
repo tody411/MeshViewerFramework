@@ -71,6 +71,22 @@ public :
         return _mesh.n_faces();
     }
 
+    //! Return the number of texture coordinates.
+    unsigned int numUVs() const
+    {
+        return _UVs.rows();
+    }
+
+    bool hasUVs() const
+    {
+        return ! _UVs.size() == 0;
+    }
+
+    bool hasUVIDs() const
+    {
+        return ! _UV_IDs.size() == 0;
+    }
+
     //! Return the point matrix.
     void points ( Eigen::MatrixXd& V );
 
@@ -182,7 +198,13 @@ private:
     std::vector<unsigned int> _indices;
 
     //! Vertex color for OpenGL calls.
-    Eigen::MatrixXf _C;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> _C;
+
+    //! UV coordinates.
+    Eigen::MatrixXd _UVs;
+
+    //! Face UV IDs.
+    Eigen::MatrixXi _UV_IDs;
 };
 
 #endif

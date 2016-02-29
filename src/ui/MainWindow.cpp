@@ -87,6 +87,8 @@ void MainWindow::createMenue()
     menuBar()->addMenu ( clusteringMenus );
 
     MenuGroup* textureMenus = new MenuGroup ( tr ( "&Texture" ), this );
+    textureMenus->addCommand ( new PlanarMappingCommand ( _scene ) );
+    menuBar()->addMenu ( textureMenus );
 
     MenuGroup* coloringMenus = new MenuGroup ( tr ( "&Coloring" ), this );
     coloringMenus->addCommand ( new DefaultShadingCommand ( _scene ) );

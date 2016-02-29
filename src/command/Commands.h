@@ -28,6 +28,8 @@
 #include "NormalVariationClusteringCommand.h"
 #include "SpectralClusteringCommand.h"
 
+#include "PlanarMappingCommand.h"
+
 #include "DefaultShadingCommand.h"
 #include "NormalColorCommand.h"
 #include "PositionColorCommand.h"

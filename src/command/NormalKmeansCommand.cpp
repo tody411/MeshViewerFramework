@@ -13,6 +13,16 @@
 #include "KMeans.h"
 #include "NormalColor.h"
 
+void NormalKmeansCommand::setupImp()
+{
+    Mesh* mesh = _scene->mesh();
+
+    Eigen::SparseMatrix<double> L;
+    mesh->faceLaplacian ( L, 0.001, 1.0,  0.5 );
+
+    _M = L.transpose() * L;
+}
+
 void NormalKmeansCommand::doImp ()
 {
     int numCenters = _numCenters.value();
@@ -44,6 +54,8 @@ void NormalKmeansCommand::doImp ()
     kmeans.compute ( X );
 
     Eigen::VectorXi clusterIDs = kmeans.clusterIDs();
+
+    smoothingWeights ( clusterIDs );
 
     std::vector<int> faceLabels ( clusterIDs.size() );
 
@@ -117,4 +129,44 @@ void NormalKmeansCommand::updateCenters ( const Eigen::MatrixXd& N, const Eigen:
     }
 
     N_centers.rowwise().normalize();
+}
+
+void NormalKmeansCommand::smoothingWeights ( Eigen::VectorXi& clusterIDs )
+{
+    int numData = clusterIDs.size();
+    int numCenters = _numCenters.value();
+
+    Eigen::MatrixXd W  = Eigen::MatrixXd::Zero ( numData, numCenters );
+
+    for ( int di = 0; di < numData; di++ )
+    {
+        W ( di, clusterIDs ( di ) ) = 1.0;
+    }
+
+    double lambda = 1.0;
+    Eigen::SparseMatrix<double> I = Eigen::MatrixXd::Identity (  _M.rows(),  _M.cols() ).sparseView();
+    Eigen::SparseMatrix<double> A_cons;
+    Eigen::MatrixXd b_cons;
+
+    double w_cons = 0.01 * lambda;
+    double w_R = 0.000001;
+
+    Eigen::SparseMatrix<double> A = w_cons * I + lambda *  _M;
+    Eigen::MatrixXd b = w_cons * W;
+
+    Eigen::SimplicialCholesky<Eigen::SparseMatrix<double>> solver;
+    solver.compute ( A );
+
+    if ( solver.info() != Eigen::Success )
+    {
+        std::cout << "Solver Fail" << std::endl;
+        return;
+    }
+
+    W = solver.solve ( b );
+
+    for ( int di = 0; di < numData; di++ )
+    {
+        W.row ( di ).maxCoeff ( &clusterIDs ( di ) );
+    }
 }
