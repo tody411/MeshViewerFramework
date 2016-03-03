@@ -11,6 +11,7 @@
 #include <random>
 #include <iostream>
 
+#include "PrimitiveFitting.h"
 #include "KMeans.h"
 #include "NormalColor.h"
 
@@ -54,11 +55,11 @@ void NormalKmeansCommand::doAll()
 
     Eigen::MatrixXd X = N;
 
+    Eigen::MatrixXd V;
+    mesh->faceCenters ( V );
+
     if ( _withPosition.value() )
     {
-        Eigen::MatrixXd V;
-        mesh->faceCenters ( V );
-
         double V_max = V.array().abs().maxCoeff();
 
         X = Eigen::MatrixXd::Zero ( X.rows(), 6 );
@@ -66,11 +67,15 @@ void NormalKmeansCommand::doAll()
         X.block ( 0, 3, numFaces, 3 ) = 5.0 * V / V_max;
     }
 
-    KMeans kmeans;
+    PrimitiveKMeans kmeans;
+    kmeans.setNumCenters ( numCenters );
+    kmeans.fit ( V, N );
+
+    /*KMeans kmeans;
 
     kmeans.setNumCenters ( numCenters );
     kmeans.compute ( X );
-
+    */
     Eigen::VectorXi clusterIDs = kmeans.clusterIDs();
 
     smoothingWeights ( _postfilterWeight.value(), clusterIDs );

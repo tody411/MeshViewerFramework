@@ -14,7 +14,7 @@ void SaveCommand::doImp ()
 {
     if ( _outputFile == "" )
     {
-        // QFileDialog().setDirectory ( _scene->project()->modelDir() );
+        QFileDialog().setDirectory ( _scene->project()->modelDir() );
         _outputFile = QFileDialog::getSaveFileName ( nullptr,
                       "Save 3D Mesh File", QString(),
                       "Mesh File (*.obj *.off *.ply)" );
