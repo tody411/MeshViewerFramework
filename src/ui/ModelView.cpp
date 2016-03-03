@@ -38,6 +38,7 @@ void ModelView::setScene ( Scene* scene )
     _overlays.append ( new WireframeOverlay ( scene ) );
     _overlays.append ( new PointsOverlay ( scene ) );
     _overlays.append ( new NormalVectorOverlay ( scene ) );
+    _overlays.append ( new TextureOverlay ( scene ) );
 
     _cameraTool = new CameraTool ( _scene, this );
 
@@ -51,29 +52,18 @@ void ModelView::setTool ( BaseTool* tool )
 
 void ModelView::render()
 {
+    repaint();
     update();
 }
 
 const QImage ModelView::screenShot()
 {
-    QImage image = grabFrameBuffer ( true );
-    image = image.convertToFormat ( QImage::Format_ARGB32 );
-    return image;
-}
-
-void ModelView::renderScreenShot ( const QString& filePath )
-{
-    /*update();
-    QImage image = screenShot();
-    image.save ( filePath );*/
-
     makeCurrent();
 
     updateRenderBuffer();
 
     _renderBuffer->bind();
 
-    //glPushAttrib ( GL_ALL_ATTRIB_BITS );
     glViewport ( 0, 0, width(), height() );
     glMatrixMode ( GL_PROJECTION );
     glLoadIdentity();
@@ -98,14 +88,12 @@ void ModelView::renderScreenShot ( const QString& filePath )
     glEnable ( GL_LIGHTING );
     glEnable ( GL_LIGHT0 );
     glEnable ( GL_MULTISAMPLE );
-    //renderBackGround();
+
     renderGL();
-    //glPopAttrib();
 
     renderOverlay();
 
     QPainter painter ( _renderBuffer );
-
     renderPainter ( &painter );
     painter.end();
 
@@ -113,7 +101,15 @@ void ModelView::renderScreenShot ( const QString& filePath )
 
     QImage image = _renderBuffer->toImage();
 
-    image.save ( filePath );
+    QImage captureImage ( image.constBits(), image.width(), image.height(), QImage::Format_ARGB32 );
+    return captureImage.copy();
+}
+
+void ModelView::renderScreenShot ( const QString& filePath )
+{
+    QImage captureImage = screenShot();
+
+    captureImage.save ( filePath );
 }
 
 void ModelView::initializeGL()
@@ -141,11 +137,9 @@ void ModelView::paintEvent ( QPaintEvent* event )
 {
     makeCurrent();
 
-    //glPushAttrib ( GL_ALL_ATTRIB_BITS );
     glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     renderGL();
-    //glPopAttrib();
 
     renderOverlay();
 }
@@ -181,10 +175,11 @@ void ModelView::renderOverlay()
 {
     glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
     //glPushAttrib ( GL_ALL_ATTRIB_BITS );
-    glMatrixMode ( GL_MODELVIEW );
-    glLoadIdentity();
+
     foreach ( BaseOverlay* overlay, _overlays )
     {
+        glMatrixMode ( GL_MODELVIEW );
+        glLoadIdentity();
         overlay->renderViewOverlay();
     }
     _tool->renderViewOverlay();
@@ -219,7 +214,6 @@ void ModelView::mousePressEvent ( QMouseEvent* event )
     {
         if ( _tool ) _tool->mousePressEvent ( event );
     }
-
 
     _cameraTool->mousePressEvent ( event );
 }
@@ -342,9 +336,14 @@ void ModelView::renderPainter ( QPainter* painter )
 
 void ModelView::updateRenderBuffer()
 {
+    QGLFramebufferObjectFormat fmt;
+    fmt.setSamples ( 1 );
+    fmt.setAttachment ( QGLFramebufferObject::Depth );
+    fmt.setInternalTextureFormat ( GL_RGBA32F_ARB );
+
     if ( _renderBuffer == nullptr )
     {
-        _renderBuffer = new QGLFramebufferObject ( size(), QGLFramebufferObject::Depth );
+        _renderBuffer = new QGLFramebufferObject ( size(), fmt );
     }
 
     if ( _renderBuffer != nullptr )
@@ -352,7 +351,7 @@ void ModelView::updateRenderBuffer()
         if ( _renderBuffer->size() != size() )
         {
             delete _renderBuffer;
-            _renderBuffer = new QGLFramebufferObject ( size(), QGLFramebufferObject::Depth );
+            _renderBuffer = new QGLFramebufferObject ( size(), fmt );
         }
     }
 }

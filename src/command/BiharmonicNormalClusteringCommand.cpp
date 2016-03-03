@@ -118,7 +118,7 @@ void BiharmonicNormalClusteringCommand::doImp ()
     Eigen::MatrixXd C ( _scene->mesh()->numFaces(), 3 );
 
     Eigen::MatrixXd Cid;
-    ColorMap::generateIDColors ( W.cols(), Cid );
+    ColorMap::IDColors ( W.cols(), Cid );
 
     if ( _showSmoothColor.value() )
     {
@@ -143,10 +143,6 @@ void BiharmonicNormalClusteringCommand::doImp ()
             C.row ( i ) = Cid.row ( maxID );
         }
     }
-
-    //mesh->setFaceColors (  C );
-
-    //_scene->setMeshDisplayMode ( Mesh::DisplayMode::FACE_COLOR );
 }
 
 void BiharmonicNormalClusteringCommand::computeWeightConstraint ( Eigen::SparseMatrix<double>& A, Eigen::MatrixXd& b )

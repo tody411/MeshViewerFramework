@@ -84,11 +84,11 @@ public :
 
     bool hasUVIDs() const
     {
-        return ! _UV_IDs.size() == 0;
+        return ! _UVIDs.size() == 0;
     }
 
     //! Return the point matrix.
-    void points ( Eigen::MatrixXd& V );
+    void points ( Eigen::MatrixXd& V ) const;
 
     //! Set the point matrix to the vertices of this mesh.
     void setPoints ( const Eigen::MatrixXd& V );
@@ -119,6 +119,32 @@ public :
 
     //! Return the face centers matrix.
     void faceCenters ( Eigen::MatrixXd& V );
+
+    //! Set the UV matrix to this mesh.
+    void setUVs ( const Eigen::MatrixXd& UVs )
+    {
+        _UVs = UVs;
+        emit updated();
+    }
+
+    //! Return the texture coordinates.
+    void UVs ( Eigen::MatrixXd& UVs ) const
+    {
+        UVs = _UVs;
+    }
+
+    //! Set the UV matrix to this mesh.
+    void setUVIDs ( const Eigen::MatrixXi& UVIDs )
+    {
+        _UVIDs = UVIDs;
+        emit updated();
+    }
+
+    //! Return the texture coordinates.
+    void UVIDs ( Eigen::MatrixXi& UVIDs ) const
+    {
+        UVIDs = _UVIDs;
+    }
 
     //! Return the vertex Laplacian matrix.
     void vertexLaplacian ( Eigen::SparseMatrix<double>& L );
@@ -159,7 +185,17 @@ public :
     //-----------------------
     //  Connectivity.
     //=======================
+
+    //! Return edge-face connection matrix.
     void Adj_ef ( Eigen::MatrixXi& A );
+
+    //! Return face-vertex connection matrix.
+    void Adj_fv ( Eigen::MatrixXi& A ) const;
+
+    //! Return face-face connection matrix.
+    void Adj_ff ( Eigen::SparseMatrix<double>& A  ) ;
+
+    void isolatedFaces ( std::vector<int>& iso_faces );
 
     //-----------------------
     //  Bounding box.
@@ -194,17 +230,17 @@ private:
     //! Bounding box.
     BoundingBox _bb;
 
-    //! Traianble index list for OpenGL calls.
-    std::vector<unsigned int> _indices;
-
     //! Vertex color for OpenGL calls.
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> _C;
 
+    //! Traianble index list for OpenGL calls.
+    Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> _A_fv;
+
     //! UV coordinates.
-    Eigen::MatrixXd _UVs;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> _UVs;
 
     //! Face UV IDs.
-    Eigen::MatrixXi _UV_IDs;
+    Eigen::MatrixXi _UVIDs;
 };
 
 #endif

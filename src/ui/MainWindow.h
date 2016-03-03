@@ -55,6 +55,9 @@ private:
     //! 3D model view.
     ModelView*   _view;
 
+    //! Tool UI.
+    QDockWidget* _toolDock;
+
     //! File menus.
     MenuGroup* _fileMenus;
 

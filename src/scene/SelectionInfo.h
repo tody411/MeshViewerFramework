@@ -51,6 +51,11 @@ public :
     //! Destructor.
     virtual ~SelectionInfo() {}
 
+    bool emptyFace()
+    {
+        return _faceSelection.empty();
+    }
+
     void gl();
 
     void clear()

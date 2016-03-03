@@ -12,6 +12,8 @@
 
 void MenuGroup::addCommand ( BaseCommand* command )
 {
+    command->setToolDock ( _toolDock );
+
     QAction* commandAction = new QAction ( command->name(), nullptr );
     connect ( commandAction, &QAction::triggered, command, &BaseCommand::actionSlot );
     addAction ( commandAction );

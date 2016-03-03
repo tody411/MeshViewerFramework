@@ -20,7 +20,7 @@ public :
         :  BaseCommand ( "Biharmonic Normal Clustering", scene ),
            _showSmoothColor ( "showSmoothColor", true )
     {
-        _params.addBool ( &_showSmoothColor );
+        //_params.addBool ( &_showSmoothColor );
     }
 
     //! Destructor.

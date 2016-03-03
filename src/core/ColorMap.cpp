@@ -10,7 +10,9 @@
 
 #include <random>
 
-void ColorMap::generateRandomColors ( int numColors, Eigen::MatrixXd& C )
+Eigen::MatrixXd ColorMap::_C_id;
+
+void ColorMap::randomColors ( int numColors, Eigen::MatrixXd& C )
 {
 
     C.resize ( numColors, 3 );
@@ -26,19 +28,64 @@ void ColorMap::generateRandomColors ( int numColors, Eigen::MatrixXd& C )
 }
 
 
-void ColorMap::generateIDColors ( int numColors, Eigen::MatrixXd& C )
+void ColorMap::IDColors ( int numColors, Eigen::MatrixXd& C )
+{
+    if ( numColors > _C_id.rows() )
+    {
+        generateIDColors ( numColors );
+    }
+
+    C = _C_id.block ( 0, 0, numColors, 3 );
+}
+
+void ColorMap::heatMap ( const Eigen::VectorXd& V, Eigen::MatrixXd& C )
+{
+    double v_min = V.minCoeff();
+    double v_max = V.maxCoeff();
+
+    heatMap ( V, C, v_min, v_max );
+}
+
+void ColorMap::heatMap ( const Eigen::VectorXd& V, Eigen::MatrixXd& C, double v_min, double v_max )
+{
+    C.resize ( V.rows(), 3 );
+
+    Eigen::Vector3d r ( 1, 0, 0 );
+    Eigen::Vector3d g ( 0, 1, 0 );
+    Eigen::Vector3d b ( 0, 0, 1 );
+
+    for ( int i = 0; i < V.rows(); i++ )
+    {
+        double v = V ( i );
+
+        Eigen::Vector3d c;
+
+        double t = ( v - v_min ) / ( v_max - v_min );
+
+        double t_gb = std::max ( 0.0, std::min ( 2.0 * t, 1.0 ) );
+
+        c = ( 1.0 - t_gb ) * b + t_gb * g;
+
+        double t_rg = std::max ( 0.0, std::min ( 2.0 * ( t - 0.5 ), 1.0 ) );
+        c = ( 1.0 - t_rg ) * c + t_rg * r;
+
+        C.row ( i ) = c;
+    }
+}
+
+void ColorMap::generateIDColors ( int numColors )
 {
     if ( numColors == 1 )
     {
-        C = Eigen::Vector3d ( 1, 0, 0 );
+        _C_id = Eigen::Vector3d ( 1, 0, 0 );
         return;
     }
 
     if ( numColors == 2 )
     {
-        C.resize ( 2, 3 );
-        C.row ( 0 ) = Eigen::Vector3d ( 1, 0, 0 );
-        C.row ( 1 ) = Eigen::Vector3d ( 0, 0, 1 );
+        _C_id.resize ( 2, 3 );
+        _C_id.row ( 0 ) = Eigen::Vector3d ( 1, 0, 0 );
+        _C_id.row ( 1 ) = Eigen::Vector3d ( 0, 0, 1 );
         return;
     }
 
@@ -50,7 +97,7 @@ void ColorMap::generateIDColors ( int numColors, Eigen::MatrixXd& C )
 
     if ( numColors == 3 )
     {
-        C = RGB;
+        _C_id = RGB;
         return;
     }
 
@@ -102,10 +149,10 @@ void ColorMap::generateIDColors ( int numColors, Eigen::MatrixXd& C )
         colors.push_back ( colorNew );
     }
 
-    C = Eigen::MatrixXd ( numColors, 3 );
+    _C_id = Eigen::MatrixXd ( numColors, 3 );
 
     for ( int i = 0; i < numColors; i++ )
     {
-        C.row ( i ) = colors[i + 2];
+        _C_id.row ( i ) = colors[i + 2];
     }
 }

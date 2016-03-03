@@ -28,7 +28,7 @@ public :
     void doImp ();
 
 private:
-    void computeWeightConstraint ( Eigen::SparseMatrix<double>& A, Eigen::MatrixXd& b );
+    void computeWeightConstraint ( Eigen::SparseMatrix<double>& A, Eigen::VectorXd& b );
 
 private:
     Eigen::SparseMatrix<double> _M;

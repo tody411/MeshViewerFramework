@@ -19,9 +19,13 @@ public :
     NormalKmeansCommand ( Scene* scene )
         :  BaseCommand ( "Normal Kmeans", scene ),
            _numCenters ( "numCenters", 2, 20, 6 ),
-           _withPosition ( "withPosition", false )
+           _withPosition ( "withPosition", false ),
+           _prefilterNormal ( "prefilterNormal", 0.0, 10.0, 1.0 ),
+           _postfilterWeight ( "postfilterWeight", 0.0, 10.0, 1.0 )
     {
         _params.addInt ( &_numCenters );
+        _params.addDouble ( &_prefilterNormal );
+        _params.addDouble ( &_postfilterWeight );
         _params.addBool ( &_withPosition );
     }
 
@@ -42,12 +46,20 @@ private:
 
     void updateCenters ( const Eigen::MatrixXd& N, const Eigen::VectorXi& ID, const Eigen::VectorXd& A_f, Eigen::MatrixXd& N_centers );
 
-    void smoothingWeights ( Eigen::VectorXi& clusterIDs );
+    void prefilterNormal ( const Eigen::MatrixXd& N, double lambda, Eigen::MatrixXd& N_smooth );
+
+    void smoothingWeights ( double lambda, Eigen::VectorXi& clusterIDs );
+
+    void doAll();
+
+    void doSelectedLabel();
 
 
 private:
     IntParameter _numCenters;
     BoolParameter _withPosition;
+    DoubleParameter _prefilterNormal;
+    DoubleParameter _postfilterWeight;
 
     Eigen::SparseMatrix<double> _M;
 };

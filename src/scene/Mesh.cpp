@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "MeshMatrix.h"
+#include "ObjIO.h"
 
 bool Mesh::loadMesh ( const QString& filePath )
 {
@@ -69,11 +70,22 @@ bool Mesh::loadMesh ( const QString& filePath )
     updateBoundingBox();
 
     computeIndices();
+
+    _UVs = Eigen::MatrixXd();
+    _UVIDs = Eigen::MatrixXi();
+
     return true;
 }
 
 bool Mesh::saveMesh ( const QString& filePath )
 {
+    if ( QFileInfo ( filePath ).suffix().toLower() == "obj" )
+    {
+        ObjIO objIO;
+        objIO.saveMesh ( filePath, *this );
+        return true;
+    }
+
     std::string file = filePath.toStdString();
 
     OpenMesh::IO::Options option;
@@ -109,7 +121,7 @@ bool Mesh::saveMesh ( const QString& filePath )
 }
 
 
-void Mesh::points ( Eigen::MatrixXd& V )
+void Mesh::points ( Eigen::MatrixXd& V ) const
 {
     V.resize ( numVertices(), 3 );
 
@@ -416,9 +428,9 @@ void Mesh::glShadingMode ()
     glNormalPointer ( GL_FLOAT, 0, _mesh.vertex_normals() );
 
     glDrawElements ( GL_TRIANGLES,
-                     _indices.size(),
+                     _A_fv.size(),
                      GL_UNSIGNED_INT,
-                     &_indices [0] );
+                     _A_fv.data() );
 
     glDisableClientState ( GL_VERTEX_ARRAY );
     glDisableClientState ( GL_NORMAL_ARRAY );
@@ -441,9 +453,9 @@ void Mesh::glVertexColorMode ()
     glColorPointer ( 3, GL_DOUBLE, 0, _C.data() );
 
     glDrawElements ( GL_TRIANGLES,
-                     _indices.size(),
+                     _A_fv.size(),
                      GL_UNSIGNED_INT,
-                     &_indices [0] );
+                     _A_fv.data() );
 
     glDisableClientState ( GL_VERTEX_ARRAY );
     glDisableClientState ( GL_COLOR_ARRAY );
@@ -489,9 +501,9 @@ void Mesh::glPoints ( )
     glNormalPointer ( GL_FLOAT, 0, _mesh.vertex_normals() );
 
     glDrawElements ( GL_TRIANGLES,
-                     _indices.size(),
+                     _A_fv.size(),
                      GL_UNSIGNED_INT,
-                     &_indices [0] );
+                     _A_fv.data() );
 
     glDisableClientState ( GL_VERTEX_ARRAY );
     glDisableClientState ( GL_NORMAL_ARRAY );
@@ -507,9 +519,9 @@ void Mesh::glWireframeMode ( )
     glNormalPointer ( GL_FLOAT, 0, _mesh.vertex_normals() );
 
     glDrawElements ( GL_TRIANGLES,
-                     _indices.size(),
+                     _A_fv.size(),
                      GL_UNSIGNED_INT,
-                     &_indices [0] );
+                     _A_fv.data() );
 
     glDisableClientState ( GL_VERTEX_ARRAY );
     glDisableClientState ( GL_NORMAL_ARRAY );
@@ -520,37 +532,22 @@ void Mesh::Adj_ef ( Eigen::MatrixXi& A )
     MeshMatrix ( _mesh ).Adj_ef ( A );
 }
 
-void Mesh::updateBoundingBox()
+void Mesh::Adj_fv ( Eigen::MatrixXi& A ) const
 {
-    _bb.clear();
-    _bb.expand ( * ( openMeshData() ) );
+    A.resize ( _A_fv.rows(), _A_fv.cols() );
+
+    for ( int ri = 0; ri < _A_fv.rows(); ri++ )
+    {
+        for ( int ci = 0; ci < _A_fv.cols(); ci++ )
+        {
+            A ( ri, ci ) = _A_fv ( ri, ci );
+        }
+    }
 }
 
-void Mesh::computeIndices()
+void Mesh::Adj_ff ( Eigen::SparseMatrix<double>& A )
 {
-    int numFaces = _mesh.n_faces();
-    _indices.resize ( 3 * numFaces );
-
-    MeshData::ConstFaceIter    fIt ( _mesh.faces_begin() ),
-             fEnd ( _mesh.faces_end() );
-    MeshData::ConstFaceVertexIter fvIt;
-
-    int triID = 0;
-
-    for ( ; fIt != fEnd; ++fIt )
-    {
-        fvIt = _mesh.cfv_iter ( *fIt );
-        _indices[triID] = fvIt->idx();
-        ++triID;
-        ++fvIt;
-
-        _indices[triID] = fvIt->idx();
-        ++triID;
-        ++fvIt;
-
-        _indices[triID] = fvIt->idx();
-        ++triID;
-    }
+    MeshMatrix ( _mesh ).Adj_ff ( A );
 }
 
 int closestVertexID ( MeshData& mesh, int vID, double th = 1e-7 )
@@ -589,6 +586,70 @@ int closestVertexID ( MeshData& mesh, int vID, double th = 1e-7 )
         return vID;
     }
 }
+
+void Mesh::isolatedFaces ( std::vector<int>& iso_faces )
+{
+    MeshData::FaceIter f_it, f_end ( _mesh.faces_end() );
+    MeshData::FaceFaceIter ff_it;
+    MeshData::FaceVertexIter fv_it;
+
+    for ( f_it = _mesh.faces_begin(); f_it != f_end; ++f_it )
+    {
+        int num_connected_faces = 0;
+
+        for ( ff_it = _mesh.ff_begin ( *f_it ); ff_it.is_valid(); ++ff_it )
+        {
+            num_connected_faces += 1;
+        }
+
+        if ( num_connected_faces > 0 ) continue;
+
+        bool isolated = true;
+
+        for ( fv_it = _mesh.fv_begin ( *f_it ); fv_it.is_valid(); ++fv_it )
+        {
+            int vID = fv_it->idx() ;
+            int vcID = closestVertexID ( _mesh, fv_it->idx() );
+
+            isolated = isolated && vID != vcID;
+        }
+
+        if ( isolated )
+        {
+            iso_faces.push_back ( f_it->idx() );
+        }
+    }
+}
+
+
+void Mesh::updateBoundingBox()
+{
+    _bb.clear();
+    _bb.expand ( * ( openMeshData() ) );
+}
+
+void Mesh::computeIndices()
+{
+    int numFaces = _mesh.n_faces();
+
+    _A_fv.resize ( numFaces, 3 );
+
+    MeshData::ConstFaceIter    fIt ( _mesh.faces_begin() ),
+             fEnd ( _mesh.faces_end() );
+    MeshData::ConstFaceVertexIter fvIt;
+
+    for ( ; fIt != fEnd; ++fIt )
+    {
+        fvIt = _mesh.cfv_iter ( *fIt );
+        for ( int fvi = 0; fvi < 3; fvi++ )
+        {
+            _A_fv ( fIt->idx(), fvi ) = fvIt->idx();
+            ++fvIt;
+        }
+    }
+}
+
+
 
 void Mesh::cleanIsolatedFaces ( MeshData& mesh )
 {

@@ -15,14 +15,16 @@
 #include "BaseCommand.h"
 #include "OverlayCommand.h"
 
+class QDockWidget;
+
 //! MenuGroup implementation.
 class MenuGroup : public QMenu
 {
     Q_OBJECT
 public :
     //! Constructor.
-    MenuGroup ( const QString& name, QWidget* parent = nullptr )
-        : _name ( name ), QMenu ( name, parent )
+    MenuGroup ( const QString& name, QWidget* parent = nullptr, QDockWidget* toolDock = nullptr )
+        : _name ( name ), QMenu ( name, parent ), _toolDock ( toolDock )
     {
     }
 
@@ -39,6 +41,8 @@ private:
     //! Menu group name.
     QString _name;
 
+    //! Tool UI.
+    QDockWidget* _toolDock;
 };
 
 #endif

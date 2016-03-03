@@ -61,7 +61,7 @@ void MainWindow::renderScreenShot ( const QString& filePath )
 
 void MainWindow::createMenue()
 {
-    _fileMenus = new MenuGroup ( tr ( "&File" ), this );
+    _fileMenus = new MenuGroup ( tr ( "&File" ), this, _toolDock );
     _fileMenus->addCommand ( new LoadCommand ( _scene ) );
     _fileMenus->addCommand ( new SaveCommand ( _scene ) );
     _fileMenus->addCommand ( new ImportLabelDataCommand ( _scene ) );
@@ -71,7 +71,7 @@ void MainWindow::createMenue()
 
     menuBar()->addMenu ( _fileMenus );
 
-    _operationMenus = new MenuGroup ( tr ( "&Operations" ), this );
+    _operationMenus = new MenuGroup ( tr ( "&Operations" ), this, _toolDock );
     _operationMenus->addCommand ( new NoiseCommand ( _scene ) );
     _operationMenus->addCommand ( new LaplacianSmoothingCommand ( _scene ) );
     _operationMenus->addCommand ( new SmoothNormalCommand ( _scene ) );
@@ -79,31 +79,33 @@ void MainWindow::createMenue()
     _operationMenus->addCommand ( new NormalizeMeshCommand ( _scene ) );
     menuBar()->addMenu ( _operationMenus );
 
-    MenuGroup* clusteringMenus = new MenuGroup ( tr ( "&Clustering" ), this );
+    MenuGroup* clusteringMenus = new MenuGroup ( tr ( "&Clustering" ), this, _toolDock );
     clusteringMenus->addCommand ( new NormalKmeansCommand ( _scene ) );
-    clusteringMenus->addCommand ( new FindExtremePoiintsCommand ( _scene ) );
+    //clusteringMenus->addCommand ( new FindExtremePoiintsCommand ( _scene ) );
     clusteringMenus->addCommand ( new BiharmonicNormalClusteringCommand ( _scene ) );
     clusteringMenus->addCommand ( new SpectralClusteringCommand ( _scene ) );
     menuBar()->addMenu ( clusteringMenus );
 
-    MenuGroup* textureMenus = new MenuGroup ( tr ( "&Texture" ), this );
+    MenuGroup* textureMenus = new MenuGroup ( tr ( "&Texture" ), this, _toolDock );
     textureMenus->addCommand ( new PlanarMappingCommand ( _scene ) );
+    textureMenus->addCommand ( new UnfoldCommand ( _scene ) );
+
     menuBar()->addMenu ( textureMenus );
 
-    MenuGroup* coloringMenus = new MenuGroup ( tr ( "&Coloring" ), this );
+    MenuGroup* coloringMenus = new MenuGroup ( tr ( "&Coloring" ), this, _toolDock );
     coloringMenus->addCommand ( new DefaultShadingCommand ( _scene ) );
     coloringMenus->addCommand ( new NormalColorCommand ( _scene ) );
     coloringMenus->addCommand ( new PositionColorCommand ( _scene ) );
     menuBar()->addMenu ( coloringMenus );
 
-    MenuGroup* shaderMenus = new MenuGroup ( tr ( "&Shader" ), this );
+    MenuGroup* shaderMenus = new MenuGroup ( tr ( "&Shader" ), this, _toolDock );
     shaderMenus->addCommand ( new LambertShaderCommand ( _scene ) );
     shaderMenus->addCommand ( new PhongShaderCommand ( _scene ) );
     shaderMenus->addCommand ( new NormalShaderCommand ( _scene ) );
     shaderMenus->addCommand ( new ToonShaderCommand ( _scene ) );
     menuBar()->addMenu ( shaderMenus );
 
-    _overlayMenus = new MenuGroup ( tr ( "&Overlay" ), this );
+    _overlayMenus = new MenuGroup ( tr ( "&Overlay" ), this, _toolDock );
 
     foreach ( BaseOverlay* overlay, _view->overlays() )
     {
@@ -112,17 +114,14 @@ void MainWindow::createMenue()
 
     menuBar()->addMenu ( _overlayMenus );
 
-    _renderMenus = new MenuGroup ( tr ( "&Render" ), this );
+    _renderMenus = new MenuGroup ( tr ( "&Render" ), this, _toolDock );
     _renderMenus->addCommand ( new RenderCommand ( _scene, _view ) );
     _renderMenus->addCommand ( new RenderWindowCommand ( _scene, this ) );
     menuBar()->addMenu ( _renderMenus );
 
-    MenuGroup* demoMenus = new MenuGroup ( tr ( "&Demo" ), this );
+    /*MenuGroup* demoMenus = new MenuGroup ( tr ( "&Demo" ), this, _toolDock );
     demoMenus->addCommand ( new DemoCommand ( _scene, _view ) );
-    menuBar()->addMenu ( demoMenus );
-
-
-
+    menuBar()->addMenu ( demoMenus );*/
 }
 
 void MainWindow::createUI()
@@ -130,10 +129,15 @@ void MainWindow::createUI()
     _view = new ModelView ( this );
     _view->setScene ( _scene );
 
-    //setCentralWidget ( _view );
-    QDockWidget* leftDock = new QDockWidget ( "3D Model View", this );
-    leftDock->setWidget ( _view );
-    addDockWidget ( Qt::LeftDockWidgetArea, leftDock );
+    _toolDock = new QDockWidget ( "Tool UI", this );
+    addDockWidget ( Qt::LeftDockWidgetArea, _toolDock );
+    _toolDock->setMaximumWidth ( 400 );
+    _toolDock->setMinimumWidth ( 300 );
+
+    QDockWidget* viewDock = new QDockWidget ( "3D Model View", this );
+    viewDock->setWidget ( _view );
+    this->setCentralWidget ( viewDock );
+    //addDockWidget ( Qt::RightDockWidgetArea, viewDock );
 
     //addDockWidget ( Qt::RightDockWidgetArea, rightDock );
     connect ( _scene, &Scene::messageUpdated, statusBar(), &QStatusBar::showMessage );
@@ -164,9 +168,9 @@ void MainWindow::dropEvent ( QDropEvent* event )
             QString filePath = url.path();
             filePath = filePath.mid ( 1 );
 
-            _scene->loadMesh ( filePath );
+            //_scene->loadMesh ( filePath );
 
-            //( new LoadCommand ( _scene, filePath ) )->actionSlot();
+            ( new LoadCommand ( _scene, filePath ) )->actionSlot();
 
             event->acceptProposedAction();
         }

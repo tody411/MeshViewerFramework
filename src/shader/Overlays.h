@@ -16,5 +16,7 @@
 #include "PointsOverlay.h"
 #include "NormalVectorOverlay.h"
 
+#include "TextureOverlay.h"
+
 #endif
 

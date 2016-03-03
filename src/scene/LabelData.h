@@ -38,11 +38,15 @@ public :
 
     void setFaceLabelData ( const std::vector<int>& indices, int label );
 
+    void setFaceLabelConfidents ( const std::vector<double>& labelConfidents );
+
     void setFaceLabelConfidents ( const std::vector<int>& indices, double w );
 
     int getFaceLabel ( int index );
 
     void faceLabelData ( std::vector<int>& faceLabels ) const;
+
+    void labelShell ( int label,  std::vector<int>& shellFaces ) const;
 
     void faceLabelConfidentsData ( std::vector<double>& faceLabelConfidents ) const;
 

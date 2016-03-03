@@ -11,6 +11,7 @@
 
 #include <QString>
 #include <QElapsedTimer>
+#include <QDockWidget>
 
 #include "Scene.h"
 
@@ -25,7 +26,7 @@ public :
     //! Constructor.
     BaseCommand ( const QString& name, Scene* scene )
         :
-        _scene ( scene ), _name ( name ), _isInteractive ( false ), _isCheckSceneEmtpy ( true )
+        _scene ( scene ), _name ( name ), _isInteractive ( false ), _isCheckSceneEmtpy ( true ), _toolDock ( nullptr )
     {}
 
     //! Destructor.
@@ -36,6 +37,11 @@ public :
         return _name;
     }
 
+    void setToolDock ( QDockWidget* toolDock )
+    {
+        _toolDock = toolDock;
+    }
+
 public slots:
     void actionSlot()
     {
@@ -44,6 +50,14 @@ public slots:
         if ( _params.empty() )
         {
             setupImp() ;
+            CommandParameterUI* paramUI = new CommandParameterUI ( _name, _params );
+            if ( _toolDock )
+            {
+                _toolDock->setWidget ( paramUI );
+                _toolDock->setWindowTitle ( _name );
+            }
+
+            connect ( paramUI, &CommandParameterUI::editFinished, this, &BaseCommand::doSlot );
             doSlot();
         }
 
@@ -52,7 +66,11 @@ public slots:
             setupImp() ;
 
             CommandParameterUI* paramUI = new CommandParameterUI ( _name, _params );
-            paramUI->show();
+            if ( _toolDock )
+            {
+                _toolDock->setWidget ( paramUI );
+                _toolDock->setWindowTitle ( _name );
+            }
 
             connect ( paramUI, &CommandParameterUI::editFinished, this, &BaseCommand::doSlot );
 
@@ -84,7 +102,7 @@ public slots:
     }
 
 public:
-    //! Return the command information.
+//! Return the command information.
     const QString str() const
     {
         QString info = _name;
@@ -112,7 +130,7 @@ protected:
 
     virtual void doImp () {}
 
-    //! Set interactive mode.
+//! Set interactive mode.
     void setInteractive ( bool isInteractive )
     {
         _isInteractive = isInteractive;
@@ -124,29 +142,32 @@ protected:
     }
 
 protected:
-    //! Command name.
+//! Command name.
     QString     _name;
 
-    //! Target scene.
+//! Target scene.
     Scene*   _scene;
 
-    //! Input information.
+//! Input information.
     QString _inputInfo;
 
-    //! Output information.
+//! Output information.
     QString _outputInfo;
 
-    //! Perfomance info.
+//! Perfomance info.
     QString _performanceInfo;
 
-    //! Command parameters.
+//! Command parameters.
     SceneParameters _params;
 
-    //! Interactive mode.
+//! Interactive mode.
     bool _isInteractive;
 
-    //! Checking scene empty.
+//! Checking scene empty.
     bool _isCheckSceneEmtpy;
+
+//! Tool UI.
+    QDockWidget* _toolDock;
 };
 
 #endif

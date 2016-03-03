@@ -26,11 +26,19 @@ void ExportLabelDataCommand::doImp ()
     std::vector<int> faceLabels;
     _scene->labelData()->faceLabelData ( faceLabels );
 
+    std::vector<double> faceConfidents;
+    _scene->labelData()->faceLabelConfidentsData ( faceConfidents );
+
     std::ofstream  ofs ( _outputFile.toStdString() );
 
     for ( int i = 0; i < faceLabels.size(); i++ )
     {
-        ofs << faceLabels[i] << std::endl;
+        ofs << "fl " << faceLabels[i] << std::endl;
+    }
+
+    for ( int i = 0; i < faceLabels.size(); i++ )
+    {
+        ofs << "fc " << faceConfidents[i] << std::endl;
     }
 
     _outputFile = "";

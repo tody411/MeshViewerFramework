@@ -58,8 +58,10 @@ void SelectionInfo::glVertexSelection()
 
     glDisable ( GL_LIGHTING );
     glEnable ( GL_DEPTH_TEST );
+    glEnable ( GL_BLEND );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-    glColor4f ( 1.0f, 0.2f, 0.1f, 0.5f );
+    glColor4f ( 1.0f, 1.0f, 1.0f, 0.2f );
 
     glBegin ( GL_POINTS );
 
@@ -104,8 +106,10 @@ void SelectionInfo::glFaceSelection()
 
     glDisable ( GL_LIGHTING );
     glEnable ( GL_DEPTH_TEST );
+    glEnable ( GL_BLEND );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
-    glColor4f ( 1.0f, 0.2f, 0.1f, 0.5f );
+    glColor4f ( 1.0f, 1.0f, 1.0f, 0.2f );
 
     glBegin ( GL_TRIANGLES );
 
@@ -129,6 +133,34 @@ void SelectionInfo::glFaceSelection()
     }
 
     glEnd();
+
+    glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE );
+    glColor4f ( 1.0f, 0.2f, 0.2f, 0.5f );
+
+    glBegin ( GL_TRIANGLES );
+
+    for ( int fi = 0; fi < indices.size(); fi++ )
+    {
+        int fID = indices[fi];
+
+        fh = mesh->face_handle ( fID );
+        fvIt = mesh->fv_iter ( fh );
+
+        for ( int vi = 0; vi < 3; vi++ )
+        {
+            OpenMesh::Vec3f v = mesh->point ( *fvIt );
+            OpenMesh::Vec3f n = mesh->normal ( *fvIt );
+
+            v += ( epsilon * bb_size ) * n;
+
+            glVertex3fv ( v.data() );
+            ++fvIt;
+        }
+    }
+
+    glEnd();
+
+    glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
 }
 
 

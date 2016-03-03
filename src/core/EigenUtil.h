@@ -14,7 +14,15 @@
 //! EigenUtil implementation.
 namespace EigenUtil
 {
-    const std::string info ( const Eigen::MatrixXd& X, const std::string& name );
+    template <typename MatrixType>
+    const std::string info ( const MatrixType& X, const std::string& name )
+    {
+        std::stringstream ss;
+        ss << name << ": " << X.rows() << ", " << X.cols() << std::endl;
+        ss << "  Range:" << X.minCoeff() << ", " << X.maxCoeff();
+        ss << "  Norm: " << X.norm();
+        return ss.str();
+    }
 };
 
 #endif

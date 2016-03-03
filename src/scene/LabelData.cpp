@@ -55,6 +55,7 @@ void LabelData::setFaceLabelData ( const std::vector<int>& faceLabels )
     {
         _faceLabels[i] = faceLabels[i];
     }
+    emit updated();
 }
 
 void LabelData::setFaceLabelData ( const std::vector<int>& indices, int label )
@@ -63,6 +64,16 @@ void LabelData::setFaceLabelData ( const std::vector<int>& indices, int label )
     {
         _faceLabels[index] = label;
     }
+    emit updated();
+}
+
+void LabelData::setFaceLabelConfidents ( const std::vector<double>& labelConfidents )
+{
+    for ( int i = 0; i < labelConfidents.size(); i++ )
+    {
+        _faceLabelConfidents[i] = labelConfidents[i];
+    }
+    emit updated();
 }
 
 void LabelData::setFaceLabelConfidents ( const std::vector<int>& indices, double w )
@@ -71,6 +82,8 @@ void LabelData::setFaceLabelConfidents ( const std::vector<int>& indices, double
     {
         _faceLabelConfidents[index] = w;
     }
+
+    emit updated();
 }
 
 
@@ -82,6 +95,16 @@ int LabelData::getFaceLabel ( int index )
 void LabelData::faceLabelData ( std::vector<int>& faceLabels ) const
 {
     std::copy ( _faceLabels.begin(), _faceLabels.end(), std::back_inserter ( faceLabels ) );
+}
+
+void LabelData::labelShell ( int label,  std::vector<int>& shellFaces ) const
+{
+    for ( int fi = 0; fi < _faceLabels.size(); fi++ )
+    {
+        if ( _faceLabels[fi] != label ) continue;
+
+        shellFaces.push_back ( fi );
+    }
 }
 
 void LabelData::faceLabelConfidentsData ( std::vector<double>& faceLabelConfidents ) const
@@ -106,10 +129,12 @@ void LabelData::gl()
     float epsilon = 1e-5;
 
     Eigen::MatrixXd C;
-    ColorMap::generateIDColors ( 10, C );
+    ColorMap::IDColors ( numLabels(), C );
 
     glDisable ( GL_LIGHTING );
     glEnable ( GL_DEPTH_TEST );
+    glEnable ( GL_BLEND );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
 
     glBegin ( GL_TRIANGLES );

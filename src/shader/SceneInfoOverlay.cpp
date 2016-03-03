@@ -30,6 +30,7 @@ void SceneInfoOverlay::renderPainterImp ( QPainter* painter )
     text += QString ( "  Num Vertices  : %1\n" ).arg ( mesh->numVertices() );
     text += QString ( "  Num Edges     : %1\n" ).arg ( mesh->numEdges() );
     text += QString ( "  Num Faces     : %1\n" ).arg ( mesh->numFaces() );
+    text += QString ( "  Num UVs       : %1\n" ).arg ( mesh->numUVs() );
 
     painter->drawText ( QRectF ( x, y, text_width, text_height ), text );
 

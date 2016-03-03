@@ -25,6 +25,13 @@ public :
 
     void doImp ();
 
+private:
+    void doAll();
+
+    void doSelection();
+
+    void doLabel();
+
 };
 
 

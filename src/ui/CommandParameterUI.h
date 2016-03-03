@@ -171,6 +171,9 @@ private:
     QComboBox* _comboBox;
 };
 
+class QPushButton;
+class QVBoxLayout;
+
 //! CommandParameterUI implementation.
 class CommandParameterUI : public QWidget
 {
@@ -186,6 +189,8 @@ public :
     //! Destructor.
     virtual ~CommandParameterUI() {}
 
+    QPushButton* addButton ( const QString& name );
+
 signals:
     void paramUpdated();
 
@@ -196,6 +201,7 @@ private:
 
 private:
     SceneParameters* _params;
+    QVBoxLayout* _layout;
 
     QString _name;
     QString _description;

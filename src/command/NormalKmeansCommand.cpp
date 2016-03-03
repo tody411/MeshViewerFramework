@@ -9,6 +9,7 @@
 #include "NormalKmeansCommand.h"
 
 #include <random>
+#include <iostream>
 
 #include "KMeans.h"
 #include "NormalColor.h"
@@ -18,12 +19,27 @@ void NormalKmeansCommand::setupImp()
     Mesh* mesh = _scene->mesh();
 
     Eigen::SparseMatrix<double> L;
-    mesh->faceLaplacian ( L, 0.001, 1.0,  0.5 );
+    mesh->faceLaplacian ( L, 1.0, 1.0,  0.5 );
 
     _M = L.transpose() * L;
 }
 
 void NormalKmeansCommand::doImp ()
+{
+    LabelData* labelData = _scene->labelData();
+
+    if ( !_scene->selectionInfo()->emptyFace() && !labelData->empty() )
+    {
+        doSelectedLabel();
+    }
+
+    else
+    {
+        doAll();
+    }
+}
+
+void NormalKmeansCommand::doAll()
 {
     int numCenters = _numCenters.value();
 
@@ -33,6 +49,8 @@ void NormalKmeansCommand::doImp ()
     mesh->faceNormals ( N );
 
     int numFaces = mesh->numFaces();
+
+    prefilterNormal ( N, _prefilterNormal.value(), N );
 
     Eigen::MatrixXd X = N;
 
@@ -45,7 +63,7 @@ void NormalKmeansCommand::doImp ()
 
         X = Eigen::MatrixXd::Zero ( X.rows(), 6 );
         X.block ( 0, 0, numFaces, 3 ) = N;
-        X.block ( 0, 3, numFaces, 3 ) = V / V_max / 3.0;
+        X.block ( 0, 3, numFaces, 3 ) = 5.0 * V / V_max;
     }
 
     KMeans kmeans;
@@ -55,7 +73,7 @@ void NormalKmeansCommand::doImp ()
 
     Eigen::VectorXi clusterIDs = kmeans.clusterIDs();
 
-    smoothingWeights ( clusterIDs );
+    smoothingWeights ( _postfilterWeight.value(), clusterIDs );
 
     std::vector<int> faceLabels ( clusterIDs.size() );
 
@@ -65,6 +83,63 @@ void NormalKmeansCommand::doImp ()
     }
 
     _scene->labelData()->setFaceLabelData ( faceLabels );
+}
+
+void NormalKmeansCommand::doSelectedLabel()
+{
+    std::vector<int> selection;
+    _scene->selectionInfo()->faceSelection ( selection );
+
+    int selectedFace = selection[0];
+
+    LabelData* labelData = _scene->labelData();
+
+    std::vector<int> faceLabels;
+    labelData->faceLabelData ( faceLabels );
+
+    int selectedLabel = faceLabels[selectedFace];
+
+    std::vector<int> shellFaces;
+
+    labelData->labelShell ( selectedLabel, shellFaces );
+
+    Eigen::MatrixXd N_all;
+    Mesh* mesh = _scene->mesh();
+    mesh->faceNormals ( N_all );
+
+    prefilterNormal ( N_all, _prefilterNormal.value(), N_all );
+
+    int numFaces = mesh->numFaces();
+
+    Eigen::MatrixXd X ( shellFaces.size(), 3 );
+
+    for ( int si = 0; si < shellFaces.size(); si++ )
+    {
+        int fi = shellFaces[si];
+        X.row ( si ) = N_all.row ( fi );
+    }
+
+    KMeans kmeans;
+    int numCenters = _numCenters.value();
+    kmeans.setNumCenters ( numCenters );
+    kmeans.compute ( X );
+
+    Eigen::VectorXi clusterIDs = kmeans.clusterIDs();
+
+    int numLabels = labelData->numLabels();
+
+    for ( int si = 0; si < shellFaces.size(); si++ )
+    {
+        int cid = clusterIDs ( si );
+
+        if ( cid == 0 ) continue;
+
+        int fi = shellFaces[si];
+
+        faceLabels[fi] = numLabels + cid - 1;
+    }
+
+    labelData->setFaceLabelData ( faceLabels );
 }
 
 void NormalKmeansCommand::computeRandomCenters ( int numCenters, Eigen::MatrixXd& N_centers )
@@ -131,7 +206,30 @@ void NormalKmeansCommand::updateCenters ( const Eigen::MatrixXd& N, const Eigen:
     N_centers.rowwise().normalize();
 }
 
-void NormalKmeansCommand::smoothingWeights ( Eigen::VectorXi& clusterIDs )
+void NormalKmeansCommand::prefilterNormal ( const Eigen::MatrixXd& N, double lambda, Eigen::MatrixXd& N_smooth )
+{
+    Eigen::SparseMatrix<double> I = Eigen::MatrixXd::Identity (  _M.rows(),  _M.cols() ).sparseView();
+    Eigen::SparseMatrix<double> A_cons;
+    Eigen::MatrixXd b_cons;
+
+    Eigen::SparseMatrix<double> A = I + lambda *  _M;
+    Eigen::MatrixXd b = N;
+
+    Eigen::SimplicialCholesky<Eigen::SparseMatrix<double>> solver;
+    solver.compute ( A );
+
+    if ( solver.info() != Eigen::Success )
+    {
+        std::cout << "Solver Fail" << std::endl;
+        return;
+    }
+
+    N_smooth = solver.solve ( b );
+
+    N_smooth.rowwise().normalize();
+}
+
+void NormalKmeansCommand::smoothingWeights ( double lambda, Eigen::VectorXi& clusterIDs )
 {
     int numData = clusterIDs.size();
     int numCenters = _numCenters.value();
@@ -143,16 +241,12 @@ void NormalKmeansCommand::smoothingWeights ( Eigen::VectorXi& clusterIDs )
         W ( di, clusterIDs ( di ) ) = 1.0;
     }
 
-    double lambda = 1.0;
     Eigen::SparseMatrix<double> I = Eigen::MatrixXd::Identity (  _M.rows(),  _M.cols() ).sparseView();
     Eigen::SparseMatrix<double> A_cons;
     Eigen::MatrixXd b_cons;
 
-    double w_cons = 0.01 * lambda;
-    double w_R = 0.000001;
-
-    Eigen::SparseMatrix<double> A = w_cons * I + lambda *  _M;
-    Eigen::MatrixXd b = w_cons * W;
+    Eigen::SparseMatrix<double> A = I + lambda *  _M;
+    Eigen::MatrixXd b = W;
 
     Eigen::SimplicialCholesky<Eigen::SparseMatrix<double>> solver;
     solver.compute ( A );

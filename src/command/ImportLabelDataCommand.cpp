@@ -29,13 +29,24 @@ void ImportLabelDataCommand::doImp ()
     int numFaces = _scene->mesh()->numFaces();
 
     std::vector<int> faceLabels ( numFaces );
+    std::vector<double> faceConfidents ( numFaces );
+
+    std::string dtype;
 
     for ( int fi = 0; fi < numFaces; fi++ )
     {
+        ifs >> dtype;
         ifs >> faceLabels[fi];
     }
 
+    for ( int fi = 0; fi < numFaces; fi++ )
+    {
+        ifs >> dtype;
+        ifs >> faceConfidents[fi];
+    }
+
     _scene->labelData()->setFaceLabelData ( faceLabels );
+    _scene->labelData()->setFaceLabelConfidents ( faceConfidents );
 
     _inputFile = "";
 }

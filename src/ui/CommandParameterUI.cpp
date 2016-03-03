@@ -186,6 +186,13 @@ void    EnumParameterUI::editTextChanged ( const QString& text )
     _param->setValue ( text );
 }
 
+QPushButton* CommandParameterUI::addButton ( const QString& name )
+{
+    QPushButton* button = new QPushButton ( name );
+    _layout->addWidget ( button );
+    return button;
+}
+
 void CommandParameterUI::createUI()
 {
     this->setWindowTitle ( _name );
@@ -200,44 +207,45 @@ void CommandParameterUI::createUI()
 
     QMap<QString, EnumParameter*> enumParameters = _params->enumParameters();
 
-    QVBoxLayout* layout = new QVBoxLayout;
+    _layout = new QVBoxLayout;
+
 
     foreach ( QString paramName, paramNames )
     {
         if ( intParameters.contains ( paramName ) )
         {
             IntParameterUI* paramUI = new IntParameterUI ( intParameters[paramName] );
-            layout->addWidget ( paramUI );
+            _layout->addWidget ( paramUI );
             connect ( paramUI, &IntParameterUI::valueChanged, this, &CommandParameterUI::paramUpdated );
         }
 
         if ( doubleParameters.contains ( paramName ) )
         {
             DoubleParameterUI* paramUI = new DoubleParameterUI ( doubleParameters[paramName] ) ;
-            layout->addWidget ( paramUI );
+            _layout->addWidget ( paramUI );
             connect ( paramUI, &DoubleParameterUI::valueChanged, this, &CommandParameterUI::paramUpdated );
         }
 
         if ( boolParameters.contains ( paramName ) )
         {
             BoolParameterUI* paramUI = new BoolParameterUI ( boolParameters[paramName] );
-            layout->addWidget ( paramUI );
+            _layout->addWidget ( paramUI );
             connect ( paramUI, &BoolParameterUI::valueChanged, this, &CommandParameterUI::paramUpdated );
         }
 
         if ( enumParameters.contains ( paramName ) )
         {
             EnumParameterUI* paramUI = new EnumParameterUI ( enumParameters[paramName] ) ;
-            layout->addWidget ( paramUI );
+            _layout->addWidget ( paramUI );
             connect ( paramUI, &EnumParameterUI::valueChanged, this, &CommandParameterUI::paramUpdated );
         }
     }
 
     QPushButton* applyButton = new QPushButton ( "Apply" );
     connect ( applyButton, &QPushButton::clicked, this, &CommandParameterUI::editFinished );
-    connect ( applyButton, &QPushButton::clicked, this,  &CommandParameterUI::close );
 
-    layout->addWidget ( applyButton );
+    _layout->addWidget ( applyButton );
+    _layout->addStretch();
 
-    setLayout ( layout );
+    setLayout ( _layout );
 }

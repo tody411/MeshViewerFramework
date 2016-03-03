@@ -29,6 +29,8 @@
 #include "SpectralClusteringCommand.h"
 
 #include "PlanarMappingCommand.h"
+#include "UnfoldCommand.h"
+
 
 #include "DefaultShadingCommand.h"
 #include "NormalColorCommand.h"
