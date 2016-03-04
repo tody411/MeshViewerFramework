@@ -9,6 +9,7 @@
 #include "ColorMap.h"
 
 #include <random>
+#include <iostream>
 
 Eigen::MatrixXd ColorMap::_C_id;
 
@@ -30,7 +31,7 @@ void ColorMap::randomColors ( int numColors, Eigen::MatrixXd& C )
 
 void ColorMap::IDColors ( int numColors, Eigen::MatrixXd& C )
 {
-    if ( numColors > _C_id.rows() )
+    if ( numColors > _C_id.size() / 3 )
     {
         generateIDColors ( numColors );
     }
@@ -75,6 +76,7 @@ void ColorMap::heatMap ( const Eigen::VectorXd& V, Eigen::MatrixXd& C, double v_
 
 void ColorMap::generateIDColors ( int numColors )
 {
+    std::cout << "Generate Colors" << numColors << std::endl;
     if ( numColors == 1 )
     {
         _C_id = Eigen::Vector3d ( 1, 0, 0 );

@@ -12,6 +12,8 @@
 
 #include <QtOpenGL>
 
+#include <iostream>
+
 #include "PointOnMesh.h"
 #include "RayCasting.h"
 #include "Scene.h"
@@ -62,6 +64,8 @@ void SelectTool::keyPressEvent ( QKeyEvent* event )
 
         labelData->setFaceLabelData ( indices, labelID );
         labelData->setFaceLabelConfidents ( indices, 1.0 );
+
+        std::cout << "Num Face Labels" << labelData->numLabels() << std::endl;
     }
 }
 
