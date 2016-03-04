@@ -202,15 +202,16 @@ void QuadricSurfaceFitting::fit ( const Eigen::MatrixXd& V,  const Eigen::Matrix
     std::cout << EigenUtil::info ( FtF_zero, "FtF_zero" ) << std::endl;
     std::cout << EigenUtil::info ( FtF_out, "FtF_out" ) << std::endl;
 
-    double w_out = 0.05;
-    double w_in = 0.0;
+    double w_out = 0.01;
+    double w_in = 0.01;
     double w_R = 0.0;
     Eigen::MatrixXd I_A = Eigen::MatrixXd::Zero ( FtF_zero.rows(), FtF_zero.cols() );
     Eigen::MatrixXd A = FtF_zero + w_out * FtF_out + w_in * FtF_in + w_R * I_A;
 
-    Eigen::VectorXd I_b = Eigen::VectorXd::Ones ( A.rows() );
-    Eigen::VectorXd b = w_out * f_out * F_out.transpose() * I_b/* + w_in * f_in * F_in.transpose() * I_b*/;
+    Eigen::VectorXd I_b = Eigen::VectorXd::Ones ( V.rows() );
+    Eigen::VectorXd b = w_out * f_out * F_out.transpose() * I_b + w_in * f_in * F_in.transpose() * I_b;
 
+    std::cout << EigenUtil::info ( F_out.transpose(), "F_out_t" ) << std::endl;
     std::cout << EigenUtil::info ( F_out.transpose() * I_b, "F_out_tb" ) << std::endl;
 
     std::cout << EigenUtil::info ( b , "b " ) << std::endl;
@@ -225,10 +226,16 @@ void QuadricSurfaceFitting::error ( const Eigen::MatrixXd& V, const Eigen::Matri
     Eigen::MatrixXd F;
     computeF ( V, F );
 
-    Eigen::VectorXd E_fit = ( F * _C ).rowwise().norm();
-    E = E_fit;
+    Eigen::VectorXd E_v;
 
-    std::cout << "error: " << E_fit.mean() << std::endl;
+    positionError ( V, E_v );
+
+    Eigen::VectorXd E_n;
+    normalError ( V, N, E_n );
+
+    E = E_n + 0.1 * E_v;
+
+    std::cout << "error: " << E_v.mean() << std::endl;
 }
 
 void QuadricSurfaceFitting::computeF ( const Eigen::MatrixXd& V, Eigen::MatrixXd& F )
@@ -256,6 +263,40 @@ void QuadricSurfaceFitting::computeF ( const Eigen::MatrixXd& V, Eigen::MatrixXd
 
     std::cout << EigenUtil::info ( V , "V" ) << std::endl;
     std::cout << EigenUtil::info ( F , "F" ) << std::endl;
+}
+
+void QuadricSurfaceFitting::positionError ( const Eigen::MatrixXd& V, Eigen::VectorXd& E )
+{
+    Eigen::MatrixXd F;
+    computeF ( V, F );
+
+    E = ( F * _C ).rowwise().norm();
+}
+
+void QuadricSurfaceFitting::normalError ( const Eigen::MatrixXd& V, const Eigen::MatrixXd& N, Eigen::VectorXd& E )
+{
+    Eigen::MatrixXd N_fit ( N.rows(), N.cols() );
+
+    Eigen::ArrayXd x = V.col ( 0 );
+    Eigen::ArrayXd y = V.col ( 1 );
+    Eigen::ArrayXd z = V.col ( 2 );
+
+    N_fit.col ( 0 ) =  _C ( 1 ) + 2 * _C ( 4 ) * x + _C ( 7 ) * y + _C ( 9 ) * z;
+    N_fit.col ( 1 ) =  _C ( 2 ) + 2 * _C ( 5 ) * x + _C ( 7 ) * y + _C ( 8 ) * z;
+    N_fit.col ( 2 ) =  _C ( 3 ) + 2 * _C ( 6 ) * x + _C ( 8 ) * y + _C ( 9 ) * z;
+
+    N_fit.rowwise().normalize();
+
+    E = ( N_fit - N ).rowwise().norm();
+}
+
+void QuadricSurfaceFitting::A_n ( const Eigen::MatrixXd& V, const Eigen::MatrixXd& N, Eigen::MatrixXd& A )
+{
+    Eigen::ArrayXd x = V.col ( 0 );
+    Eigen::ArrayXd y = V.col ( 1 );
+    Eigen::ArrayXd z = V.col ( 2 );
+
+    Eigen::MatrixXd F = Eigen::MatrixXd::Zero ( V.rows(), 10 );
 }
 
 void QuadricSurfaceFitting::info()

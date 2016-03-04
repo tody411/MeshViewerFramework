@@ -37,7 +37,7 @@ class PrimitiveKMeans
 public:
     //! Constructor.
     PrimitiveKMeans ()
-        : _numIterations ( 1 )
+        : _numIterations ( 5 )
     {}
 
     //! Destructor.
@@ -128,6 +128,12 @@ public :
 
 private:
     void computeF ( const Eigen::MatrixXd& V, Eigen::MatrixXd& F );
+
+    void positionError ( const Eigen::MatrixXd& V, Eigen::VectorXd& E );
+
+    void normalError ( const Eigen::MatrixXd& V, const Eigen::MatrixXd& N, Eigen::VectorXd& E );
+
+    void A_n ( const Eigen::MatrixXd& V, const Eigen::MatrixXd& N, Eigen::MatrixXd& A );
 
 private:
     Eigen::VectorXd _C;
