@@ -67,15 +67,15 @@ void NormalKmeansCommand::doAll()
         X.block ( 0, 3, numFaces, 3 ) = 5.0 * V / V_max;
     }
 
-    PrimitiveKMeans kmeans;
-    kmeans.setNumCenters ( numCenters );
-    kmeans.fit ( V, N );
+    /* PrimitiveKMeans kmeans;
+     kmeans.setNumCenters ( numCenters );
+     kmeans.fit ( V, N );*/
 
-    /*KMeans kmeans;
+    KMeans kmeans;
 
     kmeans.setNumCenters ( numCenters );
     kmeans.compute ( X );
-    */
+
     Eigen::VectorXi clusterIDs = kmeans.clusterIDs();
 
     smoothingWeights ( _postfilterWeight.value(), clusterIDs );
