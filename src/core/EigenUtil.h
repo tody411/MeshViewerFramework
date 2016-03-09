@@ -12,6 +12,7 @@
 #include "Eigen/Dense"
 
 #include <vector>
+#include <map>
 
 //! EigenUtil implementation.
 namespace EigenUtil
@@ -81,6 +82,28 @@ namespace EigenUtil
             }
         }
     }
+
+    template <typename VectorType, typename IndexVectorType>
+    void argsort ( const VectorType& X, IndexVectorType& Y )
+    {
+        int numData = X.size();
+        Y.resize ( numData );
+
+        std::vector<std::pair<double, int> > pairs ( numData );
+
+        for ( int i = 0; i < numData; i++ )
+        {
+            pairs[i] = std::make_pair ( X[i], i );
+        }
+
+        std::sort ( pairs.begin(), pairs.end() );
+
+        for ( int i = 0; i < numData; i++ )
+        {
+            Y[i] = pairs[i].second;
+        }
+    }
+
 
     template <typename IndexVectorType>
     void isValue ( const IndexVectorType& X, int value, IndexVectorType& Y )

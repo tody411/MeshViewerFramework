@@ -13,7 +13,10 @@
 
 #include "PrimitiveFitting.h"
 #include "KMeans.h"
+#include "IsolatedCluster.h"
+#include "RemoveSmallClusters.h"
 #include "NormalColor.h"
+#include "EigenUtil.h"
 
 void NormalKmeansCommand::setupImp()
 {
@@ -78,7 +81,16 @@ void NormalKmeansCommand::doAll()
 
     Eigen::VectorXi clusterIDs = kmeans.clusterIDs();
 
-    smoothingWeights ( _postfilterWeight.value(), clusterIDs );
+    IsolatedCluster isolatedCluster ( _scene->mesh()->openMeshData() );
+    isolatedCluster.compute ( clusterIDs );
+
+    Eigen::VectorXd Area_f;
+    mesh->Area_f ( Area_f );
+    RemoveSmallClusters removeSmallClusters ( clusterIDs, Area_f, _M );
+    clusterIDs = removeSmallClusters.clusterIDs();
+    isolatedCluster.compute ( clusterIDs );
+
+    //smoothingWeights ( _postfilterWeight.value(), clusterIDs );
 
     std::vector<int> faceLabels ( clusterIDs.size() );
 
