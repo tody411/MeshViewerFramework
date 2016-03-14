@@ -86,8 +86,8 @@ void NormalKmeansCommand::doAll()
 
     Eigen::VectorXd Area_f;
     mesh->Area_f ( Area_f );
-    RemoveSmallClusters removeSmallClusters ( clusterIDs, Area_f, _M );
-    clusterIDs = removeSmallClusters.clusterIDs();
+    //RemoveSmallClusters removeSmallClusters ( clusterIDs, Area_f, _M );
+    //clusterIDs = removeSmallClusters.clusterIDs();
     isolatedCluster.compute ( clusterIDs );
 
     //smoothingWeights ( _postfilterWeight.value(), clusterIDs );

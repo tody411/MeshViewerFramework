@@ -19,7 +19,7 @@ class GreedyFlooding
 public :
     //! Constructor.
     GreedyFlooding ( Mesh* mesh )
-        : _mesh ( mesh ), _tol ( 0.1 ), _maxClusterSize ( 50 )
+        : _mesh ( mesh ), _tol ( 0.1 ), _maxClusterSize ( 200 )
     {}
 
     //! Destructor.

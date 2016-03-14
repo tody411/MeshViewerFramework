@@ -15,7 +15,7 @@ void KHarmonicFieldCommand::setupImp()
     Mesh* mesh = _scene->mesh();
 
     Eigen::SparseMatrix<double> L;
-    mesh->faceLaplacian ( L, 0.05, 1.0,  0.5 );
+    mesh->faceLaplacian ( L, 1.0, 1.0,  0.5 );
 
     _M = L.transpose() * L;
 }

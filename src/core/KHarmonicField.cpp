@@ -14,18 +14,18 @@
 void KHarmonicField::compute()
 {
     std::vector<int> seedFaces;
-    seedFaces.push_back ( 0 );
+    /*seedFaces.push_back ( 0 );
 
     while ( seedFaces.size() < _numCenters )
     {
         optimizeWithIncremental ( seedFaces );
-    }
-    /*computeRandomCenters ( _numCenters, seedFaces );
+    }*/
+    computeRandomCenters ( _numCenters, seedFaces );
 
-    for ( int i = 0; i < 5; i++ )
+    for ( int i = 0; i < 20; i++ )
     {
         optimize ( seedFaces );
-    }*/
+    }
     updateClusterIDs ();
 }
 

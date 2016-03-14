@@ -129,7 +129,8 @@ void LabelData::gl()
     float epsilon = 1e-5;
 
     Eigen::MatrixXd C;
-    ColorMap::IDColors ( numLabels(), C );
+    int numColors = std::min ( 50, numLabels() );
+    ColorMap::IDColors ( numColors, C );
 
     glDisable ( GL_LIGHTING );
     glEnable ( GL_DEPTH_TEST );
@@ -150,7 +151,9 @@ void LabelData::gl()
 
         double w = _faceLabelConfidents[fi];
 
-        glColor4f ( C ( label, 0 ), C ( label, 1 ), C ( label, 2 ), 0.5f + 0.3f * w );
+        int colorID = label % numColors;
+
+        glColor4f ( C ( colorID, 0 ), C ( colorID, 1 ), C ( colorID, 2 ), 0.5f + 0.3f * w );
 
         for ( int vi = 0; vi < 3; vi++ )
         {
