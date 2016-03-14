@@ -45,6 +45,12 @@ void GreedyFlooding::flood ( Eigen::VectorXi& clusterIDs )
         floodSeed ( seedFaceID, clusterID, clusterIDs );
 
         doneFlood = !findSeed ( clusterIDs, seedFaceID );
+        clusterID += 1;
+
+        if ( clusterID > _maxClusterSize )
+        {
+            clusterID = _maxClusterSize;
+        }
     }
 }
 
