@@ -23,6 +23,7 @@
 #include "NormalizeMeshCommand.h"
 
 #include "NormalKmeansCommand.h"
+#include "KHarmonicFieldCommand.h"
 #include "GreedyFloodingCommand.h"
 #include "FindExtremePoiintsCommand.h"
 #include "BiharmonicNormalClusteringCommand.h"
