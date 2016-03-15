@@ -18,7 +18,7 @@ public :
     //! Constructor.
     NormalKmeansCommand ( Scene* scene )
         :  BaseCommand ( "Normal Kmeans", scene ),
-           _numCenters ( "numCenters", 2, 20, 6 ),
+           _numCenters ( "numCenters", 2, 50, 6 ),
            _withPosition ( "withPosition", false ),
            _prefilterNormal ( "prefilterNormal", 0.0, 10.0, 1.0 ),
            _postfilterWeight ( "postfilterWeight", 0.0, 10.0, 1.0 )

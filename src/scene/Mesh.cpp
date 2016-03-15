@@ -45,8 +45,6 @@ bool Mesh::loadMesh ( const QString& filePath )
         return false;
     }
 
-    cleanIsolatedFaces ( mesh );
-
     mesh.update_normals();
 
     if ( !mesh.is_trimesh() )
@@ -70,6 +68,8 @@ bool Mesh::loadMesh ( const QString& filePath )
     updateBoundingBox();
 
     computeIndices();
+
+    cleanIsolatedFaces ( _mesh );
 
     _UVs = Eigen::MatrixXd();
     _UVIDs = Eigen::MatrixXi();
@@ -688,11 +688,17 @@ void Mesh::cleanIsolatedFaces ( MeshData& mesh )
         {
             std::cout << "Isolated: face " << f_it->idx() << std::endl;
 
+            for ( int fvi = 0; fvi < 3; fvi++ )
+            {
+                _A_fv ( f_it->idx(), fvi ) =  v_hs[fvi].idx();
+            }
+
+
             //mesh.delete_face ( *f_it );
 
             //mesh.add_face ( v_hs[1], v_hs[2], v_hs[0] );
         }
     }
 
-    mesh.garbage_collection();
+    //mesh.garbage_collection();
 }
