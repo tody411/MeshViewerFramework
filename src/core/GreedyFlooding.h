@@ -19,7 +19,7 @@ class GreedyFlooding
 public :
     //! Constructor.
     GreedyFlooding ( Mesh* mesh )
-        : _mesh ( mesh ), _tol ( 0.1 ), _maxClusterSize ( 200 )
+        : _mesh ( mesh ), _tol ( 0.1 ), _maxClusterSize ( 4000 )
     {}
 
     //! Destructor.
@@ -28,6 +28,10 @@ public :
     //! Set Tolerance.
     void setTolerance ( double tol ) { _tol = tol;}
 
+
+    //! Set FaceNormal.
+    void setFaceNormal ( const Eigen::MatrixXd& N ) { _N = N;}
+
     void flood ( Eigen::VectorXi& clusterIDs );
 
     void floodSeed ( int seedFaceID, int clusterID,  Eigen::VectorXi& clusterIDs );
@@ -35,6 +39,9 @@ public :
 private:
     double _tol;
     int     _maxClusterSize;
+
+    Eigen::MatrixXd _N;
+
     Mesh* _mesh;
 };
 

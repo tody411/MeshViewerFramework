@@ -27,10 +27,11 @@ void SceneInfoOverlay::renderPainterImp ( QPainter* painter )
 
     BoundingBox bb = _scene->boundingBox();
 
+
     text += QString ( "  Num Vertices  : %1\n" ).arg ( mesh->numVertices() );
     text += QString ( "  Num Edges     : %1\n" ).arg ( mesh->numEdges() );
     text += QString ( "  Num Faces     : %1\n" ).arg ( mesh->numFaces() );
-    text += QString ( "  Num UVs       : %1\n" ).arg ( mesh->numUVs() );
+    text += QString ( "  Num Clusters  : %1\n" ).arg ( _scene->labelData()->numLabels() );
 
     painter->drawText ( QRectF ( x, y, text_width, text_height ), text );
 

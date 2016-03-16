@@ -91,13 +91,16 @@ void GreedyFlooding::floodSeed ( int seedFaceID, int clusterID, Eigen::VectorXi&
     MeshData::FaceIter f_it, f_end ( openMesh->faces_end() );
     MeshData::FaceFaceIter ff_it;
 
-    Eigen::MatrixXd N;
     Eigen::VectorXd Area_f;
 
     _mesh->Area_f ( Area_f );
-    _mesh->faceNormals ( N );
 
-    Eigen::Vector3d N_c = N.row ( seedFaceID );
+    if ( _N.size() == 0 )
+    {
+        _mesh->faceNormals ( _N );
+    }
+
+    Eigen::Vector3d N_c = _N.row ( seedFaceID );
     double A_c = 0.0;
 
     while ( !face_queue.empty() )
@@ -110,7 +113,7 @@ void GreedyFlooding::floodSeed ( int seedFaceID, int clusterID, Eigen::VectorXi&
         {
             clusterIDs[faceID] = clusterID;
 
-            Eigen::Vector3d N_fi = N.row ( faceID );
+            Eigen::Vector3d N_fi = _N.row ( faceID );
             double A_fi = Area_f ( faceID );
 
             A_c += A_fi;
@@ -127,7 +130,7 @@ void GreedyFlooding::floodSeed ( int seedFaceID, int clusterID, Eigen::VectorXi&
 
                 if ( clusterIDs[ffID] == -1 )
                 {
-                    Eigen::Vector3d N_ffi = N.row ( ffID );
+                    Eigen::Vector3d N_ffi = _N.row ( ffID );
                     double A_ffi =  Area_f ( ffID );
 
                     double error = ( N_ffi - N_c ).norm();
