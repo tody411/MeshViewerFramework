@@ -82,6 +82,7 @@ void MainWindow::createMenue()
     MenuGroup* clusteringMenus = new MenuGroup ( tr ( "&Clustering" ), this, _toolDock );
     clusteringMenus->addCommand ( new NormalKmeansCommand ( _scene ) );
     clusteringMenus->addCommand ( new KHarmonicFieldCommand ( _scene ) );
+    clusteringMenus->addCommand ( new KRegionFloodingCommand ( _scene ) );
     clusteringMenus->addCommand ( new GreedyFloodingCommand ( _scene ) );
     clusteringMenus->addCommand ( new FindExtremePoiintsCommand ( _scene ) );
     clusteringMenus->addCommand ( new BiharmonicNormalClusteringCommand ( _scene ) );

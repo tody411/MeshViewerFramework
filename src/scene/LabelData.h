@@ -10,6 +10,8 @@
 #define LABELDATA_H
 
 #include "SceneObject.h"
+
+#include <Eigen/Dense>
 #include <vector>
 
 //! LabelData implementation.
@@ -35,6 +37,8 @@ public :
     int numLabels();
 
     void setFaceLabelData ( const std::vector<int>& faceLabels );
+
+    void setFaceLabelData ( const Eigen::VectorXi& faceLabels );
 
     void setFaceLabelData ( const std::vector<int>& indices, int label );
 

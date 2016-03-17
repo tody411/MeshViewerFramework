@@ -26,12 +26,5 @@ void KHarmonicFieldCommand::doImp ()
 
     Eigen::VectorXi clusterIDs = harmonicField.clusterIDs();
 
-    std::vector<int> faceLabels ( clusterIDs.size() );
-
-    for ( int fi = 0; fi < clusterIDs.size(); fi++ )
-    {
-        faceLabels[fi] = clusterIDs ( fi );
-    }
-
-    _scene->labelData()->setFaceLabelData ( faceLabels );
+    _scene->labelData()->setFaceLabelData ( clusterIDs );
 }

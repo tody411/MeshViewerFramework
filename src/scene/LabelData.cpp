@@ -58,6 +58,15 @@ void LabelData::setFaceLabelData ( const std::vector<int>& faceLabels )
     emit updated();
 }
 
+void LabelData::setFaceLabelData ( const Eigen::VectorXi& faceLabels )
+{
+    for ( int i = 0; i < faceLabels.size(); i++ )
+    {
+        _faceLabels[i] = faceLabels[i];
+    }
+    emit updated();
+}
+
 void LabelData::setFaceLabelData ( const std::vector<int>& indices, int label )
 {
     for each ( int index in indices )

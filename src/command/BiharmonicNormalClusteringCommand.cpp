@@ -100,49 +100,21 @@ void BiharmonicNormalClusteringCommand::doImp ()
     for ( int i = 0; i < W.rows(); i++ )
     {
         int maxID = LabelData::UNLABELED;
-        double w_max = 0.0;
-        for ( int j = 0; j < W.cols(); j++ )
-        {
-            if ( W ( i, j ) > w_max )
-            {
-                w_max = W ( i, j );
-                maxID = j;
-            }
-        }
+        W.row ( i ).maxCoeff ( &maxID );
+        /* double w_max = 0.0;
+         for ( int j = 0; j < W.cols(); j++ )
+         {
+             if ( W ( i, j ) > w_max )
+             {
+                 w_max = W ( i, j );
+                 maxID = j;
+             }
+         }*/
 
         faceLabels[i] = maxID;
     }
 
     labelData->setFaceLabelData ( faceLabels );
-
-    Eigen::MatrixXd C ( _scene->mesh()->numFaces(), 3 );
-
-    Eigen::MatrixXd Cid;
-    ColorMap::IDColors ( W.cols(), Cid );
-
-    if ( _showSmoothColor.value() )
-    {
-        C = W * Cid;
-    }
-
-    else
-    {
-        for ( int i = 0; i < W.rows(); i++ )
-        {
-            int maxID = 0;
-            double w_max = 0.0;
-            for ( int j = 0; j < W.cols(); j++ )
-            {
-                if ( W ( i, j ) > w_max )
-                {
-                    w_max = W ( i, j );
-                    maxID = j;
-                }
-            }
-
-            C.row ( i ) = Cid.row ( maxID );
-        }
-    }
 }
 
 void BiharmonicNormalClusteringCommand::computeWeightConstraint ( Eigen::SparseMatrix<double>& A, Eigen::MatrixXd& b )

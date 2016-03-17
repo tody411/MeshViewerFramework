@@ -11,6 +11,7 @@
 #include "GreedyFlooding.h"
 #include "IsolatedCluster.h"
 #include "RemoveSmallClusters.h"
+#include "KRegionFlooding.h"
 
 #include <iostream>
 
@@ -48,26 +49,24 @@ void GreedyFloodingCommand::doImp ()
 
     flooding.flood ( clusterIDs );
 
-    /*Eigen::VectorXd Area_f;
+    Eigen::VectorXd Area_f;
     mesh->Area_f ( Area_f );
     RemoveSmallClusters removeSmallClusters ( clusterIDs, Area_f, _M );
     clusterIDs = removeSmallClusters.clusterIDs();
 
+    KRegionFlooding kregionFlooding ( _scene->mesh(), clusterIDs.maxCoeff() + 1 );
+
+    for ( int i = 0; i < 10; i++ )
+    {
+        kregionFlooding.flood ( clusterIDs );
+    }
+
     IsolatedCluster isolatedCluster ( _scene->mesh()->openMeshData() );
-    isolatedCluster.compute ( clusterIDs );*/
+    isolatedCluster.compute ( clusterIDs );
 
     //smoothingWeights ( 10.0, clusterIDs );
 
-    std::vector<int> faceLabels ( clusterIDs.size() );
-
-
-
-    for ( int fi = 0; fi < clusterIDs.size(); fi++ )
-    {
-        faceLabels[fi] = clusterIDs ( fi );
-    }
-
-    _scene->labelData()->setFaceLabelData ( faceLabels );
+    _scene->labelData()->setFaceLabelData ( clusterIDs );
 }
 
 

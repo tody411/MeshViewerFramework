@@ -77,7 +77,7 @@ void RemoveSmallClusters::removeSmallClusters ( const Eigen::VectorXd& Area_c )
 
     for ( int ci = 0; ci < Area_c.size(); ci++ )
     {
-        if ( Area_c[ci] < 0.005 * area_sum )
+        if ( Area_c[ci] < 0.001 * area_sum )
         {
             removed[ci] = true;
         }

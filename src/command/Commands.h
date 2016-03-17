@@ -24,6 +24,7 @@
 
 #include "NormalKmeansCommand.h"
 #include "KHarmonicFieldCommand.h"
+#include "KRegionFloodingCommand.h"
 #include "GreedyFloodingCommand.h"
 #include "FindExtremePoiintsCommand.h"
 #include "BiharmonicNormalClusteringCommand.h"

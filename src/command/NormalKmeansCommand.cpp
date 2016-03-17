@@ -16,6 +16,7 @@
 #include "IsolatedCluster.h"
 #include "RemoveSmallClusters.h"
 #include "NormalColor.h"
+#include "SuperFaces.h"
 #include "EigenUtil.h"
 
 void NormalKmeansCommand::setupImp()
@@ -81,25 +82,22 @@ void NormalKmeansCommand::doAll()
 
     Eigen::VectorXi clusterIDs = kmeans.clusterIDs();
 
-    IsolatedCluster isolatedCluster ( _scene->mesh()->openMeshData() );
-    isolatedCluster.compute ( clusterIDs );
+    /*SuperFaces superFaces;
+    superFaces.compute ( N );
+    Eigen::VectorXi clusterIDs = superFaces.clusterIDs();*/
 
-    Eigen::VectorXd Area_f;
-    mesh->Area_f ( Area_f );
-    //RemoveSmallClusters removeSmallClusters ( clusterIDs, Area_f, _M );
-    //clusterIDs = removeSmallClusters.clusterIDs();
-    isolatedCluster.compute ( clusterIDs );
+    //IsolatedCluster isolatedCluster ( _scene->mesh()->openMeshData() );
+    //isolatedCluster.compute ( clusterIDs );
+
+    //Eigen::VectorXd Area_f;
+    //mesh->Area_f ( Area_f );
+    ////RemoveSmallClusters removeSmallClusters ( clusterIDs, Area_f, _M );
+    ////clusterIDs = removeSmallClusters.clusterIDs();
+    //isolatedCluster.compute ( clusterIDs );
 
     //smoothingWeights ( _postfilterWeight.value(), clusterIDs );
 
-    std::vector<int> faceLabels ( clusterIDs.size() );
-
-    for ( int fi = 0; fi < clusterIDs.size(); fi++ )
-    {
-        faceLabels[fi] = clusterIDs ( fi );
-    }
-
-    _scene->labelData()->setFaceLabelData ( faceLabels );
+    _scene->labelData()->setFaceLabelData ( clusterIDs );
 }
 
 void NormalKmeansCommand::doSelectedLabel()
