@@ -13,6 +13,7 @@
 
 void KRegionFloodingCommand::setupImp()
 {
+    smoothing.setMesh ( _scene->mesh() );
 }
 
 void KRegionFloodingCommand::doImp ()
@@ -30,6 +31,9 @@ void KRegionFloodingCommand::doImp ()
     {
         regionFlooding.flood ( clusterIDs );
     }
+
+    smoothing.setLambda ( _postFileter.value() );
+    smoothing.smoothingClusters ( clusterIDs );
 
     _scene->labelData()->setFaceLabelData ( clusterIDs );
 }

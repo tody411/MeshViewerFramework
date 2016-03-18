@@ -65,7 +65,7 @@ void KRegionFlooding::flood ( Eigen::VectorXi& clusterIDs )
     std::cout << "updateCenters" << std::endl;
 
     Eigen::VectorXi seedFaces;
-    normalClustering.centerSamples ( _N_c, _N_f, seedFaces );
+    computeSeedFaces ( _N_c, _N_f, clusterIDs, seedFaces );
 
     std::cout << "centerSamples" << std::endl;
 
@@ -91,10 +91,12 @@ void KRegionFlooding::flood ( Eigen::VectorXi& clusterIDs )
 
     for ( int ci = 0; ci < seedFaces.size(); ci++ )
     {
+        if ( seedFaces[ci] == -1 ) continue;
+
         face_queue.push ( KRegionFloodingQueData ( 0.0, seedFaces[ci], ci ) );
     }
 
-    _N_c = Eigen::MatrixXd::Zero ( _N_c.rows(), 3 );
+    //_N_c = Eigen::MatrixXd::Zero ( _N_c.rows(), 3 );
 
     while ( !face_queue.empty() )
     {
@@ -118,7 +120,7 @@ void KRegionFlooding::flood ( Eigen::VectorXi& clusterIDs )
             N_ci = ( 1.0 - t ) * N_ci + t * N_fi;
             N_ci.normalize();
 
-            _N_c.row ( clusterID ) = N_ci;
+            //_N_c.row ( clusterID ) = N_ci;
 
             for ( ff_it = openMesh->ff_begin ( MeshData::FaceHandle ( faceID ) ); ff_it.is_valid(); ++ff_it )
             {
@@ -155,4 +157,37 @@ const Eigen::VectorXi KRegionFlooding::randomIDs ( int numSamples, int numLabels
         clusterIDs[i] = randomID ( mt );
     }
     return clusterIDs;
+}
+
+void KRegionFlooding::computeSeedFaces ( const Eigen::MatrixXd& N_c, const Eigen::MatrixXd& N_f,
+        const  Eigen::VectorXi& clusterIDs, Eigen::VectorXi& seedFaces )
+{
+    seedFaces.resize ( N_c.rows() );
+
+    for ( int ci = 0; ci < seedFaces.size(); ci++ )
+    {
+        seedFaces[ci] = -1;
+    }
+
+    for ( int fi = 0; fi < clusterIDs.size(); fi++ )
+    {
+        int clusterID = clusterIDs[fi];
+
+        if ( clusterID == -1 ) continue;
+
+        if ( seedFaces[clusterID] == -1 )
+        {
+            seedFaces[clusterID] = fi;
+            continue;
+        }
+
+        Eigen::Vector3d N_fi = N_f.row ( fi );
+        Eigen::Vector3d N_fs = N_f.row ( seedFaces[clusterID] );
+        Eigen::Vector3d N_ci = N_c.row ( clusterID );
+
+        if ( N_fs.dot ( N_ci ) < N_fi.dot ( N_ci ) )
+        {
+            seedFaces[clusterID] = fi;
+        }
+    }
 }

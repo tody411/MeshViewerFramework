@@ -28,14 +28,6 @@ public :
 
     void centerSamples ( const Eigen::MatrixXd& N_c, const Eigen::MatrixXd& N_l, Eigen::VectorXi& sampleIDs );
 
-private:
-
-// inputs.
-
-
-// outputs.
-
-
 
 };
 

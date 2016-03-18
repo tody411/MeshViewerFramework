@@ -31,6 +31,8 @@ public :
 private:
     const Eigen::VectorXi randomIDs ( int numSamples, int numLabels );
 
+    void computeSeedFaces ( const Eigen::MatrixXd& N_c, const Eigen::MatrixXd& N_f, const  Eigen::VectorXi& clusterIDs, Eigen::VectorXi& seedFaces );
+
 private:
     Mesh* _mesh;
 

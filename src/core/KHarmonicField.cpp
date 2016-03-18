@@ -22,7 +22,7 @@ void KHarmonicField::compute()
     }*/
     computeRandomCenters ( _numCenters, seedFaces );
 
-    for ( int i = 0; i < 20; i++ )
+    for ( int i = 0; i < 2; i++ )
     {
         optimize ( seedFaces );
     }
