@@ -14,6 +14,11 @@ void BiharmonicSmoothing::setMesh ( Mesh* mesh )
 {
     Eigen::SparseMatrix<double> L;
     mesh->faceLaplacian ( L, _w_u, _w_a, _sigma );
+    setLaplacianMatrix ( L );
+}
+
+void BiharmonicSmoothing::setLaplacianMatrix ( const Eigen::SparseMatrix<double>& L )
+{
     _M = L.transpose() * L;
 }
 

@@ -18,11 +18,9 @@ public :
     //! Constructor.
     KHarmonicFieldCommand ( Scene* scene )
         :  BaseCommand ( "K-Harmonic Field", scene ),
-           _numCenters ( "numCenters", 2, 50, 6 ),
-           _prefilterNormal ( "prefilterNormal", 0.0, 10.0, 1.0 )
+           _numCenters ( "numCenters", 2, 50, 6 )
     {
         _params.addInt ( &_numCenters );
-        _params.addDouble ( &_prefilterNormal );
     }
 
     //! Destructor.
@@ -34,7 +32,6 @@ public :
 
 private:
     IntParameter _numCenters;
-    DoubleParameter _prefilterNormal;
 
     Eigen::SparseMatrix<double> _M;
 

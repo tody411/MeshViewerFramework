@@ -22,6 +22,13 @@ namespace ListUtil
             list[i] = data;
         }
     }
+
+    template<typename DataType>
+    void copy ( const std::vector<DataType> src, std::vector<DataType>& dst )
+    {
+        dst.resize ( src.size() );
+        copy ( src.begin(), src.end(), dst.begin() );
+    }
 };
 
 #endif

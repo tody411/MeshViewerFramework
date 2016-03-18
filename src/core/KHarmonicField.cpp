@@ -8,19 +8,19 @@
 
 #include "KHarmonicField.h"
 
+#include "NormalClustering.h"
+
 #include <random>
 #include <iostream>
 
 void KHarmonicField::compute()
 {
     std::vector<int> seedFaces;
-    /*seedFaces.push_back ( 0 );
 
-    while ( seedFaces.size() < _numCenters )
-    {
-        optimizeWithIncremental ( seedFaces );
-    }*/
     computeRandomCenters ( _numCenters, seedFaces );
+
+    NormalClustering normalClustering;
+    normalClustering.updateCenters ( _N_f, _clusterIDs, _N_c );
 
     for ( int i = 0; i < 2; i++ )
     {

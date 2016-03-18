@@ -106,6 +106,16 @@ void LabelData::faceLabelData ( std::vector<int>& faceLabels ) const
     std::copy ( _faceLabels.begin(), _faceLabels.end(), std::back_inserter ( faceLabels ) );
 }
 
+void LabelData::faceLabelData ( Eigen::VectorXi& faceLabels ) const
+{
+    faceLabels.resize ( _faceLabels.size() );
+
+    for ( int i = 0; i < _faceLabels.size(); i++ )
+    {
+        faceLabels[i] = _faceLabels[i];
+    }
+}
+
 void LabelData::labelShell ( int label,  std::vector<int>& shellFaces ) const
 {
     for ( int fi = 0; fi < _faceLabels.size(); fi++ )

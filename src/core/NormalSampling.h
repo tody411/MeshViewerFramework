@@ -32,8 +32,6 @@ public :
 private:
     const Eigen::MatrixXd randomNormals ( int numSamples );
 
-    const Eigen::VectorXi randomIDs ( int numSamples, int numLabels );
-
 private:
     int _numSamples;
     int _numLearnSamples;

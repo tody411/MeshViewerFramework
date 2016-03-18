@@ -27,10 +27,21 @@ public :
     virtual ~BiharmonicSmoothing() {}
 
 
+    //! Set HarmonicDistanceWeight.
+    void setHarmonicDistanceWeight ( double w_u, double w_a, double sigma )
+    {
+        _w_u = w_u;
+        _w_a = w_a;
+        _sigma = sigma;
+    }
+
+
     //! Set Lambda.
     void setLambda ( double lambda ) { _lambda = lambda;}
 
     void setMesh ( Mesh* mesh );
+
+    void setLaplacianMatrix ( const Eigen::SparseMatrix<double>& L );
 
     void setConstraints ( const Eigen::MatrixXd& b_cons );
 

@@ -9,6 +9,7 @@
 #include "KRegionFlooding.h"
 
 #include "NormalClustering.h"
+#include "Random.h"
 
 #include <queue>
 #include <random>
@@ -52,22 +53,14 @@ void KRegionFlooding::flood ( Eigen::VectorXi& clusterIDs )
 {
     if ( clusterIDs.size() == 0 )
     {
-        clusterIDs = randomIDs ( _N_f.rows(), _numCenters );
+        Random::randint ( _N_f.rows(), clusterIDs, 0, _numCenters - 1 );
     }
-
-    std::cout << "clusterIDs.size" << clusterIDs.size() << std::endl;
-    std::cout << "clusterIDs.minCoeff" << clusterIDs.minCoeff() << std::endl;
-    std::cout << "clusterIDs.maxCoeff" << clusterIDs.maxCoeff() << std::endl;
 
     NormalClustering normalClustering;
     normalClustering.updateCenters ( _N_f, clusterIDs, _N_c );
 
-    std::cout << "updateCenters" << std::endl;
-
     Eigen::VectorXi seedFaces;
     computeSeedFaces ( _N_c, _N_f, clusterIDs, seedFaces );
-
-    std::cout << "centerSamples" << std::endl;
 
     Eigen::VectorXd Area_f;
     _mesh->Area_f ( Area_f );
@@ -80,9 +73,21 @@ void KRegionFlooding::flood ( Eigen::VectorXi& clusterIDs )
     Eigen::VectorXd A_c = Eigen::VectorXd::Zero ( _N_c.rows() );
     Eigen::VectorXd E_c = Eigen::VectorXd::Zero ( _N_c.rows() );
 
-    for ( int fi = 0; fi < clusterIDs.size(); fi++ )
+    if ( _targetFaces.empty() )
     {
-        clusterIDs[fi] = -1;
+        for ( int fi = 0; fi < clusterIDs.size(); fi++ )
+        {
+            clusterIDs[fi] = -1;
+        }
+    }
+
+    else
+    {
+        for ( int tfi = 0; tfi < _targetFaces.size(); tfi++ )
+        {
+            int fi = _targetFaces[tfi];
+            clusterIDs[fi] = -1;
+        }
     }
 
     bool doneFlood = false;
@@ -141,22 +146,6 @@ void KRegionFlooding::flood ( Eigen::VectorXi& clusterIDs )
             }
         }
     }
-}
-
-const Eigen::VectorXi KRegionFlooding::randomIDs ( int numSamples, int numLabels )
-{
-    Eigen::VectorXi clusterIDs ( numSamples );
-
-    std::random_device rd;
-    std::mt19937 mt ( rd() );
-
-    std::uniform_int_distribution<int> randomID ( 0, numLabels - 1 );
-
-    for ( int i = 0; i < numSamples; i++ )
-    {
-        clusterIDs[i] = randomID ( mt );
-    }
-    return clusterIDs;
 }
 
 void KRegionFlooding::computeSeedFaces ( const Eigen::MatrixXd& N_c, const Eigen::MatrixXd& N_f,

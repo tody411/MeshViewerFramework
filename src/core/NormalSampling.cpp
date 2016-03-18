@@ -9,6 +9,8 @@
 #include "NormalSampling.h"
 #include "NormalClustering.h"
 
+#include "Random.h"
+
 #include <random>
 
 const Eigen::MatrixXd NormalSampling::samples ()
@@ -16,7 +18,8 @@ const Eigen::MatrixXd NormalSampling::samples ()
     Eigen::MatrixXd N_c ( _numSamples, 3 );
 
     Eigen::MatrixXd N_l = randomNormals ( _numLearnSamples );
-    Eigen::VectorXi clusterIDs = randomIDs ( _numLearnSamples, _numSamples );
+    Eigen::VectorXi clusterIDs;
+    Random::randint ( _numLearnSamples, clusterIDs, _numSamples - 1 );
 
     NormalClustering normalClustering;
 
@@ -34,35 +37,8 @@ const Eigen::MatrixXd NormalSampling::samples ()
 const Eigen::MatrixXd NormalSampling::randomNormals ( int numSamples )
 {
     Eigen::MatrixXd N ( numSamples, 3 );
-
-    std::random_device rd;
-    std::mt19937 mt ( rd() );
-    std::uniform_real_distribution<double> randomNormal ( -1.0, 1.0 );
-
-    for ( int i = 0; i < numSamples; i++ )
-    {
-        for ( int j = 0; j < 3; j++ )
-        {
-            N ( i, j ) = randomNormal ( mt );
-        }
-    }
+    Random::rand ( numSamples, 3, N, -1.0, 1.0 );
 
     N.rowwise().normalize();
     return N;
-}
-
-const Eigen::VectorXi NormalSampling::randomIDs (  int numSamples, int numLabels )
-{
-    Eigen::VectorXi clusterIDs ( numSamples );
-
-    std::random_device rd;
-    std::mt19937 mt ( rd() );
-
-    std::uniform_int_distribution<int> randomID ( 0, numLabels - 1 );
-
-    for ( int i = 0; i < numSamples; i++ )
-    {
-        clusterIDs[i] = randomID ( mt );
-    }
-    return clusterIDs;
 }

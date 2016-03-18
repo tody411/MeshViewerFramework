@@ -39,12 +39,19 @@ public :
     void doImp ();
 
 private:
+    void doSelection();
+
+    void doAll();
+
+private:
     IntParameter _numCenters;
     IntParameter _numIterations;
     DoubleParameter _norm;
     DoubleParameter _postFileter;
 
     BiharmonicSmoothing smoothing;
+
+    Eigen::MatrixXd _N_f;
 };
 
 #endif

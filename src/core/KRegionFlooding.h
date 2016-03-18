@@ -11,6 +11,7 @@
 
 #include "Eigen/Dense"
 #include "Mesh.h"
+#include "ListUtil.h"
 
 //! KRegionFlooding implementation.
 class KRegionFlooding
@@ -26,11 +27,19 @@ public :
     //! Set Norm.
     void setNorm ( double norm ) { _norm = norm;}
 
+    //! Set FaceNormals.
+    void setFaceNormals ( const Eigen::MatrixXd& N_f ) { _N_f = N_f;}
+
+
+    //! Set TargetFaces.
+    void setTargetFaces ( const std::vector<int>& targetFaces )
+    {
+        ListUtil::copy ( targetFaces, _targetFaces );
+    }
+
     void flood ( Eigen::VectorXi& clusterIDs );
 
 private:
-    const Eigen::VectorXi randomIDs ( int numSamples, int numLabels );
-
     void computeSeedFaces ( const Eigen::MatrixXd& N_c, const Eigen::MatrixXd& N_f, const  Eigen::VectorXi& clusterIDs, Eigen::VectorXi& seedFaces );
 
 private:
@@ -43,6 +52,8 @@ private:
     Eigen::MatrixXd _N_c;
 
     double _norm;
+
+    std::vector<int> _targetFaces;
 };
 
 #endif

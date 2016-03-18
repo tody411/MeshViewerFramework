@@ -27,6 +27,11 @@ public :
     //! Destructor.
     virtual ~KHarmonicField() {}
 
+
+    //! Set FaceNormals.
+    void setFaceNormals ( const  Eigen::MatrixXd& N_f ) { _N_f = N_f;}
+
+
     //! Out clusterIDs.
     const Eigen::VectorXi clusterIDs() const { return _clusterIDs;}
 
@@ -54,6 +59,9 @@ private:
 
     //! Cluster ids.
     Eigen::VectorXi _clusterIDs;
+
+    Eigen::MatrixXd _N_f;
+    Eigen::MatrixXd _N_c;
 
     Eigen::SparseMatrix<double> _M;
     Eigen::MatrixXd _W;

@@ -86,8 +86,8 @@ void NormalKmeansCommand::doAll()
     superFaces.compute ( N );
     Eigen::VectorXi clusterIDs = superFaces.clusterIDs();*/
 
-    //IsolatedCluster isolatedCluster ( _scene->mesh()->openMeshData() );
-    //isolatedCluster.compute ( clusterIDs );
+    IsolatedCluster isolatedCluster ( _scene->mesh()->openMeshData() );
+    isolatedCluster.compute ( clusterIDs );
 
     //Eigen::VectorXd Area_f;
     //mesh->Area_f ( Area_f );
