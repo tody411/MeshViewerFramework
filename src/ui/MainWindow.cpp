@@ -81,17 +81,17 @@ void MainWindow::createMenue()
 
     MenuGroup* clusteringMenus = new MenuGroup ( tr ( "&Clustering" ), this, _toolDock );
     clusteringMenus->addCommand ( new NormalKmeansCommand ( _scene ) );
-    clusteringMenus->addCommand ( new KHarmonicFieldCommand ( _scene ) );
+    //clusteringMenus->addCommand ( new KHarmonicFieldCommand ( _scene ) );
     clusteringMenus->addCommand ( new KRegionFloodingCommand ( _scene ) );
-    clusteringMenus->addCommand ( new GreedyFloodingCommand ( _scene ) );
-    clusteringMenus->addCommand ( new FindExtremePoiintsCommand ( _scene ) );
+    //clusteringMenus->addCommand ( new GreedyFloodingCommand ( _scene ) );
+    //clusteringMenus->addCommand ( new FindExtremePoiintsCommand ( _scene ) );
     clusteringMenus->addCommand ( new BiharmonicNormalClusteringCommand ( _scene ) );
-    clusteringMenus->addCommand ( new SpectralClusteringCommand ( _scene ) );
+    //clusteringMenus->addCommand ( new SpectralClusteringCommand ( _scene ) );
     menuBar()->addMenu ( clusteringMenus );
 
     MenuGroup* textureMenus = new MenuGroup ( tr ( "&Texture" ), this, _toolDock );
     textureMenus->addCommand ( new PlanarMappingCommand ( _scene ) );
-    textureMenus->addCommand ( new UnfoldCommand ( _scene ) );
+    //textureMenus->addCommand ( new UnfoldCommand ( _scene ) );
 
     menuBar()->addMenu ( textureMenus );
 

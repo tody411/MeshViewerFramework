@@ -19,7 +19,7 @@ class KRegionFloodingCommand: public BaseCommand
 public :
     //! Constructor.
     KRegionFloodingCommand ( Scene* scene )
-        :  BaseCommand ( "K-Region Flooding", scene ),
+        :  BaseCommand ( "K-Region Growing", scene ),
            _numCenters ( "numCenters", 2, 500, 50 ),
            _numIterations ( "numIterations", 1, 500, 10 ),
            _norm ( "norm", 0.0, 50.0, 2.0 ),
